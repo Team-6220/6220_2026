@@ -25,6 +25,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
 import edu.wpi.first.wpilibj.smartdashboard.*;
+import frc.robot.config.RobotConfig;
 
 // import edu.wpi.first.math.kinematics.SwerveModuleState;
 
@@ -128,13 +129,13 @@ public class SwerveModule {
   private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
     SmartDashboard.putBoolean("mod" + moduleNumber + "isopenloop", isOpenLoop);
     if (isOpenLoop) {
-      driveDutyCycle.Output = desiredState.speedMetersPerSecond / SwerveConstants.maxSpeed;
+      driveDutyCycle.Output = desiredState.speedMetersPerSecond / RobotConfig.SWERVECONFIG.maxSpeed();
       mDriveMotor.setControl(driveDutyCycle);
       SmartDashboard.putNumber("Mod " + moduleNumber + "drivedutycycle", driveDutyCycle.Output);
     } else {
       driveVelocity.Velocity =
           Conversions.MPSToRPS(
-              desiredState.speedMetersPerSecond, SwerveConstants.wheelCircumference);
+              desiredState.speedMetersPerSecond, RobotConfig.SWERVECONFIG.wheelCircumference());
       driveVelocity.FeedForward = driveFeedForward.calculate(desiredState.speedMetersPerSecond);
       mDriveMotor.setControl(driveVelocity);
     }
@@ -159,7 +160,7 @@ public class SwerveModule {
   public SwerveModuleState getState() {
     return new SwerveModuleState(
         Conversions.RPSToMPS(
-            mDriveMotor.getVelocity().getValueAsDouble(), SwerveConstants.wheelCircumference),
+            mDriveMotor.getVelocity().getValueAsDouble(), RobotConfig.SWERVECONFIG.wheelCircumference()),
         Rotation2d.fromRotations(
             RevConfigs.NeoEncoderAngleToCANCoder(mNeoAngleEncoder.getPosition())));
   }
@@ -167,7 +168,7 @@ public class SwerveModule {
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(
         Conversions.rotationsToMeters(
-            mDriveMotor.getPosition().getValueAsDouble(), SwerveConstants.wheelCircumference),
+            mDriveMotor.getPosition().getValueAsDouble(), RobotConfig.SWERVECONFIG.wheelCircumference()),
         Rotation2d.fromRotations(
             RevConfigs.NeoEncoderAngleToCANCoder(mNeoAngleEncoder.getPosition())));
   }

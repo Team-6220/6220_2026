@@ -2,21 +2,28 @@ package frc.robot.subsystems.Drive;
 
 import frc.lib.util.RumbleManager;
 import frc.lib.util.TunableNumber;
+import frc.robot.AutoConstants;
 import frc.robot.Constants;
+import frc.robot.SwerveConstants;
 // import frc.robot.LimelightCalculations;
 // import frc.robot.Localization_V2;
 // import frc.robot.LimelightHelpers;
 import frc.robot.SwerveModule;
-// import frc.robot.Constants.SwerveConstants;
+// import frc.robot.Constants.frc.robot.config.RobotConfig.SWERVECONFIG;
 // import frc.robot.Constants.VisionConstants;
-import frc.robot.SwerveConstants;
 import frc.robot.VisionConstants;
+import frc.robot.config.AutoConfig;
 import frc.robot.subsystems.PhotonVisionSubsystem;
 import frc.robot.subsystems.Drive.GyroIO.GyroIOInputs;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 // import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -42,6 +49,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -82,9 +90,8 @@ public class Swerve extends SubsystemBase {
   private final GyroIOInputs gyroInputs = new GyroIOInputs();
   private boolean isAutoTurning;
 
-  private ProfiledPIDController
-      turnPidController; // ProfiledPIDController creates a "trapazoid" when it speeds up to avoid
-  // pulling too much voltage from the battery at once.
+  /**PID controller using rad */
+  private ProfiledPIDController turnPidController;
   // private ProfiledPIDController xPidController;
   // private ProfiledPIDController yPidController;
   
@@ -99,24 +106,25 @@ public class Swerve extends SubsystemBase {
   private double lastTurnUpdate;
   private double autoTurnHeading;
 
-  private final TunableNumber turnKP = new TunableNumber("turn kP", SwerveConstants.turnKP);
-  private final TunableNumber turnKI = new TunableNumber("turn kI", SwerveConstants.turnKI);
-  private final TunableNumber turnKD = new TunableNumber("turn Kd", SwerveConstants.turnKD);
-  private final TunableNumber turnMaxVel =
-      new TunableNumber("turn MaxVel", SwerveConstants.turnMaxVel);
-  private final TunableNumber turnMaxAccel =
-      new TunableNumber("turn Accel", SwerveConstants.turnMaxAccel);
+  private final int swerveAlignUpdateSecond = 20;
 
-  private final TunableNumber autoRkP = new TunableNumber("auto R kP", SwerveConstants.rotation_kP);
-  private final TunableNumber autoRkI = new TunableNumber("auto R kI", SwerveConstants.rotation_kI);
-  private final TunableNumber autoRkD = new TunableNumber("auto R kD", SwerveConstants.rotation_kD);
+  // private final TunableNumber autoAngularKP = new TunableNumber("Angular kP", AutoConstants.angular_kP);
+  // private final TunableNumber autoAngularKI = new TunableNumber("Angular kI", AutoConstants.angular_kI);
+  // private final TunableNumber autoAngularKIzone = new TunableNumber("Angular kIzone ", AutoConstants.angular_kIzone);
+  // private final TunableNumber autoAngularKD = new TunableNumber("Angular Kd", AutoConstants.angular_kD);
+  // private final TunableNumber autoAngularMaxVelDegPerSec =
+  //     new TunableNumber("Angular MaxVel Deg per sec", AutoConstants.maxAngularVelocityRadPerSec.in(DegreesPerSecond));
+  // private final TunableNumber autoAngularMaxAccelDegPerSecSq =
+  //     new TunableNumber("Angular Accel Deg per sec per sec", AutoConstants.maxAngularAcceleratRadPerSecSq.in(DegreesPerSecondPerSecond));
+  // private final TunableNumber autoAngularToleranceDeg =
+  //     new TunableNumber("Angular Tolerance Deg", AutoConstants.angularTolerance.in(Degrees));
 
-  private final TunableNumber autoTkP =
-      new TunableNumber("auto T kP", SwerveConstants.translation_kP);
-  private final TunableNumber autoTkI =
-      new TunableNumber("auto T kI", SwerveConstants.translation_kI);
-  private final TunableNumber autoTkD =
-      new TunableNumber("auto T kD", SwerveConstants.translation_kD);
+  // private final TunableNumber autoTranslationKP =
+  //     new TunableNumber("auto T kP", AutoConstants.translation_kP);
+  // private final TunableNumber autoTranslationKI =
+  //     new TunableNumber("auto T kI", AutoConstants.translation_kI);
+  // private final TunableNumber autoTranslationKD =
+  //     new TunableNumber("auto T kD", AutoConstants.translation_kD);
 
   private boolean autoIsOverShoot = false, isAuto = false;
 
@@ -148,43 +156,48 @@ public class Swerve extends SubsystemBase {
 
     mSwerveMods =
         new SwerveModule[] {
-          new SwerveModule(0, SwerveConstants.Mod0.constants),
-          new SwerveModule(1, SwerveConstants.Mod1.constants),
-          new SwerveModule(2, SwerveConstants.Mod2.constants),
-          new SwerveModule(3, SwerveConstants.Mod3.constants)
+          new SwerveModule(0, frc.robot.config.RobotConfig.SWERVECONFIG.backRightMod0()),
+          new SwerveModule(1, frc.robot.config.RobotConfig.SWERVECONFIG.backLeftMod1()),
+          new SwerveModule(2, frc.robot.config.RobotConfig.SWERVECONFIG.frontRightMod2()),
+          new SwerveModule(3, frc.robot.config.RobotConfig.SWERVECONFIG.frontLeftMod3())
         };
 
     poseEstimator =
         new SwerveDrivePoseEstimator(
-            SwerveConstants.swerveKinematics,
+            frc.robot.config.RobotConfig.SWERVECONFIG.kinematics(),
             new Rotation2d(),
             positions,
             new Pose2d(),
             stateStdDevs,
             visionMeasurementStdDevs);
-    // odometer = new SwerveDriveOdometry(Constants.SwerveConstants.swerveKinematics, new
+    // odometer = new SwerveDriveOdometry(Constants.frc.robot.config.RobotConfig.SWERVECONFIG.kinematics(), new
     // Rotation2d(0), positions);
 
-    turnPidController =
-        new ProfiledPIDController(
-            turnKP.get(),
-            turnKI.get(),
-            turnKD.get(),
-            new TrapezoidProfile.Constraints(turnMaxVel.get(), turnMaxAccel.get()));
-    turnPidController.setIZone(SwerveConstants.turnIZone);
-    turnPidController.setTolerance(SwerveConstants.turnTolerance);
-    turnPidController.enableContinuousInput(-180, 180);
+  turnPidController = new ProfiledPIDController(
+      AutoConfig.angularKP.get(),
+      AutoConfig.angularKI.get(),
+      AutoConfig.angularKD.get(),
+      new TrapezoidProfile.Constraints(
+          AutoConfig.angularMaxAccelRad(),
+          AutoConfig.angularMaxAccelRad()
+      )
+  );
+
+  turnPidController.setIZone(AutoConfig.angularKIzone.get());
+  turnPidController.setTolerance(AutoConfig.angularToleranceRad());
+
+    turnPidController.enableContinuousInput(-(Math.PI/2.0), (Math.PI/2.0));
 
     // xPidController = new ProfiledPIDController(xKP.get(), xKI.get(), xKD.get(), new
     // TrapezoidProfile.Constraints(xMaxVel.get(), xMaxAccel.get()));
-    // xPidController.setIZone(Constants.SwerveConstants.xIZone);
-    // xPidController.setTolerance(Constants.SwerveConstants.xTolerance);
+    // xPidController.setIZone(Constants.frc.robot.config.RobotConfig.SWERVECONFIG.xIZone);
+    // xPidController.setTolerance(Constants.frc.robot.config.RobotConfig.SWERVECONFIG.xTolerance);
     // xPidController.enableContinuousInput(-180, 180);
 
     // yPidController = new ProfiledPIDController(yKP.get(), yKI.get(), yKD.get(), new
     // TrapezoidProfile.Constraints(yMaxVel.get(), yMaxAccel.get()));
-    // yPidController.setIZone(Constants.SwerveConstants.yIZone);
-    // yPidController.setTolerance(Constants.SwerveConstants.yTolerance);
+    // yPidController.setIZone(Constants.frc.robot.config.RobotConfig.SWERVECONFIG.yIZone);
+    // yPidController.setTolerance(Constants.frc.robot.config.RobotConfig.SWERVECONFIG.yTolerance);
     // yPidController.enableContinuousInput(-180, 180);
 
     // Set up custom logging to add the current path to a field 2d widget
@@ -193,7 +206,7 @@ public class Swerve extends SubsystemBase {
     // Shuffleboard.getTab("Field Pose 2d tab (map)").add("Field 2d", field2d);
     // SmartDashboard.putData("Field", field2d);
     // ModuleConfig swerveModuleConfig = new
-    // ModuleConfig(wheelRadius,SwerveConstants.maxSpeed,1.0,krackonX60, /);
+    // ModuleConfig(wheelRadius,frc.robot.config.RobotConfig.SWERVECONFIG.maxSpeed,1.0,krackonX60, /);
 
     // try{
     // config = RobotConfig.fromGUISettings();
@@ -203,7 +216,7 @@ public class Swerve extends SubsystemBase {
             Constants.robotMass,
             Constants.robotMOI,
             SwerveConstants.swerveModuleConfig,
-            SwerveConstants.swerveKinematics.getModules()); // see
+            frc.robot.config.RobotConfig.SWERVECONFIG.kinematics().getModules()); // see
     // https://pathplanner.dev/robot-config.html#bumper-config-options
     // for more details on what you need to set robotconfig up manuelly
     // Also https://pathplanner.dev/api/java/com/pathplanner/lib/config/RobotConfig.html for API
@@ -223,12 +236,12 @@ public class Swerve extends SubsystemBase {
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
     SwerveModuleState[] swerveModuleStates =
-        SwerveConstants.swerveKinematics.toSwerveModuleStates(
+        frc.robot.config.RobotConfig.SWERVECONFIG.kinematics().toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(
                     translation.getX(), translation.getY(), rotation, getHeading())
                 : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.maxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, frc.robot.config.RobotConfig.SWERVECONFIG.maxSpeed());
 
     // set all the modules
     for (SwerveModule mod : mSwerveMods) {
@@ -254,8 +267,16 @@ public class Swerve extends SubsystemBase {
         this::getRobotRelativeSpeeds,
         (speeds, feedforwards) -> driveRobotRelative(speeds),
         new PPHolonomicDriveController(
-            new PIDConstants(autoTkP.get(), autoTkI.get(), autoTkD.get()),
-            new PIDConstants(autoRkP.get(), autoRkI.get(), autoRkD.get())),
+            new PIDConstants(
+            AutoConfig.translationKP.get(),
+            AutoConfig.translationKI.get(),
+            AutoConfig.translationKD.get()
+            ),
+            new PIDConstants(
+              AutoConfig.angularKP.get(),
+              AutoConfig.angularKI.get(),
+              AutoConfig.angularKD.get()
+            )),
         config,
         () -> {
           var alliance = DriverStation.getAlliance();
@@ -274,7 +295,7 @@ public class Swerve extends SubsystemBase {
     ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
 
     SwerveModuleState[] targetStates =
-        SwerveConstants.swerveKinematics.toSwerveModuleStates(targetSpeeds);
+        frc.robot.config.RobotConfig.SWERVECONFIG.kinematics().toSwerveModuleStates(targetSpeeds);
     setModuleStates(targetStates);
   }
 
@@ -291,13 +312,13 @@ public class Swerve extends SubsystemBase {
   /** Get's the chassis speed of the robot in ROBOT RELATIVE SPEED */
   public ChassisSpeeds getRobotRelativeSpeeds() {
     ChassisSpeeds chassisSpeeds =
-        SwerveConstants.swerveKinematics.toChassisSpeeds(getModuleStates());
+        frc.robot.config.RobotConfig.SWERVECONFIG.kinematics().toChassisSpeeds(getModuleStates());
     return chassisSpeeds;
   }
 
   /* Used by SwerveControllerCommand in Auto */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, SwerveConstants.maxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, frc.robot.config.RobotConfig.SWERVECONFIG.maxSpeed());
 
     for (SwerveModule mod : mSwerveMods) {
       mod.setDesiredState(desiredStates[mod.moduleNumber], false);
@@ -376,11 +397,11 @@ public class Swerve extends SubsystemBase {
     isAutoTurning = state;
   }
 
-  public void setAutoTurnHeading(double heading) {
+  public void setAutoTurnHeading(Angle heading) {
     // autoTurnHeading = heading;
-    autoTurnHeading = wrapAngleForTurningPID(heading);
+    autoTurnHeading = wrapAngleForTurningPID(heading.in(Degrees));
     resetTurnController();
-    turnPidController.setGoal(autoTurnHeading);
+    turnPidController.setGoal(Radians.convertFrom(autoTurnHeading, Degrees));
   }
 
   public static double wrapAngleForTurningPID(double angle) {
@@ -400,12 +421,12 @@ public class Swerve extends SubsystemBase {
   }
 
   public void resetTurnController() {
-    turnPidController.reset(getHeading().getDegrees());
+    turnPidController.reset(getHeading().getRadians());
     // System.out.println("ResetTurnController");
   }
 
-  public void setTurnControllerGoal(double goal) {
-    turnPidController.setGoal(goal);
+  public void setTurnControllerGoal(Angle goal) {
+    turnPidController.setGoal(goal.in(Radians));
   }
 
   /**
@@ -417,11 +438,11 @@ public class Swerve extends SubsystemBase {
 
     // SmartDashboard.putNumber(" raw speed", speed);
 
-    if (speed > SwerveConstants.maxAngularVelocity) {
-      speed = SwerveConstants.maxAngularVelocity;
+    if (speed > frc.robot.config.RobotConfig.SWERVECONFIG.maxAngularVelocity()) {
+      speed = frc.robot.config.RobotConfig.SWERVECONFIG.maxAngularVelocity();
     }
-    if (speed < -SwerveConstants.maxAngularVelocity) {
-      speed = -SwerveConstants.maxAngularVelocity;
+    if (speed < -frc.robot.config.RobotConfig.SWERVECONFIG.maxAngularVelocity()) {
+      speed = -frc.robot.config.RobotConfig.SWERVECONFIG.maxAngularVelocity();
     }
     return speed;
   }
@@ -539,7 +560,7 @@ public class Swerve extends SubsystemBase {
     // SmartDashboard.putNumber("distance yaw", targetYaw);
     // SmartDashboard.putNumber("distance pitch", targetPitch);
 
-    if (timestamp - SwerveConstants.swerveAlignUpdateSecond >= lastTurnUpdate) {
+    if (timestamp - swerveAlignUpdateSecond >= lastTurnUpdate) {
       lastTurnUpdate = timestamp;
       resetModulesToAbsolute();
       // System.out.println("update!");
@@ -555,8 +576,8 @@ public class Swerve extends SubsystemBase {
 
     // SmartDashboard.putData("fieldSwerve",field2d);
 
-    if (turnKP.hasChanged() || turnKD.hasChanged() || turnKI.hasChanged()) {
-      turnPidController.setPID(turnKP.get(), turnKI.get(), turnKD.get());
+    if (AutoConfig.angularKP.hasChanged() || AutoConfig.angularKD.hasChanged() || AutoConfig.angularKD.hasChanged()) {
+      turnPidController.setPID(AutoConfig.angularKP.get(), AutoConfig.angularKD.get(), AutoConfig.angularKD.get());
       turnPidController.reset(getHeading().getDegrees());
     }
 
@@ -573,9 +594,9 @@ public class Swerve extends SubsystemBase {
     //     yPidController.setPID(yKP.get(), yKI.get(), yKD.get());
     //     yPidController.reset(getPose().getY());
     // }
-    if (turnMaxAccel.hasChanged() || turnMaxVel.hasChanged()) {
+    if (AutoConfig.angularMaxAccelDeg.hasChanged() || AutoConfig.angularMaxVelDeg.hasChanged()) {
       turnPidController.setConstraints(
-          new TrapezoidProfile.Constraints(turnMaxVel.get(), turnMaxAccel.get()));
+          new TrapezoidProfile.Constraints(AutoConfig.angularMaxVelDeg.get(), AutoConfig.angularMaxAccelDeg.get()));
       turnPidController.reset(getHeading().getDegrees());
     }
   }
