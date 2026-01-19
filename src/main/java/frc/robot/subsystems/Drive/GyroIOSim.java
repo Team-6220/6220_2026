@@ -9,11 +9,11 @@ import static edu.wpi.first.units.Units.Degrees;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /** Add your docs here. */
-public class GyroIOSim implements GyroIO{
-    private Rotation2d yaw = new Rotation2d(Degrees.of(0));
+public class GyroIOSim implements GyroIO {
+  private Rotation2d yaw = new Rotation2d(Degrees.of(0));
 
-    @Override
-    public void updateInputs(GyroIOInputs inputs) {
-        inputs.yawPosition = yaw;
-    }
+  @Override
+  public void updateInputs(GyroIOInputs inputs) {
+    inputs.yawPosition = yaw;
+  }
 }

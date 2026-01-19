@@ -9,11 +9,11 @@ import com.studica.frc.AHRS.NavXComType;
 import com.studica.frc.AHRS.NavXUpdateRate;
 
 /** Add your docs here. */
-public class GyroIONavX implements GyroIO{
-        private final AHRS navx = new AHRS(NavXComType.kMXP_SPI, NavXUpdateRate.k200Hz);
-    
-        @Override
-        public void updateInputs(GyroIOInputs inputs) {
-            inputs.yawPosition = navx.getRotation2d();
-        }
-    }
+public class GyroIONavX implements GyroIO {
+  private final AHRS navx = new AHRS(NavXComType.kMXP_SPI, NavXUpdateRate.k200Hz);
+
+  @Override
+  public void updateInputs(GyroIOInputs inputs) {
+    inputs.yawPosition = navx.getRotation2d();
+  }
+}

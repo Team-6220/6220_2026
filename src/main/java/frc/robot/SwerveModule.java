@@ -4,34 +4,22 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-
-// // import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkClosedLoopController;
-// import com.revrobotics.SparkRelativeEncoder.Type;
-// import com.revrobotics.spark.SparkRelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
-// import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.*;
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
-import edu.wpi.first.wpilibj.smartdashboard.*;
 import frc.robot.config.RobotConfig;
-
-// import edu.wpi.first.math.kinematics.SwerveModuleState;
-
-// import com.revrobotics.SparkRelativeEncoder.Type;
-
-// import com.revrobotics.RelativeEncoder;
 
 public class SwerveModule {
   public int moduleNumber;
@@ -129,7 +117,8 @@ public class SwerveModule {
   private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
     SmartDashboard.putBoolean("mod" + moduleNumber + "isopenloop", isOpenLoop);
     if (isOpenLoop) {
-      driveDutyCycle.Output = desiredState.speedMetersPerSecond / RobotConfig.SWERVECONFIG.maxSpeed();
+      driveDutyCycle.Output =
+          desiredState.speedMetersPerSecond / RobotConfig.SWERVECONFIG.maxSpeed();
       mDriveMotor.setControl(driveDutyCycle);
       SmartDashboard.putNumber("Mod " + moduleNumber + "drivedutycycle", driveDutyCycle.Output);
     } else {
@@ -160,7 +149,8 @@ public class SwerveModule {
   public SwerveModuleState getState() {
     return new SwerveModuleState(
         Conversions.RPSToMPS(
-            mDriveMotor.getVelocity().getValueAsDouble(), RobotConfig.SWERVECONFIG.wheelCircumference()),
+            mDriveMotor.getVelocity().getValueAsDouble(),
+            RobotConfig.SWERVECONFIG.wheelCircumference()),
         Rotation2d.fromRotations(
             RevConfigs.NeoEncoderAngleToCANCoder(mNeoAngleEncoder.getPosition())));
   }
@@ -168,7 +158,8 @@ public class SwerveModule {
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(
         Conversions.rotationsToMeters(
-            mDriveMotor.getPosition().getValueAsDouble(), RobotConfig.SWERVECONFIG.wheelCircumference()),
+            mDriveMotor.getPosition().getValueAsDouble(),
+            RobotConfig.SWERVECONFIG.wheelCircumference()),
         Rotation2d.fromRotations(
             RevConfigs.NeoEncoderAngleToCANCoder(mNeoAngleEncoder.getPosition())));
   }

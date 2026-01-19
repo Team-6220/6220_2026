@@ -1,17 +1,13 @@
-/** Swerve drive command used for teleop period. */
 package frc.robot.commands;
 
-import frc.robot.OIConstants;
-import frc.robot.subsystems.Drive.Swerve;
-
-import java.util.function.BooleanSupplier;
-// import java.util.function.DoubleSupplier;
-
-// import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.OIConstants;
+import frc.robot.subsystems.Drive.Swerve;
+import java.util.function.BooleanSupplier;
 
+/** Swerve drive command used for teleop period. */
 public class TeleopSwerve extends Command {
   private Swerve s_Swerve;
   private BooleanSupplier robotCentricSup;

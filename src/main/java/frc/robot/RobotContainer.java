@@ -5,12 +5,7 @@
 package frc.robot;
 
 // import frc.robot.commands.Autos;
-import frc.robot.commands.TeleopSwerve;
-import frc.robot.commands.photonAlignCmd;
-import frc.robot.subsystems.Drive.Swerve;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -19,6 +14,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.TeleopSwerve;
+import frc.robot.subsystems.Drive.Swerve;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -45,14 +42,12 @@ public class RobotContainer {
     s_Swerve.configureAutoBuilder();
     s_Swerve.zeroHeading(m_driverController.getHID());
 
-    
-    
     s_Swerve.setDefaultCommand(
-      new TeleopSwerve(s_Swerve, m_driverController, m_driverController.leftBumper()));
-      
-      autoChooser = AutoBuilder.buildAutoChooser();
-      SmartDashboard.putData("Auto Chooser", autoChooser);
-      
+        new TeleopSwerve(s_Swerve, m_driverController, m_driverController.leftBumper()));
+
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
     // TODO: Register named commands as needed for auto
     // NamedCommands.registerCommand(null, null);
 
@@ -74,7 +69,9 @@ public class RobotContainer {
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
 
-    m_driverController.rightBumper().onTrue(new TeleopSwerve(s_Swerve, m_driverController, m_driverController.leftBumper()));
+    m_driverController
+        .rightBumper()
+        .onTrue(new TeleopSwerve(s_Swerve, m_driverController, m_driverController.leftBumper()));
   }
 
   /**

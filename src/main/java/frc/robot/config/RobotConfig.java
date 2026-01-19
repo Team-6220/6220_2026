@@ -4,22 +4,22 @@
 
 package frc.robot.config;
 
-import frc.robot.config.SwerveConfigs.SwerveConfig;
+import frc.robot.subsystems.Drive.SwerveConfigs;
 
 /** Add your docs here. */
 public final class RobotConfig {
-    public enum RobotType {
-        COMP,
-        PRACTICE,
-        SIM
-    }
+  public enum RobotType {
+    COMP,
+    PRACTICE,
+    SIM
+  }
 
-    public static final RobotType TYPE = RobotType.COMP;
+  public static final RobotType TYPE = RobotType.COMP;
 
-    public static final SwerveConfig SWERVECONFIG =
-        switch (TYPE) {
-            case COMP -> SwerveConfigs.COMP;
-            case PRACTICE -> SwerveConfigs.PRACTICE;
-            case SIM -> SwerveConfigs.SIM;
-        };
+  public static final SwerveConfig SWERVECONFIG =
+      switch (TYPE) {
+        case COMP -> SwerveConfigs.COMP;
+        case PRACTICE -> SwerveConfigs.GEORGE;
+        case SIM -> SwerveConfigs.SIM;
+      };
 }
