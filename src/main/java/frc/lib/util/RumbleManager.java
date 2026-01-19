@@ -10,10 +10,9 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 /** Add your docs here. */
 public class RumbleManager {
-    public static void rumble(XboxController driver, double delayTimeInSec)
-    {
-        driver.setRumble(RumbleType.kBothRumble, 0.75);
-        Timer.delay(delayTimeInSec);
-        driver.setRumble(RumbleType.kBothRumble, 0);
-    }
+  public static void rumble(XboxController driver, double delayTimeInSec) {
+    driver.setRumble(RumbleType.kBothRumble, 0.75);
+    Timer.delay(delayTimeInSec);
+    driver.setRumble(RumbleType.kBothRumble, 0);
+  }
 }

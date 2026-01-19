@@ -4,15 +4,20 @@
 
 package frc.robot;
 
-//import frc.robot.commands.Autos;
+// import frc.robot.commands.Autos;
 import frc.robot.commands.TeleopSwerve;
-import frc.robot.subsystems.Swerve;
-import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.commands.photonAlignCmd;
+import frc.robot.subsystems.Drive.Swerve;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -24,26 +29,32 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   // private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  
+
+  private final SendableChooser<Command> autoChooser;
 
   private final Swerve s_Swerve = new Swerve();
-  
 
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(0);
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  private final CommandXboxController m_driverController = new CommandXboxController(0);
+
+  private final Joystick m_joystick = new Joystick(1);
+
+  private final GenericHID m_buttonBoard = new GenericHID(2);
+
   public RobotContainer() {
     // Configure the trigger bindings
-    s_Swerve.zeroHeading();
-
     s_Swerve.configureAutoBuilder();
+    s_Swerve.zeroHeading(m_driverController.getHID());
 
+    
+    
     s_Swerve.setDefaultCommand(
-        new TeleopSwerve(
-            s_Swerve,
-            m_driverController,
-            m_driverController.leftBumper())
-        );
+      new TeleopSwerve(s_Swerve, m_driverController, m_driverController.leftBumper()));
+      
+      autoChooser = AutoBuilder.buildAutoChooser();
+      SmartDashboard.putData("Auto Chooser", autoChooser);
+      
+    // TODO: Register named commands as needed for auto
+    // NamedCommands.registerCommand(null, null);
 
     configureBindings();
   }
@@ -59,12 +70,11 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    m_driverController.y().onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
-    m_driverController.leftTrigger().onTrue(new RunCommand(() -> s_Swerve.driveRobotRelative(s_Swerve.getRobotRelativeSpeeds())));
+    m_driverController
+        .y()
+        .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // cancelling on release.
-    
+    m_driverController.rightBumper().onTrue(new TeleopSwerve(s_Swerve, m_driverController, m_driverController.leftBumper()));
   }
 
   /**
@@ -74,8 +84,8 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return new Command() {
-      
-    };
+    return autoChooser.getSelected();
   }
+  // An example command will be run in autonomous
+
 }

@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.PhotonVisionSubsystem;
+
+import java.util.ArrayList;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -21,7 +24,12 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
+  private ArrayList<Command> m_autonomousCommandList;
+
   public static final CTREConfigs ctreConfigs = new CTREConfigs();
+
+  private final PhotonVisionSubsystem vision =
+      PhotonVisionSubsystem.getInstance(VisionConstants.cameraNames);
 
   private final RobotContainer m_robotContainer;
 
@@ -33,7 +41,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-
+    // CameraServer.startAutomaticCapture();
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
   }
@@ -64,46 +72,38 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-
     Optional<Alliance> ally = DriverStation.getAlliance();
     if (ally.isPresent()) {
-        if (ally.get() == Alliance.Red) {
-            Constants.isRed = "red";
-        }
-        if (ally.get() == Alliance.Blue) {
-            Constants.isRed = "blue";
-        }
+      if (ally.get() == Alliance.Red) {
+        Constants.isRed = "red";
+      }
+      if (ally.get() == Alliance.Blue) {
+        Constants.isRed = "blue";
+      }
+    } else {
+      Constants.isRed = "N/A";
     }
-    else {
-        Constants.isRed = "N/A";
-    }
-
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+      CommandScheduler.getInstance().schedule();
     }
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    if(Constants.isRed.equals("N/A"))
-    {
+    if (Constants.isRed.equals("N/A")) {
       Optional<Alliance> ally = DriverStation.getAlliance();
-      if (ally.isPresent())
-      {
-          if (ally.get() == Alliance.Red) {
-              Constants.isRed = "red";
-          }
-          if (ally.get() == Alliance.Blue) {
-              Constants.isRed = "blue";
-          }
-      }
-      else
-      {
-          Constants.isRed = "N/A";
+      if (ally.isPresent()) {
+        if (ally.get() == Alliance.Red) {
+          Constants.isRed = "red";
+        }
+        if (ally.get() == Alliance.Blue) {
+          Constants.isRed = "blue";
+        }
+      } else {
+        Constants.isRed = "N/A";
       }
     }
   }
@@ -116,15 +116,14 @@ public class Robot extends TimedRobot {
     // this line or comment it out.
     Optional<Alliance> ally = DriverStation.getAlliance();
     if (ally.isPresent()) {
-        if (ally.get() == Alliance.Red) {
-            Constants.isRed = "red";
-        }
-        if (ally.get() == Alliance.Blue) {
-            Constants.isRed = "blue";
-        }
-    }
-    else {
-        Constants.isRed = "N/A";
+      if (ally.get() == Alliance.Red) {
+        Constants.isRed = "red";
+      }
+      if (ally.get() == Alliance.Blue) {
+        Constants.isRed = "blue";
+      }
+    } else {
+      Constants.isRed = "N/A";
     }
 
     if (m_autonomousCommand != null) {
@@ -135,21 +134,17 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    if(Constants.isRed.equals("N/A"))
-    {
+    if (Constants.isRed.equals("N/A")) {
       Optional<Alliance> ally = DriverStation.getAlliance();
-      if (ally.isPresent())
-      {
-          if (ally.get() == Alliance.Red) {
-              Constants.isRed = "red";
-          }
-          if (ally.get() == Alliance.Blue) {
-              Constants.isRed = "blue";
-          }
-      }
-      else
-      {
-          Constants.isRed = "N/A";
+      if (ally.isPresent()) {
+        if (ally.get() == Alliance.Red) {
+          Constants.isRed = "red";
+        }
+        if (ally.get() == Alliance.Blue) {
+          Constants.isRed = "blue";
+        }
+      } else {
+        Constants.isRed = "N/A";
       }
     }
   }
