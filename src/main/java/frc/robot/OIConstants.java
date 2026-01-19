@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.config.RobotConfig;
 
 public final class OIConstants {
   public static final int kDriverControllerPort = 0;
@@ -94,9 +95,9 @@ public final class OIConstants {
     inputs[0] *= invert;
     inputs[1] *= invert;
 
-    inputs[0] *= SwerveConstants.maxSpeed;
-    inputs[1] *= SwerveConstants.maxSpeed;
-    inputs[2] *= SwerveConstants.maxAngularVelocity;
+    inputs[0] *= RobotConfig.SWERVECONFIG.maxSpeed();
+    inputs[1] *= RobotConfig.SWERVECONFIG.maxSpeed();
+    inputs[2] *= RobotConfig.SWERVECONFIG.maxAngularVelocity();
     return inputs;
   }
 }

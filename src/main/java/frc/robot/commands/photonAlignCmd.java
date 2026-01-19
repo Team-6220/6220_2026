@@ -12,8 +12,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.util.TunableNumber;
 import frc.robot.SwerveConstants;
 import frc.robot.VisionConstants;
+import frc.robot.config.AutoConfig;
 import frc.robot.subsystems.PhotonVisionSubsystem;
 import frc.robot.subsystems.Drive.Swerve;
+
+import static edu.wpi.first.units.Units.Degrees;
 
 import java.util.List;
 
@@ -24,22 +27,22 @@ public class photonAlignCmd extends Command {
   private Swerve s_Swerve;
   private PhotonVisionSubsystem s_Photon;
 
-  private final TunableNumber xKP = new TunableNumber("x kP", SwerveConstants.xKP);
-  private final TunableNumber xKI = new TunableNumber("x kI", SwerveConstants.xKI);
-  private final TunableNumber xKD = new TunableNumber("x kD", SwerveConstants.xKD);
-  private final TunableNumber xMaxVel = new TunableNumber("x MaxVel", SwerveConstants.xMaxVel);
-  private final TunableNumber xMaxAccel = new TunableNumber("x Accel", SwerveConstants.xMaxAccel);
+  // private final TunableNumber xKP = new TunableNumber("x kP", SwerveConstants.xKP);
+  // private final TunableNumber xKI = new TunableNumber("x kI", SwerveConstants.xKI);
+  // private final TunableNumber xKD = new TunableNumber("x kD", SwerveConstants.xKD);
+  // private final TunableNumber xMaxVel = new TunableNumber("x MaxVel", SwerveConstants.xMaxVel);
+  // private final TunableNumber xMaxAccel = new TunableNumber("x Accel", SwerveConstants.xMaxAccel);
 
-  private final TunableNumber yKP = new TunableNumber("y kP", SwerveConstants.yKP);
-  private final TunableNumber yKI = new TunableNumber("y kI", SwerveConstants.yKI);
-  private final TunableNumber yKD = new TunableNumber("y kD", SwerveConstants.yKD);
-  private final TunableNumber yMaxVel = new TunableNumber("y MaxVel", SwerveConstants.yMaxVel);
-  private final TunableNumber yMaxAccel = new TunableNumber("y Accel", SwerveConstants.yMaxAccel);
+  // private final TunableNumber yKP = new TunableNumber("y kP", SwerveConstants.yKP);
+  // private final TunableNumber yKI = new TunableNumber("y kI", SwerveConstants.yKI);
+  // private final TunableNumber yKD = new TunableNumber("y kD", SwerveConstants.yKD);
+  // private final TunableNumber yMaxVel = new TunableNumber("y MaxVel", SwerveConstants.yMaxVel);
+  // private final TunableNumber yMaxAccel = new TunableNumber("y Accel", SwerveConstants.yMaxAccel);
   private int cameraNum;
   private double xSetpoint, ySetpoint;
   private int lockedFiducialID = -1;
-  private PIDController xcontroller = new PIDController(xKP.get(), xKI.get(), xKD.get());
-  private PIDController ycontroller = new PIDController(yKP.get(), yKI.get(), yKD.get());
+  private PIDController xcontroller = new PIDController(AutoConfig.translationKP.get(), AutoConfig.translationKI.get(), AutoConfig.translationKD.get());
+  private PIDController ycontroller = new PIDController(AutoConfig.translationKP.get(), AutoConfig.translationKI.get(), AutoConfig.translationKD.get());
 
   // private PhotonTrackedTarget bestTarget;
 
@@ -108,7 +111,7 @@ public class photonAlignCmd extends Command {
             SmartDashboard.putNumber("x pid out", xout);
             SmartDashboard.putNumber("y pid out", yout);
             SmartDashboard.putNumber("theta pid out", thetaout);
-            // s_Swerve.setAutoTurnHeading(VisionConstants.aprilTagAngle[tar.getFiducialId() - 1]);
+            s_Swerve.setAutoTurnHeading(Degrees.of(0));
             s_Swerve.drive(new Translation2d(-xout*2, -yout*2), -thetaout, false, false);
             SmartDashboard.putNumber("camera to pose x", currentPose.getX());
             SmartDashboard.putNumber("camera to pose y", currentPose.getY());
