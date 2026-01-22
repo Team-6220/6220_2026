@@ -29,7 +29,18 @@ public final class SwerveConfigs {
               6, 9, 3, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(90.5)),
 
           // https://docs.wcproducts.com/welcome/electronics/kraken-x60/kraken-x60-motor/overview-and-features/physical-specifications
-          new DCMotor(12, 7.09, 366, 2, 628.32, 1));
+          new DCMotor(12, 7.09, 366, 2, 628.32, 1),
+          0.12,
+          0,
+          0,
+          0.32,
+          1.51,
+          0.27,
+          0.5,
+          0,
+          0.15,
+          0.25,
+          0);
 
   public static final SwerveConfig GEORGE =
       new SwerveConfig(
@@ -49,7 +60,18 @@ public final class SwerveConfigs {
               6, 9, 3, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(90.5)),
 
           // https://store.ctr-electronics.com/products/falcon-500-powered-by-talon-fx
-          new DCMotor(12, 4.69, 257, 1.5, 668.112, 1));
+          new DCMotor(12, 4.69, 257, 1.5, 668.112, 1),
+          0.12,
+          0,
+          0,
+          0.32,
+          1.51,
+          0.27,
+          0.5,
+          0,
+          0.15,
+          0.25,
+          0);
 
   public static final SwerveConfig SIM = COMP;
 
