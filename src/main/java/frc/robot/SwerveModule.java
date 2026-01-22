@@ -38,6 +38,7 @@ public class SwerveModule {
 
   public void periodic() {
     io.updateInputs(inputs);
+    io.setAnglePosition(moduleNumber);
   }
 
   public SwerveModuleState getState() {

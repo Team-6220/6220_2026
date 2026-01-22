@@ -457,6 +457,9 @@ public class Swerve extends SubsystemBase {
   @Override
   public void periodic() {
     gyro.updateInputs(gyroInputs);
+    for(SwerveModule mod : mSwerveMods){
+      mod.periodic();
+    }
     SmartDashboard.putBoolean("is Red", Constants.isRed.equals("red"));
     Double timestamp = Timer.getFPGATimestamp();
 
