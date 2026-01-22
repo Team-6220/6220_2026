@@ -110,30 +110,34 @@ public class Swerve extends SubsystemBase {
           new SwerveModule(
               0,
               frc.robot.config.RobotConfig.SWERVECONFIG.backRightMod0(),
-              RobotBase.isSimulation()
-                  ? new SwerveModuleIOSim()
-                  : new SwerveModuleIOTalonFXSparkMax(
+              // RobotBase.isSimulation()
+                  // ? new SwerveModuleIOSim()
+                  // : 
+                  new SwerveModuleIOTalonFXSparkMax(
                       frc.robot.config.RobotConfig.SWERVECONFIG.backRightMod0())),
           new SwerveModule(
               1,
               frc.robot.config.RobotConfig.SWERVECONFIG.backLeftMod1(),
-              RobotBase.isSimulation()
-                  ? new SwerveModuleIOSim()
-                  : new SwerveModuleIOTalonFXSparkMax(
+              // RobotBase.isSimulation()
+                  // ? new SwerveModuleIOSim()
+                  // : 
+                  new SwerveModuleIOTalonFXSparkMax(
                       frc.robot.config.RobotConfig.SWERVECONFIG.backLeftMod1())),
           new SwerveModule(
               2,
               frc.robot.config.RobotConfig.SWERVECONFIG.frontRightMod2(),
-              RobotBase.isSimulation()
-                  ? new SwerveModuleIOSim()
-                  : new SwerveModuleIOTalonFXSparkMax(
+              // RobotBase.isSimulation()
+                  // ? new SwerveModuleIOSim()
+                  // : 
+                  new SwerveModuleIOTalonFXSparkMax(
                       frc.robot.config.RobotConfig.SWERVECONFIG.frontRightMod2())),
           new SwerveModule(
               3,
               frc.robot.config.RobotConfig.SWERVECONFIG.frontLeftMod3(),
-              RobotBase.isSimulation()
-                  ? new SwerveModuleIOSim()
-                  : new SwerveModuleIOTalonFXSparkMax(
+              // RobotBase.isSimulation()
+                  // ? new SwerveModuleIOSim()
+                  // : 
+                  new SwerveModuleIOTalonFXSparkMax(
                       frc.robot.config.RobotConfig.SWERVECONFIG.frontLeftMod3()))
         };
 
