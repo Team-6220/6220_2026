@@ -1,5 +1,16 @@
-## Placeholder README.md
+<img align="left" src="https://files.catbox.moe/u5c5te.png">
 
-This is the repository for Team 6220's robot, for the 2026 FRC Rebuilt competition.
+# Team 6220 (2026)
 
-File organization and structure here, include other necessary details.
+This is the repository for Team 6220's robot, in preparation for the 2026 FRC Rebuilt competition.
+
+
+
+## General Structure
+- Robot code can be found under the `src` directory.
+
+- To modify code for a specific subsystem, make sure you edit its corresponding branch.
+  - For example, use the `15-swerve-io` branch for working on swerve.
+ 
+
+
