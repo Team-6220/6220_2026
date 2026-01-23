@@ -57,7 +57,7 @@ public final class SwerveConfigs {
           new SwerveModuleConstants(
               7, 8, 9, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-85.869)),
           new SwerveModuleConstants(
-              10, 11, 12, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-59.386)),
+              10, 11, 12, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-59.386-90)),
 
           // https://store.ctr-electronics.com/products/falcon-500-powered-by-talon-fx
           new DCMotor(12, 4.69, 257, 1.5, 668.112, 1),
