@@ -6,6 +6,8 @@ package frc.robot;
 
 // import frc.robot.commands.Autos;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -36,7 +38,6 @@ public class RobotContainer {
   private final Joystick m_joystick = new Joystick(1);
 
   private final GenericHID m_buttonBoard = new GenericHID(2);
-
   public RobotContainer() {
     // Configure the trigger bindings
     s_Swerve.configureAutoBuilder();
@@ -50,7 +51,8 @@ public class RobotContainer {
 
     // TODO: Register named commands as needed for auto
     // NamedCommands.registerCommand(null, null);
-
+    autoChooser.addOption("test", new PathPlannerAuto("Auto1"));
+    SmartDashboard.putData(autoChooser);
     configureBindings();
   }
 
