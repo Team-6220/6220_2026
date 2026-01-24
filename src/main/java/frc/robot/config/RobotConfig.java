@@ -14,7 +14,7 @@ public final class RobotConfig {
     SIM
   }
 
-  public static final RobotType TYPE = RobotType.COMP;
+  public static final RobotType TYPE = RobotType.PRACTICE;
 
   public static final SwerveConfig SWERVECONFIG =
       switch (TYPE) {
