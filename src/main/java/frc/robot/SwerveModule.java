@@ -11,6 +11,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
+import frc.lib.util.TunableNumber;
 import frc.robot.config.RobotConfig;
 import frc.robot.subsystems.Drive.SwerveModuleIO;
 import frc.robot.subsystems.Drive.SwerveModuleIO.SwerveModuleIOInputs;
@@ -24,11 +25,15 @@ public class SwerveModule {
   private final DutyCycleOut driveDutyCycle = new DutyCycleOut(0);
   private final VelocityVoltage driveVelocity = new VelocityVoltage(0);
 
+  private final TunableNumber driveKS =
+      new TunableNumber("SwerveModule_kS", RobotConfig.SWERVECONFIG.driveKS());
+  private final TunableNumber driveKV =
+      new TunableNumber("SwerveModule_kV", RobotConfig.SWERVECONFIG.driveKV());
+  private final TunableNumber driveKA =
+      new TunableNumber("SwerveModule_kA", RobotConfig.SWERVECONFIG.driveKA());
+
   private final SimpleMotorFeedforward driveFeedForward =
-      new SimpleMotorFeedforward(
-          RobotConfig.SWERVECONFIG.driveKS(),
-          RobotConfig.SWERVECONFIG.driveKV(),
-          RobotConfig.SWERVECONFIG.driveKA());
+      new SimpleMotorFeedforward(driveKS.get(), driveKV.get(), driveKA.get());
 
   public SwerveModule(int moduleNumber, SwerveModuleConstants config, SwerveModuleIO io) {
     this.io = io;
@@ -39,6 +44,15 @@ public class SwerveModule {
   public void periodic() {
     io.updateInputs(inputs);
     io.setAnglePosition(moduleNumber);
+    if (driveKS.hasChanged()) {
+      driveFeedForward.setKs(driveKS.get());
+    }
+    if (driveKV.hasChanged()) {
+      driveFeedForward.setKv(driveKV.get());
+    }
+    if (driveKA.hasChanged()) {
+      driveFeedForward.setKa(driveKA.get());
+    }
   }
 
   public SwerveModuleState getState() {
