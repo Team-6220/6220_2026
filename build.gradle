@@ -1,7 +1,7 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2026.1.1"
-    id "com.diffplug.spotless" version "6.23.3"
+    id "edu.wpi.first.GradleRIO" version "2026.2.1"
+    id "com.diffplug.spotless" version "8.2.0"
 }
 
 java {
@@ -77,7 +77,7 @@ dependencies {
     nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
     simulationRelease wpi.sim.enableRelease()
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.0.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -122,3 +122,7 @@ spotless {
     }
 }
 
+tasks.named("build") {
+    dependsOn("spotlessApply")
+    dependsOn("spotlessCheck")
+}

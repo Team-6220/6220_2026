@@ -26,7 +26,20 @@ public record SwerveConfig(
     SwerveModuleConstants backLeftMod1,
     SwerveModuleConstants frontRightMod2,
     SwerveModuleConstants frontLeftMod3,
-    DCMotor dcMotor) {
+    DCMotor dcMotor,
+    double driveKP,
+    double driveKI,
+    double driveKD,
+    double driveKS,
+    double driveKV,
+    double driveKA,
+    double angleKP,
+    double angleKI,
+    double angleKD,
+    /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
+     * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc */
+    double openLoopRamp,
+    double closedLoopRamp) {
 
   public double wheelCircumference() {
     return wheelDiameter.in(Meters) * Math.PI;
