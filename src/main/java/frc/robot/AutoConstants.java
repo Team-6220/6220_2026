@@ -20,10 +20,10 @@ public final class AutoConstants {
   // FIXME: The below constants are used in the example auto, and must be
   // tuned to specific robot
 
-  public static final double translation_kP = 2.25;
+  public static final double translation_kP = 7;
   public static final double translation_kI = 0.05;
   public static final double translation_kD = 0;
-  public static final double angular_kP = 0.45;
+  public static final double angular_kP = 6;
   public static final double angular_kI = 0;
   public static final double angular_kIzone = 0.05;
   public static final double angular_kD = 0.05;
