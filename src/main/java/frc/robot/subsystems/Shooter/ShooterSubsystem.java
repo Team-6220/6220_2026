@@ -10,6 +10,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,29 +19,23 @@ import frc.lib.util.TunableNumber;
 import frc.robot.subsystems.Shooter.ShooterIO.ShooterIOInputs;
 
 public class ShooterSubsystem extends SubsystemBase {
-  private final ShooterIO io;
-  private final ShooterIOInputs inputs = new ShooterIOInputs();
+  private  ShooterIO io;
+  private  ShooterIOInputs inputs = new ShooterIOInputs();
 
 
-  private final RelativeEncoder m_topEncoder;
-  private final RelativeEncoder m_bottomEncoder;
-  private final ProfiledPIDController m_Controller;
-  private final PIDController m_topPidController;
-  private final PIDController m_bottomPidController;
+  private  RelativeEncoder m_topEncoder;
+  private  RelativeEncoder m_bottomEncoder;
 
-  private final TunableNumber m_kp = new TunableNumber("Shooter/kp", 0.0);
-  private final TunableNumber m_ki = new TunableNumber("Shooter/ki", 0.0);
-  private final TunableNumber m_kd = new TunableNumber("Shooter/kd", 0.0);
-  private final TunableNumber m_kv = new TunableNumber("Shooter/kv", 0.0);
-  
- final TalonFX m_MotorShooter1 = new TalonFX(ShooterIO.Motor1ID);
-    final TalonFX m_MotorShooter2 = new TalonFX(ShooterIO.Motor2ID);
-    final TalonFX m_MotorShooter3 = new TalonFX(ShooterIO.Motor3ID);
-    final TalonFX m_kicker1 = new TalonFX(ShooterIO.Kicker1ID);
-    final TalonFX m_kicker2 = new TalonFX(ShooterIO.Kicker2ID);
-    final SparkMax m_hood = new SparkMax(ShooterIO.HoodID, MotorType.kBrushless);
+  private  PIDController m_topPidController;
+  private  PIDController m_bottomPidController;
 
-  private double m_targetRPM = 1200;
+  private  final TunableNumber m_kp = new TunableNumber("Shooter/kp", 0.0);
+  private  final TunableNumber m_ki = new TunableNumber("Shooter/ki", 0.0);
+  private  final TunableNumber m_kd = new TunableNumber("Shooter/kd", 0.0);
+  private  final TunableNumber m_kv = new TunableNumber("Shooter/kv", 0.0);
+  private  final TunableNumber m_RPM = new TunableNumber("Shooter/RPM", 0.0);
+
+  private double m_targetRPM = 0.0;
 
 
   // public ShooterSubsystem(ShooterIO io) {
