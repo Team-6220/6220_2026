@@ -20,6 +20,7 @@ import frc.robot.commands.SwerveCom;
 import frc.robot.subsystems.Climber.ClimberIOReal;
 import frc.robot.subsystems.Climber.ClimberIOSim;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
+import frc.robot.commands.AlignHub;
 import frc.robot.subsystems.Drive.Swerve;
 
 /**
@@ -148,6 +149,8 @@ public class RobotContainer {
 
     // Climber height control - X button zeros climber to bottom using stall detection
     m_driverController.x().whileTrue(new GoToZeroCommand(climberSubsystem));
+
+    m_driverController.a().whileTrue(new AlignHub());
   }
 
   /**
