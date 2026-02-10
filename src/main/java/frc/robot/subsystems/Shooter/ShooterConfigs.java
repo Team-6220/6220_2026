@@ -5,4 +5,4 @@
 package frc.robot.subsystems.Shooter;
 
 /** Add your docs here. */
-public class ShooterIO {}
+public class ShooterConfigs {}
