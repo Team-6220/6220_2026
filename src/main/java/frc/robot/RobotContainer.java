@@ -22,6 +22,7 @@ import frc.robot.subsystems.Climber.ClimberIOSim;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
 import frc.robot.commands.AlignHub;
 import frc.robot.subsystems.Drive.Swerve;
+import frc.robot.subsystems.Vision.Limelight;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -38,6 +39,8 @@ public class RobotContainer {
   /* Subsystems */
   private final Swerve s_Swerve = new Swerve();
   private final ClimberSubsystem climberSubsystem;
+
+  private final Limelight s_Limelight = new Limelight();
 
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
@@ -150,7 +153,7 @@ public class RobotContainer {
     // Climber height control - X button zeros climber to bottom using stall detection
     m_driverController.x().whileTrue(new GoToZeroCommand(climberSubsystem));
 
-    m_driverController.a().whileTrue(new AlignHub());
+    m_driverController.a().whileTrue(new AlignHub(s_Limelight));
   }
 
   /**

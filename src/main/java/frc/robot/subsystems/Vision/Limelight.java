@@ -10,13 +10,27 @@ import frc.robot.LimelightHelpers;
 
 public class Limelight extends SubsystemBase {
   /** Creates a new Limelight. */
+  private int tagID;
+
   private static String tableKey = "Vision_";
 
-  public Limelight() {}
+  public Limelight() {
+    tagID = -1;
+    LimelightHelpers.setPipelineIndex("front", 0);
+  }
 
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Vision_pipeline", LimelightHelpers.getCurrentPipelineIndex("front"));
+    if (LimelightHelpers.getRawFiducials("front").length > 0) {
+      tagID = LimelightHelpers.getRawFiducials("front")[0].getTagID();
+    }
+    SmartDashboard.putNumber(
+        "Vision_tagID", LimelightHelpers.getRawFiducials("front")[0].getTagID());
+  }
+
+  public double getTagID() {
+    return tagID;
   }
 }
 

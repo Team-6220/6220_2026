@@ -617,6 +617,10 @@ public class LimelightHelpers {
           && Double.compare(distToRobot, other.distToRobot) == 0
           && Double.compare(ambiguity, other.ambiguity) == 0;
     }
+
+    public int getTagID() {
+      return id;
+    }
   }
 
   /** Represents a Limelight Raw Target/Contour result from Limelight's NetworkTables output. */
