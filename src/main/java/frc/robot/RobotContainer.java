@@ -14,8 +14,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.Drive.Swerve;
+import frc.robot.subsystems.Climber.ClimberSubsystem;
+import frc.robot.subsystems.Climber.ClimberIOReal;
+import frc.robot.subsystems.Climber.ClimberIOSim;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -29,8 +33,10 @@ public class RobotContainer {
 
   private final SendableChooser<Command> autoChooser;
 
+  /* Subsystems */
   private final Swerve s_Swerve = new Swerve();
-
+  private final ClimberSubsystem climberSubsystem;
+  
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
   private final Joystick m_joystick = new Joystick(1);
@@ -38,6 +44,13 @@ public class RobotContainer {
   private final GenericHID m_buttonBoard = new GenericHID(2);
 
   public RobotContainer() {
+    // Initialize climber subsystem based on robot mode
+    if (Robot.isReal()) {
+      climberSubsystem = new ClimberSubsystem(new ClimberIOReal());
+    } else {
+      climberSubsystem = new ClimberSubsystem(new ClimberIOSim());
+    }
+    
     // Configure the trigger bindings
     s_Swerve.configureAutoBuilder();
     s_Swerve.zeroHeading(m_driverController.getHID());
@@ -72,6 +85,11 @@ public class RobotContainer {
     m_driverController
         .rightBumper()
         .onTrue(new TeleopSwerve(s_Swerve, m_driverController, m_driverController.leftBumper()));
+
+    // Climber control using driver controller left stick Y-axis and A button
+    m_driverController
+        .a()
+        .whileTrue(new ClimberCommand(climberSubsystem, m_driverController));
   }
 
   /**
