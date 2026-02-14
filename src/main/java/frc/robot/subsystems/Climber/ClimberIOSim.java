@@ -84,13 +84,13 @@ public class ClimberIOSim implements ClimberIO {
 
   @Override
   public void setLeftMotor(double speed) {
-    this.leftMotorSpeed = Math.max(-0.5, Math.min(0.5, speed));
+    this.leftMotorSpeed = Math.max(-0.75, Math.min(0.75, speed));
   }
 
   // TODO: Add right motor control when installed on full robot
   // @Override
   // public void setRightMotor(double speed) {
-  //     this.rightMotorSpeed = Math.max(-0.5, Math.min(0.5, speed));
+  //     this.rightMotorSpeed = Math.max(-0.75, Math.min(0.75, speed));
   // }
 
   @Override
