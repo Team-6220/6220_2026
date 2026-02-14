@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-// import frc.robot.commands.Autos;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -14,7 +13,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.GoToZeroCommand;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.subsystems.Climber.ClimberIOReal;
+import frc.robot.subsystems.Climber.ClimberIOSim;
+import frc.robot.subsystems.Climber.ClimberSubsystem;
 import frc.robot.subsystems.Drive.Swerve;
 
 /**
@@ -29,7 +32,9 @@ public class RobotContainer {
 
   private final SendableChooser<Command> autoChooser;
 
+  /* Subsystems */
   private final Swerve s_Swerve = new Swerve();
+  private final ClimberSubsystem climberSubsystem;
 
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
@@ -38,6 +43,16 @@ public class RobotContainer {
   private final GenericHID m_buttonBoard = new GenericHID(2);
 
   public RobotContainer() {
+    // Initialize climber subsystem based on robot mode
+    if (Robot.isReal()) {
+      climberSubsystem = new ClimberSubsystem(new ClimberIOReal());
+    } else {
+      climberSubsystem = new ClimberSubsystem(new ClimberIOSim());
+    }
+
+    // Initialize target height for height control (logged to SmartDashboard)
+    SmartDashboard.putNumber("Climber/TargetHeightInput", 10.0);
+
     // Configure the trigger bindings
     s_Swerve.configureAutoBuilder();
     s_Swerve.zeroHeading(m_driverController.getHID());
@@ -49,7 +64,7 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     // TODO: Register named commands as needed for auto
-    // NamedCommands.registerCommand(null, null);
+    // NamedCommands.registerCommand("AutoClimber", new AutoClimberCommand(climberSubsystem));
 
     configureBindings();
   }
@@ -72,6 +87,61 @@ public class RobotContainer {
     m_driverController
         .rightBumper()
         .onTrue(new TeleopSwerve(s_Swerve, m_driverController, m_driverController.leftBumper()));
+
+    // Climber servo control - A button toggles servo between deployed (1.0) and retracted (0.0)
+    m_driverController
+        .a()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  double currentPosition = climberSubsystem.getServoPosition();
+                  if (currentPosition > 0.5) {
+                    // Servo is deployed, retract it
+                    climberSubsystem.setServoPosition(0.0);
+                  } else {
+                    // Servo is retracted, deploy it
+                    climberSubsystem.setServoPosition(1.0);
+                  }
+                }));
+
+    // Climber control mode toggle - B button toggles between LEFT, RIGHT, and BOTH
+    m_driverController.b().onTrue(new InstantCommand(climberSubsystem::toggleControlMode));
+
+    // Climber motor control - continuously read LT and RT analog trigger values
+    // RT: drives up (positive, 0 to 0.75)
+    // LT: drives down (negative, 0 to -0.75)
+    new Trigger(
+            () -> {
+              double leftTrigger = m_driverController.getLeftTriggerAxis();
+              double rightTrigger = m_driverController.getRightTriggerAxis();
+              // Either trigger is pressed
+              return leftTrigger > 0.05 || rightTrigger > 0.05;
+            })
+        .whileTrue(
+            new edu.wpi.first.wpilibj2.command.Command() {
+              @Override
+              public void execute() {
+                double leftTrigger = m_driverController.getLeftTriggerAxis();
+                double rightTrigger = m_driverController.getRightTriggerAxis();
+                // RT (0-1) maps to positive speed (0 to 0.75)
+                // LT (0-1) maps to negative speed (0 to -0.75)
+                double speed = (rightTrigger * 0.75) - (leftTrigger * 0.75);
+                climberSubsystem.setMotorSpeed(speed);
+              }
+
+              @Override
+              public void end(boolean interrupted) {
+                climberSubsystem.stop();
+              }
+
+              @Override
+              public boolean isFinished() {
+                return false;
+              }
+            }.withName("AnalogClimberControl"));
+
+    // Climber height control - X button zeros climber to bottom using stall detection
+    m_driverController.x().whileTrue(new GoToZeroCommand(climberSubsystem));
   }
 
   /**
