@@ -19,7 +19,6 @@ public interface ClimberIO {
     public double leftMotorPosition = 0.0;
     // TODO: Add right motor when installed on full robot
     // public double rightMotorPosition = 0.0;
-    public double leftMotorSpeed = 0.0;
 
     // Absolute encoder inputs
     public double leftEncoderPosition = 0.0; // Raw encoder position in rotations
