@@ -15,7 +15,7 @@ public class ClimberSubsystem extends SubsystemBase {
     BOTH // Control both climbers together
   }
 
-  public boolean ClimberAtBottom = false;
+  public boolean climberAtBottom = false;
 
   private final ClimberIO io;
   private final ClimberIO.ClimberIOInputs inputs = new ClimberIO.ClimberIOInputs();
