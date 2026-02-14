@@ -130,6 +130,10 @@ public class RobotContainer {
             })
         .whileTrue(
             new edu.wpi.first.wpilibj2.command.Command() {
+              {
+                addRequirements(climberSubsystem);
+              }
+
               @Override
               public void execute() {
                 double leftTrigger = m_driverController.getLeftTriggerAxis();
