@@ -11,6 +11,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -55,10 +56,10 @@ public class RobotContainer {
 
   public RobotContainer() {
     // Initialize climber subsystem based on robot mode
-    if (Robot.isReal()) {
-      climberSubsystem = new ClimberSubsystem(new ClimberIOReal());
-    } else {
+    if (RobotBase.isSimulation()) {
       climberSubsystem = new ClimberSubsystem(new ClimberIOSim());
+    } else {
+      climberSubsystem = new ClimberSubsystem(new ClimberIOReal());
     }
     
     // Configure the trigger bindings
