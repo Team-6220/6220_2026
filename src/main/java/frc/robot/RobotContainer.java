@@ -6,15 +6,21 @@ package frc.robot;
 
 // import frc.robot.commands.Autos;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.SwerveCom;
 import frc.robot.subsystems.Drive.Swerve;
 
 /**
@@ -43,14 +49,15 @@ public class RobotContainer {
     s_Swerve.zeroHeading(m_driverController.getHID());
 
     s_Swerve.setDefaultCommand(
-        new TeleopSwerve(s_Swerve, m_driverController, m_driverController.leftBumper()));
+        new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     // TODO: Register named commands as needed for auto
     // NamedCommands.registerCommand(null, null);
-
+    autoChooser.addOption("auto1", new PathPlannerAuto("Auto1"));
+    SmartDashboard.putData(autoChooser);
     configureBindings();
   }
 
@@ -71,7 +78,7 @@ public class RobotContainer {
 
     m_driverController
         .rightBumper()
-        .onTrue(new TeleopSwerve(s_Swerve, m_driverController, m_driverController.leftBumper()));
+        .onTrue(new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
   }
 
   /**
@@ -80,7 +87,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
+    System.out.println("auto: "+autoChooser.getSelected());
     return autoChooser.getSelected();
   }
   // An example command will be run in autonomous
