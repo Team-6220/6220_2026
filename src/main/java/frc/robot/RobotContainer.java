@@ -5,12 +5,18 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.GoToZeroCommand;
@@ -18,7 +24,12 @@ import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.Climber.ClimberIOReal;
 import frc.robot.subsystems.Climber.ClimberIOSim;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
+import frc.robot.commands.ClimberCommand;
+import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.Drive.Swerve;
+import frc.robot.subsystems.Climber.ClimberSubsystem;
+import frc.robot.subsystems.Climber.ClimberIOReal;
+import frc.robot.subsystems.Climber.ClimberIOSim;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -35,7 +46,7 @@ public class RobotContainer {
   /* Subsystems */
   private final Swerve s_Swerve = new Swerve();
   private final ClimberSubsystem climberSubsystem;
-
+  
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
   private final Joystick m_joystick = new Joystick(1);
@@ -49,16 +60,13 @@ public class RobotContainer {
     } else {
       climberSubsystem = new ClimberSubsystem(new ClimberIOSim());
     }
-
-    // Initialize target height for height control (logged to SmartDashboard)
-    SmartDashboard.putNumber("Climber/TargetHeightInput", 10.0);
-
+    
     // Configure the trigger bindings
     s_Swerve.configureAutoBuilder();
     s_Swerve.zeroHeading(m_driverController.getHID());
 
     s_Swerve.setDefaultCommand(
-        new TeleopSwerve(s_Swerve, m_driverController, m_driverController.leftBumper()));
+        new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -66,6 +74,9 @@ public class RobotContainer {
     // TODO: Register named commands as needed for auto
     // NamedCommands.registerCommand("AutoClimber", new AutoClimberCommand(climberSubsystem));
 
+    // NamedCommands.registerCommand(null, null);
+    autoChooser.addOption("auto1", new PathPlannerAuto("Auto1"));
+    SmartDashboard.putData(autoChooser);
     configureBindings();
   }
 
@@ -150,7 +161,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
+    System.out.println("auto: "+autoChooser.getSelected());
     return autoChooser.getSelected();
   }
   // An example command will be run in autonomous
