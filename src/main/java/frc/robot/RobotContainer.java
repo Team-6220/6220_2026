@@ -87,7 +87,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    System.out.println("are we getting the fucking auto");
     System.out.println("auto: "+autoChooser.getSelected());
     return autoChooser.getSelected();
   }
