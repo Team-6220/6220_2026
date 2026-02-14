@@ -28,9 +28,8 @@ public class SetClimberServoCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // Convert angle (0-180 degrees) to servo position (0.0-1.0)
-    double position = servoPosition;
-    climberSubsystem.setServoPosition(position);
+    // Set the servo to the specified position (0.0 to 1.0)
+    climberSubsystem.setServoPosition(servoPosition);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
