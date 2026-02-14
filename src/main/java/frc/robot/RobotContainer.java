@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.GoToZeroCommand;
 import frc.robot.commands.SwerveCom;
 import frc.robot.subsystems.Climber.ClimberIOReal;
