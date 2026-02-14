@@ -61,7 +61,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     // Check if motor is stalled (high current draw)
     if (inputs.leftMotorCurrent > ClimberConstants.STALL_CURRENT_THRESHOLD
-        & inputs.leftMotorVelocity < ClimberConstants.VELOCITY_THRESHOLD) {
+        && inputs.leftMotorVelocity < ClimberConstants.VELOCITY_THRESHOLD) {
       // Motor is stalled, we've hit bottom - stop
       io.setLeftMotor(0.0);
     } else {
@@ -73,7 +73,7 @@ public class ClimberSubsystem extends SubsystemBase {
   /** Check if climber is at zero position (stalled) */
   public boolean isAtZero() {
     return inputs.leftMotorCurrent > ClimberConstants.STALL_CURRENT_THRESHOLD
-        & inputs.leftMotorVelocity < ClimberConstants.VELOCITY_THRESHOLD;
+        && inputs.leftMotorVelocity < ClimberConstants.VELOCITY_THRESHOLD;
   }
 
   /**
