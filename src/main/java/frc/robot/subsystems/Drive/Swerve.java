@@ -252,6 +252,7 @@ public class Swerve extends SubsystemBase {
    * @param robotRelativeSpeeds the speed in m/s
    */
   public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
+    System.out.println("relative");
     ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
 
     SwerveModuleState[] targetStates =
