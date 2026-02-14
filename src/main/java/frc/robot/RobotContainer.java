@@ -20,17 +20,13 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.GoToZeroCommand;
-import frc.robot.commands.TeleopSwerve;
-import frc.robot.subsystems.Climber.ClimberIOReal;
-import frc.robot.subsystems.Climber.ClimberIOSim;
-import frc.robot.subsystems.Climber.ClimberSubsystem;
 import frc.robot.commands.ClimberCommand;
-import frc.robot.commands.TeleopSwerve;
-import frc.robot.subsystems.Drive.Swerve;
-import frc.robot.subsystems.Climber.ClimberSubsystem;
+import frc.robot.commands.GoToZeroCommand;
+import frc.robot.commands.SwerveCom;
 import frc.robot.subsystems.Climber.ClimberIOReal;
 import frc.robot.subsystems.Climber.ClimberIOSim;
+import frc.robot.subsystems.Climber.ClimberSubsystem;
+import frc.robot.subsystems.Drive.Swerve;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -98,7 +94,7 @@ public class RobotContainer {
 
     m_driverController
         .rightBumper()
-        .onTrue(new TeleopSwerve(s_Swerve, m_driverController, m_driverController.leftBumper()));
+        .onTrue(new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
     // Climber servo control - A button toggles servo between deployed (1.0) and retracted (0.0)
     m_driverController
