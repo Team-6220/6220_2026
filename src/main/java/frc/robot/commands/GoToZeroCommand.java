@@ -7,21 +7,18 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
 
-public class ClimberCommand extends Command {
-  /** Creates a new ClimberCommand with configurable motor speed. */
+public class GoToZeroCommand extends Command {
+  /** Creates a new GoToZeroCommand that zeros the climber to bottom using stall detection. */
   private final ClimberSubsystem climberSubsystem;
 
-  private final double speed;
-
   /**
-   * Creates a new ClimberCommand that drives the left climber at a specified speed.
+   * Creates a new GoToZeroCommand. This command zeros the climber by driving downward until stall
+   * current is detected (indicating the climber has hit the bottom).
    *
    * @param climberSubsystem The climber subsystem to control
-   * @param speed The motor speed from -1.0 to 1.0
    */
-  public ClimberCommand(ClimberSubsystem climberSubsystem, double speed) {
+  public GoToZeroCommand(ClimberSubsystem climberSubsystem) {
     this.climberSubsystem = climberSubsystem;
-    this.speed = speed;
     addRequirements(climberSubsystem);
   }
 
@@ -32,11 +29,7 @@ public class ClimberCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // Drive left climber motor at configured speed
-    climberSubsystem.setMotorSpeed(speed);
-
-    // TODO: Add right motor control when installed on full robot
-    // climberSubsystem.setMotorSpeed(speed);
+    climberSubsystem.zeroClimberToBottom();
   }
 
   // Called once the command ends or is interrupted.
@@ -48,6 +41,6 @@ public class ClimberCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return climberSubsystem.isAtZero();
   }
 }

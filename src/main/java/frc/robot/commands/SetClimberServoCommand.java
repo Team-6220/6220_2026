@@ -7,47 +7,42 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
 
-public class ClimberCommand extends Command {
-  /** Creates a new ClimberCommand with configurable motor speed. */
+public class SetClimberServoCommand extends Command {
+  /** Creates a new SetClimberServoCommand that sets the servo to the configured angle. */
   private final ClimberSubsystem climberSubsystem;
 
-  private final double speed;
+  private final double servoPosition;
 
   /**
-   * Creates a new ClimberCommand that drives the left climber at a specified speed.
+   * Creates a new SetClimberServoCommand.
    *
    * @param climberSubsystem The climber subsystem to control
-   * @param speed The motor speed from -1.0 to 1.0
+   * @param servoPosition The servo position (0.0 to 1.0)
    */
-  public ClimberCommand(ClimberSubsystem climberSubsystem, double speed) {
+  public SetClimberServoCommand(ClimberSubsystem climberSubsystem, double servoPosition) {
     this.climberSubsystem = climberSubsystem;
-    this.speed = speed;
+    this.servoPosition = servoPosition;
     addRequirements(climberSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    // Set the servo to the specified position (0.0 to 1.0)
+    climberSubsystem.setServoPosition(servoPosition);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    // Drive left climber motor at configured speed
-    climberSubsystem.setMotorSpeed(speed);
-
-    // TODO: Add right motor control when installed on full robot
-    // climberSubsystem.setMotorSpeed(speed);
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    climberSubsystem.stop();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

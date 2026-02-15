@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-// import frc.robot.commands.Autos;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -12,6 +11,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,16 +20,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-<<<<<<< 32-make-servo-work
-import frc.robot.commands.ClimberCommand;
-import frc.robot.commands.TeleopSwerve;
-=======
+import frc.robot.commands.GoToZeroCommand;
 import frc.robot.commands.SwerveCom;
->>>>>>> dev
-import frc.robot.subsystems.Drive.Swerve;
-import frc.robot.subsystems.Climber.ClimberSubsystem;
 import frc.robot.subsystems.Climber.ClimberIOReal;
 import frc.robot.subsystems.Climber.ClimberIOSim;
+import frc.robot.subsystems.Climber.ClimberSubsystem;
+import frc.robot.subsystems.Drive.Swerve;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -55,10 +51,10 @@ public class RobotContainer {
 
   public RobotContainer() {
     // Initialize climber subsystem based on robot mode
-    if (Robot.isReal()) {
-      climberSubsystem = new ClimberSubsystem(new ClimberIOReal());
-    } else {
+    if (RobotBase.isSimulation()) {
       climberSubsystem = new ClimberSubsystem(new ClimberIOSim());
+    } else {
+      climberSubsystem = new ClimberSubsystem(new ClimberIOReal());
     }
     
     // Configure the trigger bindings
@@ -72,6 +68,8 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     // TODO: Register named commands as needed for auto
+    // NamedCommands.registerCommand("AutoClimber", new AutoClimberCommand(climberSubsystem));
+
     // NamedCommands.registerCommand(null, null);
     autoChooser.addOption("auto1", new PathPlannerAuto("Auto1"));
     SmartDashboard.putData(autoChooser);
@@ -95,16 +93,66 @@ public class RobotContainer {
 
     m_driverController
         .rightBumper()
-<<<<<<< 32-make-servo-work
-        .onTrue(new TeleopSwerve(s_Swerve, m_driverController, m_driverController.leftBumper()));
+        .onTrue(new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
-    // Climber control using driver controller left stick Y-axis and A button
+    // Climber servo control - A button toggles servo between deployed (1.0) and retracted (0.0)
     m_driverController
         .a()
-        .whileTrue(new ClimberCommand(climberSubsystem, m_driverController));
-=======
-        .onTrue(new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
->>>>>>> dev
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  double currentPosition = climberSubsystem.getServoPosition();
+                  if (currentPosition > 0.5) {
+                    // Servo is deployed, retract it
+                    climberSubsystem.setServoPosition(0.0);
+                  } else {
+                    // Servo is retracted, deploy it
+                    climberSubsystem.setServoPosition(1.0);
+                  }
+                }));
+
+    // Climber control mode toggle - B button toggles between LEFT, RIGHT, and BOTH
+    m_driverController.b().onTrue(new InstantCommand(climberSubsystem::toggleControlMode));
+
+    // Climber motor control - continuously read LT and RT analog trigger values
+    // RT: drives up (positive, 0 to 0.75)
+    // LT: drives down (negative, 0 to -0.75)
+    new Trigger(
+            () -> {
+              double leftTrigger = m_driverController.getLeftTriggerAxis();
+              double rightTrigger = m_driverController.getRightTriggerAxis();
+              // Either trigger is pressed
+              return leftTrigger > 0.05 || rightTrigger > 0.05;
+            })
+        .whileTrue(
+            new edu.wpi.first.wpilibj2.command.Command() {
+              {
+                addRequirements(climberSubsystem);
+              }
+
+              @Override
+              public void execute() {
+                double leftTrigger = m_driverController.getLeftTriggerAxis();
+                double rightTrigger = m_driverController.getRightTriggerAxis();
+                // RT (0-1) maps to positive speed (0 to 0.75)
+                // LT (0-1) maps to negative speed (0 to -0.75)
+                double speed = (rightTrigger * 0.75) - (leftTrigger * 0.75);
+                climberSubsystem.setMotorSpeed(speed);
+              }
+
+              @Override
+              public void end(boolean interrupted) {
+                climberSubsystem.stop();
+              }
+
+              @Override
+              public boolean isFinished() {
+                return false;
+              }
+            }.withName("AnalogClimberControl"));
+
+    // Climber height control - X button zeros climber to bottom using stall detection
+    m_driverController.x().whileTrue(new GoToZeroCommand(climberSubsystem));
   }
 
   /**
