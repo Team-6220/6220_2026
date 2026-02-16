@@ -19,7 +19,8 @@ public class ClimberConstants {
   // Example: If 1 rotation = 2 inches of height, coefficient = 2.0
   // Adjust based on your mechanism's gear ratio and drum/pulley diameter
   public static final double climberHeightCoefficient =
-      1.2024 * 3.142; // Distance climber moves per encoder rotation (in inches). This is based on the
+      1.2024
+          * 3.142; // Distance climber moves per encoder rotation (in inches). This is based on the
   // pitch circumference of a 15T sprocket
 
   // Encoder offset in inches (adjust to calibrate starting position)
