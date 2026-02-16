@@ -14,8 +14,7 @@ public class SwerveCom extends Command {
   private BooleanSupplier robotCentricSup;
   private CommandXboxController driver;
 
-  public SwerveCom(
-      Swerve s_Swerve, CommandXboxController driver, BooleanSupplier robotCentricSup) {
+  public SwerveCom(Swerve s_Swerve, CommandXboxController driver, BooleanSupplier robotCentricSup) {
     this.s_Swerve = s_Swerve;
     addRequirements(s_Swerve);
     this.driver = driver;
@@ -28,18 +27,19 @@ public class SwerveCom extends Command {
     // Initilize so that the swerve doesn't become grumpy
     s_Swerve.resetModulesToAbsolute();
   }
-  
 
   @Override
   public void execute() {
     if (!DriverStation.isAutonomous()) {
       System.out.println("im using up swerve");
-    /* Get Values, Deadband*/
-    double[] driverInputs = OIConstants.getDriverInputs(driver.getHID());
-    /* Drive */
-    s_Swerve.drive(
-        new Translation2d(-driverInputs[0], -driverInputs[1]),
-        -driverInputs[2],
-        !robotCentricSup.getAsBoolean(),
-        true);}}
+      /* Get Values, Deadband*/
+      double[] driverInputs = OIConstants.getDriverInputs(driver.getHID());
+      /* Drive */
+      s_Swerve.drive(
+          new Translation2d(-driverInputs[0], -driverInputs[1]),
+          -driverInputs[2],
+          !robotCentricSup.getAsBoolean(),
+          true);
+    }
+  }
 }
