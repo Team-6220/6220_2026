@@ -21,7 +21,7 @@ public class Limelight extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Vision_pipeline", LimelightHelpers.getCurrentPipelineIndex("front"));
+    SmartDashboard.putNumber("Vision_Raw", LimelightHelpers.getRawFiducials("front")[0].getTagID());
     if (LimelightHelpers.getRawFiducials("front").length > 0) {
       tagID = LimelightHelpers.getRawFiducials("front")[0].getTagID();
     }
