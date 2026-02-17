@@ -43,8 +43,8 @@ public final class AutoConstants {
     return new PathConstraints(
         MetersPerSecond.of(translationMaxVelMpsTN.get()),
         MetersPerSecondPerSecond.of(translationMaxAccelMpsSqTN.get()),
-        RadiansPerSecond.of(angularMaxVelDegTN.get()),
-        RadiansPerSecondPerSecond.of(angularMaxAccelDegTN.get()));
+        RadiansPerSecond.of(angularMaxVelRadPerSec()),
+        RadiansPerSecondPerSecond.of(angularMaxAccelRadPerSecSq()));
   }
 
   // -----------------------------
@@ -120,11 +120,11 @@ public final class AutoConstants {
       new TunableNumber("auto/angularTolerance_deg", angularTolerance.in(Degrees));
 
   // Convert to radians for controllers
-  public static double angularMaxVelRad() {
+  public static double angularMaxVelRadPerSec() {
     return Math.toRadians(angularMaxVelDegTN.get());
   }
 
-  public static double angularMaxAccelRad() {
+  public static double angularMaxAccelRadPerSecSq() {
     return Math.toRadians(angularMaxAccelDegTN.get());
   }
 

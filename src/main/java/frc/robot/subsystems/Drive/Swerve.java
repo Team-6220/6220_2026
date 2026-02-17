@@ -149,7 +149,8 @@ public class Swerve extends SubsystemBase {
             AutoConstants.angularKITN.get(),
             AutoConstants.angularKDTN.get(),
             new TrapezoidProfile.Constraints(
-                AutoConstants.angularMaxVelRad(), AutoConstants.angularMaxAccelRad()));
+                AutoConstants.angularMaxVelRadPerSec(),
+                AutoConstants.angularMaxAccelRadPerSecSq()));
 
     turnPidController.setIZone(AutoConstants.angularKIzoneTN.get());
     turnPidController.setTolerance(AutoConstants.angularToleranceRad());
@@ -477,7 +478,7 @@ public class Swerve extends SubsystemBase {
         || AutoConstants.angularMaxVelDegTN.hasChanged()) {
       turnPidController.setConstraints(
           new TrapezoidProfile.Constraints(
-              AutoConstants.angularMaxVelRad(), AutoConstants.angularMaxAccelRad()));
+              AutoConstants.angularMaxVelRadPerSec(), AutoConstants.angularMaxAccelRadPerSecSq()));
       turnPidController.reset(getHeading().getDegrees());
     }
   }
