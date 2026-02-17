@@ -31,8 +31,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.RumbleManager;
+import frc.robot.AutoConstants;
 import frc.robot.Constants;
-import frc.robot.config.AutoConfig;
 import frc.robot.subsystems.Drive.GyroIO.GyroIOInputs;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -145,14 +145,14 @@ public class Swerve extends SubsystemBase {
 
     turnPidController =
         new ProfiledPIDController(
-            AutoConfig.angularKP.get(),
-            AutoConfig.angularKI.get(),
-            AutoConfig.angularKD.get(),
+            AutoConstants.angularKPTN.get(),
+            AutoConstants.angularKITN.get(),
+            AutoConstants.angularKDTN.get(),
             new TrapezoidProfile.Constraints(
-                AutoConfig.angularMaxAccelRad(), AutoConfig.angularMaxAccelRad()));
+                AutoConstants.angularMaxAccelRad(), AutoConstants.angularMaxAccelRad()));
 
-    turnPidController.setIZone(AutoConfig.angularKIzone.get());
-    turnPidController.setTolerance(AutoConfig.angularToleranceRad());
+    turnPidController.setIZone(AutoConstants.angularKIzoneTN.get());
+    turnPidController.setTolerance(AutoConstants.angularToleranceRad());
 
     turnPidController.enableContinuousInput(-(Math.PI / 2.0), (Math.PI / 2.0));
 
@@ -221,13 +221,13 @@ public class Swerve extends SubsystemBase {
         (speeds, feedforwards) -> driveRobotRelative(speeds),
         new PPHolonomicDriveController(
             new PIDConstants(
-                AutoConfig.translationKP.get(),
-                AutoConfig.translationKI.get(),
-                AutoConfig.translationKD.get()),
+                AutoConstants.translationKPTN.get(),
+                AutoConstants.translationKITN.get(),
+                AutoConstants.translationKDTN.get()),
             new PIDConstants(
-                AutoConfig.angularKP.get(),
-                AutoConfig.angularKI.get(),
-                AutoConfig.angularKD.get())),
+                AutoConstants.angularKPTN.get(),
+                AutoConstants.angularKITN.get(),
+                AutoConstants.angularKDTN.get())),
         config,
         () -> {
           var alliance = DriverStation.getAlliance();
@@ -463,18 +463,21 @@ public class Swerve extends SubsystemBase {
 
     field2d.setRobotPose(getPose());
 
-    if (AutoConfig.angularKP.hasChanged()
-        || AutoConfig.angularKD.hasChanged()
-        || AutoConfig.angularKD.hasChanged()) {
+    if (AutoConstants.angularKPTN.hasChanged()
+        || AutoConstants.angularKITN.hasChanged()
+        || AutoConstants.angularKDTN.hasChanged()) {
       turnPidController.setPID(
-          AutoConfig.angularKP.get(), AutoConfig.angularKD.get(), AutoConfig.angularKD.get());
+          AutoConstants.angularKPTN.get(),
+          AutoConstants.angularKITN.get(),
+          AutoConstants.angularKDTN.get());
       turnPidController.reset(getHeading().getDegrees());
     }
 
-    if (AutoConfig.angularMaxAccelDeg.hasChanged() || AutoConfig.angularMaxVelDeg.hasChanged()) {
+    if (AutoConstants.angularMaxAccelDegTN.hasChanged()
+        || AutoConstants.angularMaxVelDegTN.hasChanged()) {
       turnPidController.setConstraints(
           new TrapezoidProfile.Constraints(
-              AutoConfig.angularMaxVelDeg.get(), AutoConfig.angularMaxAccelDeg.get()));
+              AutoConstants.angularMaxVelDegTN.get(), AutoConstants.angularMaxAccelDegTN.get()));
       turnPidController.reset(getHeading().getDegrees());
     }
   }

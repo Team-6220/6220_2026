@@ -24,15 +24,20 @@ public class SwerveModule {
   private final DutyCycleOut driveDutyCycle = new DutyCycleOut(0);
   private final VelocityVoltage driveVelocity = new VelocityVoltage(0);
 
-  private final TunableNumber driveKS =
+  /** driveKS Tunable Number */
+  private final TunableNumber driveKSTN =
       new TunableNumber("SwerveModule_kS", SwerveConstants.DRIVE_KS);
-  private final TunableNumber driveKV =
+
+  /** driveKV Tunable Number */
+  private final TunableNumber driveKVTN =
       new TunableNumber("SwerveModule_kV", SwerveConstants.DRIVE_KV);
-  private final TunableNumber driveKA =
+
+  /** driveKA Tunable Number */
+  private final TunableNumber driveKATN =
       new TunableNumber("SwerveModule_kA", SwerveConstants.DRIVE_KA);
 
   private final SimpleMotorFeedforward driveFeedForward =
-      new SimpleMotorFeedforward(driveKS.get(), driveKV.get(), driveKA.get());
+      new SimpleMotorFeedforward(driveKSTN.get(), driveKVTN.get(), driveKATN.get());
 
   public SwerveModule(int moduleNumber, SwerveModuleConstants config, SwerveModuleIO io) {
     this.io = io;
@@ -43,14 +48,14 @@ public class SwerveModule {
   public void periodic() {
     io.updateInputs(inputs);
     io.setAnglePosition(moduleNumber);
-    if (driveKS.hasChanged()) {
-      driveFeedForward.setKs(driveKS.get());
+    if (driveKSTN.hasChanged()) {
+      driveFeedForward.setKs(driveKSTN.get());
     }
-    if (driveKV.hasChanged()) {
-      driveFeedForward.setKv(driveKV.get());
+    if (driveKVTN.hasChanged()) {
+      driveFeedForward.setKv(driveKVTN.get());
     }
-    if (driveKA.hasChanged()) {
-      driveFeedForward.setKa(driveKA.get());
+    if (driveKATN.hasChanged()) {
+      driveFeedForward.setKa(driveKATN.get());
     }
   }
 
