@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.subsystems.Drive;
 
 import static edu.wpi.first.units.Units.Volts;
 
@@ -12,7 +12,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
 import frc.lib.util.TunableNumber;
-import frc.robot.subsystems.Drive.SwerveModuleIO;
+import frc.robot.RevConfigs;
 import frc.robot.subsystems.Drive.SwerveModuleIO.SwerveModuleIOInputs;
 
 public class SwerveModule {

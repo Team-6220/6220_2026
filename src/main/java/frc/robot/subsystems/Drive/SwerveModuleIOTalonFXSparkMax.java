@@ -32,7 +32,6 @@ import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.RevConfigs;
 import frc.robot.Robot;
-import frc.robot.SwerveConstants;
 
 /** TalonFX Drive Motor, SparkMax Turn Motor */
 public class SwerveModuleIOTalonFXSparkMax implements SwerveModuleIO {
