@@ -149,7 +149,7 @@ public class Swerve extends SubsystemBase {
             AutoConstants.angularKITN.get(),
             AutoConstants.angularKDTN.get(),
             new TrapezoidProfile.Constraints(
-                AutoConstants.angularMaxAccelRad(), AutoConstants.angularMaxAccelRad()));
+                AutoConstants.angularMaxVelRad(), AutoConstants.angularMaxAccelRad()));
 
     turnPidController.setIZone(AutoConstants.angularKIzoneTN.get());
     turnPidController.setTolerance(AutoConstants.angularToleranceRad());
