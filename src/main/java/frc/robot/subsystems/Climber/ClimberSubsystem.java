@@ -6,7 +6,6 @@ package frc.robot.subsystems.Climber;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.ClimberConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
   public enum ClimberControlMode {

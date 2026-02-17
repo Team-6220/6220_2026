@@ -13,7 +13,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Distance;
 import frc.lib.util.SwerveModuleConstants;
-import frc.robot.config.RobotConfig;
+import frc.robot.Constants;
 
 /**
  * SwerveConstants contains robot-independent swerve constants and also per-robot swerve
@@ -136,8 +136,8 @@ public final class SwerveConstants {
   public static final double CLOSED_LOOP_RAMP;
 
   static {
-    switch (RobotConfig.TYPE) {
-      case COMP -> {
+    switch (Constants.TYPE) {
+      case COMPBOT -> {
         WHEEL_DIAMETER = COMP_WHEEL_DIAMETER;
         DRIVE_GEAR_RATIO = COMP_DRIVE_GEAR_RATIO;
         ANGLE_GEAR_RATIO = COMP_ANGLE_GEAR_RATIO;
@@ -161,7 +161,7 @@ public final class SwerveConstants {
         OPEN_LOOP_RAMP = COMP_OPEN_LOOP_RAMP;
         CLOSED_LOOP_RAMP = COMP_CLOSED_LOOP_RAMP;
       }
-      case PRACTICE -> {
+      case PRACTICEBOT -> {
         WHEEL_DIAMETER = GEORGE_WHEEL_DIAMETER;
         DRIVE_GEAR_RATIO = GEORGE_DRIVE_GEAR_RATIO;
         ANGLE_GEAR_RATIO = GEORGE_ANGLE_GEAR_RATIO;
@@ -185,7 +185,7 @@ public final class SwerveConstants {
         OPEN_LOOP_RAMP = GEORGE_OPEN_LOOP_RAMP;
         CLOSED_LOOP_RAMP = GEORGE_CLOSED_LOOP_RAMP;
       }
-      case SIM -> {
+      case SIMBOT -> {
         WHEEL_DIAMETER = COMP_WHEEL_DIAMETER;
         DRIVE_GEAR_RATIO = COMP_DRIVE_GEAR_RATIO;
         ANGLE_GEAR_RATIO = COMP_ANGLE_GEAR_RATIO;
@@ -209,7 +209,7 @@ public final class SwerveConstants {
         OPEN_LOOP_RAMP = COMP_OPEN_LOOP_RAMP;
         CLOSED_LOOP_RAMP = COMP_CLOSED_LOOP_RAMP;
       }
-      default -> throw new IllegalStateException("Unknown RobotType: " + RobotConfig.TYPE);
+      default -> throw new IllegalStateException("Unknown RobotType: " + Constants.TYPE);
     }
   }
 
