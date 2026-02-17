@@ -153,7 +153,7 @@ public class RobotContainer {
     // Climber height control - X button zeros climber to bottom using stall detection
     m_driverController.x().whileTrue(new GoToZeroCommand(climberSubsystem));
 
-    m_driverController.a().whileTrue(new AlignHub(s_Limelight));
+    m_driverController.a().whileTrue(new AlignHub());
   }
 
   /**

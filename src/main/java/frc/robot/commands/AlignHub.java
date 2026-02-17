@@ -16,13 +16,10 @@ public class AlignHub extends Command {
   private static String name = "front";
   private static String key = "FrontVision_";
   private static Translation2d translation = new Translation2d(0, 0);
-  private Limelight s_Limelight;
 
-  public AlignHub(Limelight limelight) {
+  public AlignHub() {
     // Use addRequirements() here to declare subsystem dependencies.
-    s_Limelight = limelight;
-    tagID = s_Limelight.getTagID();
-    System.out.print(tagID);
+    tagID = LimelightHelpers.getFiducialID(name);
     LimelightHelpers.setPipelineIndex(name, 0);
   }
 
@@ -31,20 +28,7 @@ public class AlignHub extends Command {
   public void initialize() {
     // s_Swerve.resetTurnController();
     // s_Swerve.setTurnControllerGoal(LimelightHelpers.getTX(name));
-
-    if (tagID == 2.0 || tagID == 18.0) {
-      LimelightHelpers.setPipelineIndex(name, 1);
-    } else if (tagID == 11.0 || tagID == 27.0) {
-      LimelightHelpers.setPipelineIndex(name, 2);
-    } else if (tagID == 10.0 || tagID == 26.0) {
-      LimelightHelpers.setPipelineIndex(name, 3);
-    } else if (tagID == 9.0 || tagID == 25.0) {
-      LimelightHelpers.setPipelineIndex(name, 4);
-    } else if (tagID == 8.0 || tagID == 24.0) {
-      LimelightHelpers.setPipelineIndex(name, 5);
-    } else if (tagID == 5.0 || tagID == 21.0) {
-      LimelightHelpers.setPipelineIndex(name, 6);
-    }
+    Limelight.setPipeline();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -58,7 +42,7 @@ public class AlignHub extends Command {
       end(true);
     }
     */
-    System.out.println(tagID + "  pipline: " + LimelightHelpers.getCurrentPipelineIndex(name));
+    System.out.println("Aligning to hub????????????? we shall see");
   }
 
   // Called once the command ends or is interrupted.
