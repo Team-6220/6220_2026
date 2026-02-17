@@ -13,7 +13,7 @@ public class AlignHub extends Command {
   /** Creates a new AlignHub. */
   private double tagID;
 
-  private static String name = "front";
+  private static String name = "limelight-front";
   private static String key = "FrontVision_";
   private static Translation2d translation = new Translation2d(0, 0);
 
