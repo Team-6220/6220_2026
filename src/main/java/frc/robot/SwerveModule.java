@@ -12,7 +12,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
 import frc.lib.util.TunableNumber;
-import frc.robot.config.RobotConfig;
 import frc.robot.subsystems.Drive.SwerveModuleIO;
 import frc.robot.subsystems.Drive.SwerveModuleIO.SwerveModuleIOInputs;
 
@@ -26,11 +25,11 @@ public class SwerveModule {
   private final VelocityVoltage driveVelocity = new VelocityVoltage(0);
 
   private final TunableNumber driveKS =
-      new TunableNumber("SwerveModule_kS", RobotConfig.SWERVECONFIG.driveKS());
+      new TunableNumber("SwerveModule_kS", SwerveConstants.DRIVE_KS);
   private final TunableNumber driveKV =
-      new TunableNumber("SwerveModule_kV", RobotConfig.SWERVECONFIG.driveKV());
+      new TunableNumber("SwerveModule_kV", SwerveConstants.DRIVE_KV);
   private final TunableNumber driveKA =
-      new TunableNumber("SwerveModule_kA", RobotConfig.SWERVECONFIG.driveKA());
+      new TunableNumber("SwerveModule_kA", SwerveConstants.DRIVE_KA);
 
   private final SimpleMotorFeedforward driveFeedForward =
       new SimpleMotorFeedforward(driveKS.get(), driveKV.get(), driveKA.get());
@@ -83,12 +82,11 @@ public class SwerveModule {
 
     // drive control
     if (isOpenLoop) {
-      driveDutyCycle.Output = state.speedMetersPerSecond / RobotConfig.SWERVECONFIG.maxSpeed();
+      driveDutyCycle.Output = state.speedMetersPerSecond / SwerveConstants.maxSpeed();
       io.setDriveControlDutyCycle(driveDutyCycle);
     } else {
       driveVelocity.Velocity =
-          Conversions.MPSToRPS(
-              state.speedMetersPerSecond, RobotConfig.SWERVECONFIG.wheelCircumference());
+          Conversions.MPSToRPS(state.speedMetersPerSecond, SwerveConstants.wheelCircumference());
       driveVelocity.FeedForward = driveFeedForward.calculate(state.speedMetersPerSecond);
       io.setDriveControlVelocity(driveVelocity);
     }

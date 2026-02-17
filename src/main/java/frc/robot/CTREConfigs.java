@@ -2,7 +2,6 @@ package frc.robot;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import frc.robot.config.RobotConfig;
 
 // import com.ctre.phoenix6.signals.InvertedValue;
 
@@ -23,7 +22,7 @@ public final class CTREConfigs {
     swerveDriveFXConfig.MotorOutput.NeutralMode = SwerveConstants.driveNeutralMode;
 
     /* Gear Ratio Config */
-    swerveDriveFXConfig.Feedback.SensorToMechanismRatio = RobotConfig.SWERVECONFIG.driveGearRatio();
+    swerveDriveFXConfig.Feedback.SensorToMechanismRatio = SwerveConstants.DRIVE_GEAR_RATIO;
 
     swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable =
         SwerveConstants.driveEnableCurrentLimit;
@@ -32,19 +31,17 @@ public final class CTREConfigs {
     swerveDriveFXConfig.CurrentLimits.SupplyCurrentLowerTime = SwerveConstants.driveMaxCurrentTime;
 
     /* PID Config */
-    swerveDriveFXConfig.Slot0.kP = RobotConfig.SWERVECONFIG.driveKP();
-    swerveDriveFXConfig.Slot0.kI = RobotConfig.SWERVECONFIG.driveKI();
-    swerveDriveFXConfig.Slot0.kD = RobotConfig.SWERVECONFIG.driveKD();
+    swerveDriveFXConfig.Slot0.kP = SwerveConstants.DRIVE_KP;
+    swerveDriveFXConfig.Slot0.kI = SwerveConstants.DRIVE_KI;
+    swerveDriveFXConfig.Slot0.kD = SwerveConstants.DRIVE_KD;
 
     /* Open and Closed Loop Ramping */
-    swerveDriveFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod =
-        RobotConfig.SWERVECONFIG.openLoopRamp();
-    swerveDriveFXConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod =
-        RobotConfig.SWERVECONFIG.openLoopRamp();
+    swerveDriveFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = SwerveConstants.OPEN_LOOP_RAMP;
+    swerveDriveFXConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = SwerveConstants.OPEN_LOOP_RAMP;
 
     swerveDriveFXConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod =
-        RobotConfig.SWERVECONFIG.closedLoopRamp();
+        SwerveConstants.CLOSED_LOOP_RAMP;
     swerveDriveFXConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod =
-        RobotConfig.SWERVECONFIG.closedLoopRamp();
+        SwerveConstants.CLOSED_LOOP_RAMP;
   }
 }

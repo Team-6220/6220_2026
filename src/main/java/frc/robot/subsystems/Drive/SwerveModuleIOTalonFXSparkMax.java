@@ -33,7 +33,6 @@ import frc.lib.util.SwerveModuleConstants;
 import frc.robot.RevConfigs;
 import frc.robot.Robot;
 import frc.robot.SwerveConstants;
-import frc.robot.config.RobotConfig;
 
 /** TalonFX Drive Motor, SparkMax Turn Motor */
 public class SwerveModuleIOTalonFXSparkMax implements SwerveModuleIO {
@@ -58,10 +57,7 @@ public class SwerveModuleIOTalonFXSparkMax implements SwerveModuleIO {
         .smartCurrentLimit(SwerveConstants.angleCurrentLimit);
     angleMotorConfig
         .closedLoop
-        .pid(
-            RobotConfig.SWERVECONFIG.angleKP(),
-            RobotConfig.SWERVECONFIG.angleKI(),
-            RobotConfig.SWERVECONFIG.angleKD())
+        .pid(SwerveConstants.ANGLE_KP, SwerveConstants.ANGLE_KI, SwerveConstants.ANGLE_KD)
         .positionWrappingEnabled(true)
         .positionWrappingMinInput(0)
         .positionWrappingMaxInput(RevConfigs.CANCoderAngleToNeoEncoder(1));
@@ -82,13 +78,11 @@ public class SwerveModuleIOTalonFXSparkMax implements SwerveModuleIO {
     inputs.drivePositionMeters =
         Meters.of(
             Conversions.rotationsToMeters(
-                driveMotor.getPosition().getValueAsDouble(),
-                RobotConfig.SWERVECONFIG.wheelCircumference()));
+                driveMotor.getPosition().getValueAsDouble(), SwerveConstants.wheelCircumference()));
     inputs.driveVelocityMps =
         MetersPerSecond.of(
             Conversions.RPSToMPS(
-                driveMotor.getVelocity().getValueAsDouble(),
-                RobotConfig.SWERVECONFIG.wheelCircumference()));
+                driveMotor.getVelocity().getValueAsDouble(), SwerveConstants.wheelCircumference()));
 
     inputs.anglePositionRad =
         Radians.of(
