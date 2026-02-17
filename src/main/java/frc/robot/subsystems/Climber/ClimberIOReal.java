@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.Climber;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -22,14 +21,8 @@ public class ClimberIOReal implements ClimberIO {
   private final RelativeEncoder leftEncoder;
   // TODO: Add right encoder when installed on full robot
   // private final RelativeEncoder rightEncoder;
-  private final AbsoluteEncoder leftAbsoluteEncoder;
-  // TODO: Add right absolute encoder when installed on full robot
-  // private final AbsoluteEncoder rightAbsoluteEncoder;
-  private final Servo servo;
-
-  // Unwrapping encoder position (handles 0-1 wrapping)
-  private double previousAbsolutePosition = 0.0;
-  private int fullRotationCount;
+  private final Servo leftServo;
+  private final Servo rightServo;
 
   public ClimberIOReal() {
     // Initialize left motor
@@ -40,33 +33,26 @@ public class ClimberIOReal implements ClimberIO {
 
     // Configure left motor using SparkMaxConfig
     SparkMaxConfig config = new SparkMaxConfig();
-    config.inverted(ClimberConstants.motorAInverted);
+    config.inverted(ClimberConstants.leftMotorInverted);
     config.idleMode(IdleMode.kBrake);
     leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // TODO: Add right motor configuration when installed on full robot
     // SparkMaxConfig rightConfig = new SparkMaxConfig();
-    // rightConfig.inverted(ClimberConstants.motorBInverted);
+    // rightConfig.inverted(ClimberConstants.rightMotorInverted);
     // rightConfig.idleMode(IdleMode.kBrake);
     // rightMotor.configure(rightConfig, ResetMode.kResetSafeParameters,
     // PersistMode.kPersistParameters);
 
     // Get encoders
     leftEncoder = leftMotor.getEncoder();
-    leftAbsoluteEncoder = leftMotor.getAbsoluteEncoder();
 
     // TODO: Add right encoders when installed on full robot
     // rightEncoder = rightMotor.getEncoder();
-    // rightAbsoluteEncoder = rightMotor.getAbsoluteEncoder();
 
-    // Initialize servo on PWM port
-    servo = new Servo(ClimberConstants.servoPWMPort);
-
-    // Initialize with offset from constants (convert inches to rotations)
-    fullRotationCount =
-        (int)
-            (ClimberConstants.climberEncoderOffsetInches
-                / ClimberConstants.climberHeightCoefficient);
+    // Initialize servos on PWM ports
+    leftServo = new Servo(ClimberConstants.leftServoPWMPort);
+    rightServo = new Servo(ClimberConstants.rightServoPWMPort);
   }
 
   @Override
@@ -75,44 +61,15 @@ public class ClimberIOReal implements ClimberIO {
     inputs.leftMotorVoltage = leftMotor.getBusVoltage() * leftMotor.getAppliedOutput();
     inputs.leftMotorCurrent = leftMotor.getOutputCurrent();
     inputs.leftMotorVelocity = leftEncoder.getVelocity();
-    inputs.leftMotorPosition = leftEncoder.getPosition();
-
-    // Update left encoder telemetry with unwrapping to handle 0-1 rotation wrapping
-    double rawAbsolutePosition = leftAbsoluteEncoder.getPosition();
-
-    // Detect wrapping and unwrap the position
-    double delta = rawAbsolutePosition - previousAbsolutePosition;
-    if (delta < -0.5) {
-      // Wrapped from 1 to 0
-      fullRotationCount++;
-    } else if (delta > 0.5) {
-      // Wrapped from 0 to 1 (going backwards)
-      fullRotationCount--;
-    }
-    previousAbsolutePosition = rawAbsolutePosition;
-
-    // Calculate unwrapped position in rotations
-    double unwrappedRotations = fullRotationCount + rawAbsolutePosition;
-
-    // Convert rotations to height in inches
-    inputs.leftEncoderPosition = unwrappedRotations; // Store raw rotations
-    inputs.leftEncoderVelocity = leftAbsoluteEncoder.getVelocity();
-    inputs.leftClimberHeight = unwrappedRotations * ClimberConstants.climberHeightCoefficient;
 
     // TODO: Add right motor telemetry when installed on full robot
     // inputs.rightMotorVoltage = rightMotor.getBusVoltage() * rightMotor.getAppliedOutput();
     // inputs.rightMotorCurrent = rightMotor.getOutputCurrent();
     // inputs.rightMotorVelocity = rightEncoder.getVelocity();
-    // inputs.rightMotorPosition = rightEncoder.getPosition();
-
-    // TODO: Add right encoder telemetry when installed on full robot
-    // inputs.rightEncoderPosition = rightAbsoluteEncoder.getPosition();
-    // inputs.rightEncoderVelocity = rightAbsoluteEncoder.getVelocity();
-    // inputs.rightClimberHeight = inputs.rightEncoderPosition *
-    // ClimberConstants.climberHeightCoefficient;
 
     // Update servo telemetry
-    inputs.servoPosition = servo.get();
+    inputs.leftServoPosition = leftServo.get();
+    inputs.rightServoPosition = rightServo.get();
   }
 
   @Override
@@ -131,12 +88,18 @@ public class ClimberIOReal implements ClimberIO {
   // }
 
   @Override
-  public void setServoPosition(double position) {
-    servo.set(position);
+  public void setServoPositions(double position) {
+    leftServo.set(position);
+    rightServo.set(position);
   }
 
   @Override
-  public double getServoPosition() {
-    return servo.get();
+  public double getLeftServoPosition() {
+    return leftServo.get();
+  }
+
+  @Override
+  public double getRightServoPosition() {
+    return rightServo.get();
   }
 }

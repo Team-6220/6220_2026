@@ -8,8 +8,9 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
 
 /**
- * Auto climber sequence: actuates servo, zeros climber to bottom using stall detection, then stops
- * servo. This command is designed for use in autonomous routines.
+ * Auto climber sequence: toggles servo to deploy, zeros climber to bottom using stall detection,
+ * then toggles servo to retract. The servo is initialized to retracted (0.0) on robot startup, so
+ * the first toggle will always deploy it.
  */
 public class AutoClimberCommand extends SequentialCommandGroup {
   /**
@@ -19,11 +20,11 @@ public class AutoClimberCommand extends SequentialCommandGroup {
    */
   public AutoClimberCommand(ClimberSubsystem climberSubsystem) {
     addCommands(
-        // Step 1: Actuate the servo to deployed position
-        new SetClimberServoCommand(climberSubsystem, 1.0),
+        // Step 1: Toggle servo to deployed position (will always deploy since initialized to 0.0)
+        new ToggleClimberServoCommand(climberSubsystem),
         // Step 2: Zero climber to bottom using stall detection
         new GoToZeroCommand(climberSubsystem),
-        // Step 3: Deactuate the servo
-        new SetClimberServoCommand(climberSubsystem, 0.0));
+        // Step 3: Toggle servo back to retracted position
+        new ToggleClimberServoCommand(climberSubsystem));
   }
 }

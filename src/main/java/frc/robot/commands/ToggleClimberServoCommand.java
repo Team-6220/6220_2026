@@ -7,47 +7,45 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
 
-public class ClimberCommand extends Command {
-  /** Creates a new ClimberCommand with configurable motor speed. */
+public class ToggleClimberServoCommand extends Command {
+  /**
+   * Creates a new ToggleClimberServoCommand that toggles both servos simultaneously between
+   * deployed (1.0) and retracted (0.0) positions based on current position.
+   */
   private final ClimberSubsystem climberSubsystem;
 
-  private final double speed;
-
   /**
-   * Creates a new ClimberCommand that drives the left climber at a specified speed.
+   * Creates a new ToggleClimberServoCommand.
    *
    * @param climberSubsystem The climber subsystem to control
-   * @param speed The motor speed from -1.0 to 1.0
    */
-  public ClimberCommand(ClimberSubsystem climberSubsystem, double speed) {
+  public ToggleClimberServoCommand(ClimberSubsystem climberSubsystem) {
     this.climberSubsystem = climberSubsystem;
-    this.speed = speed;
     addRequirements(climberSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    // Read current left servo position and calculate new position
+    // (both servos should be in sync, so we only need to check one)
+    double currentPosition = climberSubsystem.getLeftServoPosition();
+    double newPosition = (currentPosition > 0.5) ? 0.0 : 1.0;
+    // Set both servos to the toggled position simultaneously
+    climberSubsystem.setServoPositions(newPosition);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    // Drive left climber motor at configured speed
-    climberSubsystem.setMotorSpeed(speed);
-
-    // TODO: Add right motor control when installed on full robot
-    // climberSubsystem.setMotorSpeed(speed);
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    climberSubsystem.stop();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

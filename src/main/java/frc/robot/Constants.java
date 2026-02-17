@@ -29,11 +29,6 @@ public final class Constants {
     // TODO: Add right motor CAN ID when installed on full robot
     // public static final int climberDriverRightID = 11; // Change to your actual CAN ID
 
-    // Motor inversions
-    public static final boolean motorAInverted = false; // Adjust based on your setup
-    // TODO: Add right motor inversion when installed on full robot
-    // public static final boolean motorBInverted = true;  // Adjust based on your setup
-
     // Servo configuration
     public static final int servoPWMPort = 0; // Change to your actual PWM port (0-9)
     public static final double servoAngleDegrees = 90.0; // Angle in degrees when button is pressed
