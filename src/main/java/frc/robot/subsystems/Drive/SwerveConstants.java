@@ -213,8 +213,8 @@ public final class SwerveConstants {
     }
   }
 
-  // Convenience helpers that mirror what SwerveConfig provided so callers can keep using
-  // RobotConfig.SWERVECONFIG.* if needed while you migrate code to the primitive constants.
+  // Convenience helpers that mirror what the old SwerveConfig provided so callers can use
+  // SwerveConstants.* (e.g., wheelCircumference(), kinematics(), maxSpeed()) while migrating
   public static double wheelCircumference() {
     return WHEEL_DIAMETER.in(Meters) * Math.PI;
   }
