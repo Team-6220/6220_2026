@@ -39,7 +39,7 @@ public final class AutoConstants {
 
   public static final Angle angularTolerance = Degrees.of(5);
 
-  public PathConstraints getPathConstraints() {
+  public static PathConstraints getPathConstraints() {
     return new PathConstraints(
         MetersPerSecond.of(translationMaxVelMpsTN.get()),
         MetersPerSecondPerSecond.of(translationMaxAccelMpsSqTN.get()),
