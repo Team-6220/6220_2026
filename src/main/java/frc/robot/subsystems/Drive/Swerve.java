@@ -316,6 +316,10 @@ public class Swerve extends SubsystemBase {
     return getPose().getRotation().getDegrees();
   }
 
+  public double getHeadingRads() {
+    return getPose().getRotation().getRadians();
+  }
+
   public void setHeading(Rotation2d heading) {
     poseEstimator.resetPosition(
         getGyroYaw(), getModulePositions(), new Pose2d(getPose().getTranslation(), heading));
@@ -385,7 +389,7 @@ public class Swerve extends SubsystemBase {
    */
   public double getTurnPidSpeed() {
 
-    double speed = turnPidController.calculate(getHeadingDegrees());
+    double speed = turnPidController.calculate(getHeadingRads());
 
     if (speed > SwerveConstants.maxAngularVelocity()) {
       speed = SwerveConstants.maxAngularVelocity();
@@ -471,7 +475,7 @@ public class Swerve extends SubsystemBase {
           AutoConstants.angularKPTN.get(),
           AutoConstants.angularKITN.get(),
           AutoConstants.angularKDTN.get());
-      turnPidController.reset(getHeading().getDegrees());
+      turnPidController.reset(getHeadingRads());
     }
 
     if (AutoConstants.angularMaxAccelDegTN.hasChanged()
@@ -479,7 +483,7 @@ public class Swerve extends SubsystemBase {
       turnPidController.setConstraints(
           new TrapezoidProfile.Constraints(
               AutoConstants.angularMaxVelRadPerSec(), AutoConstants.angularMaxAccelRadPerSecSq()));
-      turnPidController.reset(getHeading().getDegrees());
+      turnPidController.reset(getHeadingRads());
     }
   }
 
