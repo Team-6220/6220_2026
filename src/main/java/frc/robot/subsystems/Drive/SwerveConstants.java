@@ -212,15 +212,16 @@ public final class SwerveConstants {
       }
       default -> throw new IllegalStateException("Unknown RobotType: " + Constants.TYPE);
     }
-    
+
     // Initialize KINEMATICS once after TRACK_WIDTH and WHEEL_BASE are set
     double tw = TRACK_WIDTH.in(Meters);
     double wb = WHEEL_BASE.in(Meters);
-    KINEMATICS = new SwerveDriveKinematics(
-        new Translation2d(wb / 2.0, tw / 2.0),
-        new Translation2d(wb / 2.0, -tw / 2.0),
-        new Translation2d(-wb / 2.0, tw / 2.0),
-        new Translation2d(-wb / 2.0, -tw / 2.0));
+    KINEMATICS =
+        new SwerveDriveKinematics(
+            new Translation2d(wb / 2.0, tw / 2.0),
+            new Translation2d(wb / 2.0, -tw / 2.0),
+            new Translation2d(-wb / 2.0, tw / 2.0),
+            new Translation2d(-wb / 2.0, -tw / 2.0));
   }
 
   // Convenience helpers that mirror what the old SwerveConfig provided so callers can use
