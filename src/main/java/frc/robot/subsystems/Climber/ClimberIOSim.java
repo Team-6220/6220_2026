@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems.Climber;
 
-import frc.robot.ClimberConstants;
-
 public class ClimberIOSim implements ClimberIO {
   private double leftMotorSpeed = 0.0;
   // TODO: Add right motor when installed on full robot

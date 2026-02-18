@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.subsystems.Drive;
 
 import static edu.wpi.first.units.Units.Volts;
 
@@ -12,8 +12,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
 import frc.lib.util.TunableNumber;
-import frc.robot.config.RobotConfig;
-import frc.robot.subsystems.Drive.SwerveModuleIO;
+import frc.robot.RevConfigs;
 import frc.robot.subsystems.Drive.SwerveModuleIO.SwerveModuleIOInputs;
 
 public class SwerveModule {
@@ -25,15 +24,20 @@ public class SwerveModule {
   private final DutyCycleOut driveDutyCycle = new DutyCycleOut(0);
   private final VelocityVoltage driveVelocity = new VelocityVoltage(0);
 
-  private final TunableNumber driveKS =
-      new TunableNumber("SwerveModule_kS", RobotConfig.SWERVECONFIG.driveKS());
-  private final TunableNumber driveKV =
-      new TunableNumber("SwerveModule_kV", RobotConfig.SWERVECONFIG.driveKV());
-  private final TunableNumber driveKA =
-      new TunableNumber("SwerveModule_kA", RobotConfig.SWERVECONFIG.driveKA());
+  /** driveKS Tunable Number */
+  private final TunableNumber driveKSTN =
+      new TunableNumber("SwerveModule_kS", SwerveConstants.DRIVE_KS);
+
+  /** driveKV Tunable Number */
+  private final TunableNumber driveKVTN =
+      new TunableNumber("SwerveModule_kV", SwerveConstants.DRIVE_KV);
+
+  /** driveKA Tunable Number */
+  private final TunableNumber driveKATN =
+      new TunableNumber("SwerveModule_kA", SwerveConstants.DRIVE_KA);
 
   private final SimpleMotorFeedforward driveFeedForward =
-      new SimpleMotorFeedforward(driveKS.get(), driveKV.get(), driveKA.get());
+      new SimpleMotorFeedforward(driveKSTN.get(), driveKVTN.get(), driveKATN.get());
 
   public SwerveModule(int moduleNumber, SwerveModuleConstants config, SwerveModuleIO io) {
     this.io = io;
@@ -44,14 +48,14 @@ public class SwerveModule {
   public void periodic() {
     io.updateInputs(inputs);
     io.setAnglePosition(moduleNumber);
-    if (driveKS.hasChanged()) {
-      driveFeedForward.setKs(driveKS.get());
+    if (driveKSTN.hasChanged()) {
+      driveFeedForward.setKs(driveKSTN.get());
     }
-    if (driveKV.hasChanged()) {
-      driveFeedForward.setKv(driveKV.get());
+    if (driveKVTN.hasChanged()) {
+      driveFeedForward.setKv(driveKVTN.get());
     }
-    if (driveKA.hasChanged()) {
-      driveFeedForward.setKa(driveKA.get());
+    if (driveKATN.hasChanged()) {
+      driveFeedForward.setKa(driveKATN.get());
     }
   }
 
@@ -83,12 +87,11 @@ public class SwerveModule {
 
     // drive control
     if (isOpenLoop) {
-      driveDutyCycle.Output = state.speedMetersPerSecond / RobotConfig.SWERVECONFIG.maxSpeed();
+      driveDutyCycle.Output = state.speedMetersPerSecond / SwerveConstants.maxSpeed();
       io.setDriveControlDutyCycle(driveDutyCycle);
     } else {
       driveVelocity.Velocity =
-          Conversions.MPSToRPS(
-              state.speedMetersPerSecond, RobotConfig.SWERVECONFIG.wheelCircumference());
+          Conversions.MPSToRPS(state.speedMetersPerSecond, SwerveConstants.wheelCircumference());
       driveVelocity.FeedForward = driveFeedForward.calculate(state.speedMetersPerSecond);
       io.setDriveControlVelocity(driveVelocity);
     }

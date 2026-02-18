@@ -1,6 +1,6 @@
 package frc.robot;
 
-import frc.robot.config.RobotConfig;
+import frc.robot.subsystems.Drive.SwerveConstants;
 
 public class RevConfigs {
 
@@ -9,12 +9,12 @@ public class RevConfigs {
   public static double CANCoderAngleToNeoEncoder(double CANCoderAngle) {
     // return CANCoderAngle / (360) * Constants.Swerve.angleGearRatio * 42; //BAD
     // return CANCoderAngle / (2 * Math.PI) * Constants.Swerve.angleGearRatio * 42; //BAD
-    return (CANCoderAngle * RobotConfig.SWERVECONFIG.angleGearRatio());
+    return (CANCoderAngle * SwerveConstants.ANGLE_GEAR_RATIO);
   }
 
   public static double NeoEncoderAngleToCANCoder(double NeoEncoderAngle) {
     // return NeoEncoderAngle * (360) / Constants.Swerve.angleGearRatio / 42; //BAD
     // return NeoEncoderAngle * (2 * Math.PI) / Constants.Swerve.angleGearRatio / 42; //BAD
-    return NeoEncoderAngle / RobotConfig.SWERVECONFIG.angleGearRatio(); // THIS ONE ACTUALLY WORKS
+    return NeoEncoderAngle / SwerveConstants.ANGLE_GEAR_RATIO; // THIS ONE ACTUALLY WORKS
   }
 }

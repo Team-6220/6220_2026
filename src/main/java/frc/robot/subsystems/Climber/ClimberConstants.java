@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.subsystems.Climber;
 
 public class ClimberConstants {
   // Motor CAN IDs

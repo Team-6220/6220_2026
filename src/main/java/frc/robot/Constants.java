@@ -14,7 +14,8 @@ import java.util.Optional;
 
 public final class Constants {
 
-  public static boolean TUNING_MODE = true;
+  public static final RobotType TYPE = RobotType.COMPBOT;
+  public static boolean TUNING_MODE = (TYPE != RobotType.COMPBOT);
 
   public static Optional<DriverStation.Alliance> ALLIANCE_COLOR = DriverStation.getAlliance();
 
@@ -23,26 +24,29 @@ public final class Constants {
 
   public static String isRed = "N/A"; // FIXME: MAKE AUTO UPDATE ISRED
 
-  public static final class ClimberConstants {
-    // Motor CAN IDs
-    public static final int climberDriverLeftID = 16; // Change to your actual CAN ID
-    // TODO: Add right motor CAN ID when installed on full robot
-    // public static final int climberDriverRightID = 11; // Change to your actual CAN ID
+  public enum RobotType {
+    COMPBOT,
+    PRACTICEBOT,
+    SIMBOT
+  }
 
-    // Motor inversions
-    public static final boolean motorAInverted = false; // Adjust based on your setup
-    // TODO: Add right motor inversion when installed on full robot
-    // public static final boolean motorBInverted = true;  // Adjust based on your setup
+  /** Checks whether the correct robot is selected when deploying. */
+  public static class CheckDeploy {
+    public static void main(String... args) {
+      if (TYPE == RobotType.SIMBOT) {
+        System.err.println("Cannot deploy, invalid robot selected: " + TYPE);
+        System.exit(1);
+      }
+    }
+  }
 
-    // Servo configuration
-    public static final int servoPWMPort = 0; // Change to your actual PWM port (0-9)
-    public static final double servoAngleDegrees = 90.0; // Angle in degrees when button is pressed
-
-    // Climber height configuration
-    // This coefficient converts encoder rotations to height (inches or meters)
-    // Example: If 1 rotation = 2 inches of height, coefficient = 2.0
-    // Adjust based on your mechanism's gear ratio and drum/pulley diameter
-    public static final double climberHeightCoefficient =
-        1.76 * 3.142; // Change to match your mechanism
+  /** Checks that the default robot is selected and tuning mode is disabled. */
+  public static class CheckPullRequest {
+    public static void main(String... args) {
+      if (TYPE != RobotType.COMPBOT || TUNING_MODE) {
+        System.err.println("Do not merge, non-default constants are configured.");
+        System.exit(1);
+      }
+    }
   }
 }
