@@ -134,6 +134,7 @@ public final class SwerveConstants {
   public static final double ANGLE_KD;
   public static final double OPEN_LOOP_RAMP;
   public static final double CLOSED_LOOP_RAMP;
+  public static final SwerveDriveKinematics KINEMATICS;
 
   static {
     switch (Constants.TYPE) {
@@ -211,6 +212,15 @@ public final class SwerveConstants {
       }
       default -> throw new IllegalStateException("Unknown RobotType: " + Constants.TYPE);
     }
+    
+    // Initialize KINEMATICS once after TRACK_WIDTH and WHEEL_BASE are set
+    double tw = TRACK_WIDTH.in(Meters);
+    double wb = WHEEL_BASE.in(Meters);
+    KINEMATICS = new SwerveDriveKinematics(
+        new Translation2d(wb / 2.0, tw / 2.0),
+        new Translation2d(wb / 2.0, -tw / 2.0),
+        new Translation2d(-wb / 2.0, tw / 2.0),
+        new Translation2d(-wb / 2.0, -tw / 2.0));
   }
 
   // Convenience helpers that mirror what the old SwerveConfig provided so callers can use
@@ -224,13 +234,7 @@ public final class SwerveConstants {
   }
 
   public static SwerveDriveKinematics kinematics() {
-    double tw = TRACK_WIDTH.in(Meters);
-    double wb = WHEEL_BASE.in(Meters);
-    return new SwerveDriveKinematics(
-        new Translation2d(wb / 2.0, tw / 2.0),
-        new Translation2d(wb / 2.0, -tw / 2.0),
-        new Translation2d(-wb / 2.0, tw / 2.0),
-        new Translation2d(-wb / 2.0, -tw / 2.0));
+    return KINEMATICS;
   }
 
   /** Meters per second */
