@@ -6,6 +6,7 @@ package frc.robot.subsystems.Shooter;
 
 /** Interface for all shooters to implement */
 public interface ShooterIO {
+  
   public static class ShooterIOInputs {
     public double velocityA = 0.0;
     public double velocityB = 0.0;
