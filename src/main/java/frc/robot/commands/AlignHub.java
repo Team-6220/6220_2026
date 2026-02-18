@@ -4,9 +4,15 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.LimelightHelpers;
+import frc.robot.VisionConstants;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Vision.Limelight;
 
@@ -23,7 +29,6 @@ public class AlignHub extends Command {
     this.s_Swerve = s_Swerve;
     LimelightHelpers.setPipelineIndex(name, 0);
     addRequirements(s_Swerve);
-    this.s_Swerve = s_Swerve;
   }
 
   // Called when the command is initially scheduled.
@@ -45,8 +50,7 @@ public class AlignHub extends Command {
   @Override
   public void end(boolean interrupted) {
     LimelightHelpers.setPipelineIndex(name, 0);
-    s_Swerve.stopDriving();
-    System.out.println("DONE ALIGNINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
+    // s_Swerve.stopDriving();
   }
 
   // Returns true when the command should end.
