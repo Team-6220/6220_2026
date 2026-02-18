@@ -33,13 +33,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.RumbleManager;
 import frc.robot.Constants;
 import frc.robot.SwerveModule;
-import frc.robot.VisionConstants;
+// import frc.robot.Constants.frc.robot.config.RobotConfig.SWERVECONFIG;
+// import frc.robot.Constants.VisionConstants;
 import frc.robot.config.AutoConfig;
 import frc.robot.subsystems.Drive.GyroIO.GyroIOInputs;
-import frc.robot.subsystems.Vision.PhotonVisionSubsystem;
 import java.util.HashMap;
 import java.util.LinkedList;
-import org.photonvision.targeting.PhotonPipelineResult;
 
 public class Swerve extends SubsystemBase {
 
@@ -86,9 +85,10 @@ public class Swerve extends SubsystemBase {
 
   private boolean autoIsOverShoot = false, isAuto = false;
 
-  PhotonVisionSubsystem s_Photon = PhotonVisionSubsystem.getInstance(VisionConstants.cameraNames);
-
-  PhotonPipelineResult result;
+  // private double targetX;
+  // private double targetY;
+  // private double targetYaw;
+  // private double targetPitch;
 
   private SwerveModulePosition[] positions = {
     new SwerveModulePosition(),
@@ -453,10 +453,6 @@ public class Swerve extends SubsystemBase {
 
   public boolean getPidAtGoalYaw() {
     return turnPidController.atGoal();
-  }
-
-  public PhotonPipelineResult getResult() {
-    return result;
   }
 
   @Override
