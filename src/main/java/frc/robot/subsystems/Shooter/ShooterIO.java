@@ -13,3 +13,20 @@ public class ShooterIO {
     public static final int Motor2ID = 0;
     public static final int Motor1ID = 0;
     public static final int HoodID = 0;}
+/** Interface for all shooters to implement */
+public interface ShooterIO {
+  
+  public static class ShooterIOInputs {
+    public double velocityA = 0.0;
+    public double velocityB = 0.0;
+  }
+
+public final int Motor1ID = 0;
+public final int Motor2ID = 0;
+
+  default void updateInputs(ShooterIOInputs inputs) {}
+
+  default void setVelocity(double a, double b) {}
+
+  default void stop() {}
+}
