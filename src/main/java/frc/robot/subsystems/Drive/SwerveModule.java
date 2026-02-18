@@ -47,7 +47,6 @@ public class SwerveModule {
 
   public void periodic() {
     io.updateInputs(inputs);
-    io.setAnglePosition(moduleNumber);
     if (driveKSTN.hasChanged()) {
       driveFeedForward.setKs(driveKSTN.get());
     }
