@@ -16,9 +16,9 @@ import frc.lib.util.SwerveModuleConstants;
 import frc.robot.Constants;
 
 /**
- * SwerveConstants contains robot-independent swerve constants and also per-robot swerve
- * configurations (COMP/GEORGE/SIM). The public SwerveConfig instances are used by the rest of the
- * codebase.
+ * SwerveConstants contains robot-independnet swerve constants and also per-robot swerve
+ * configurations (COMP/GEORGE(PRACTICEBOT)/SIM). One can access the swerve config from the public
+ * constants.
  */
 public final class SwerveConstants {
 
