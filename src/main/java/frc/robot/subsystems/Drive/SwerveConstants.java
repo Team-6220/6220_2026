@@ -243,7 +243,7 @@ public final class SwerveConstants {
     return 0.80
         * (MOTOR_FREE_SPEED_RPM / 60.0)
         * wheelCircumference()
-        * DRIVE_GEAR_RATIO; // assume 80% efficiency in real life
+        / DRIVE_GEAR_RATIO; // assume 80% efficiency in real life
   }
 
   /** Radians per second */
