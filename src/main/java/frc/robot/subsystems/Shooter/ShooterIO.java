@@ -11,6 +11,9 @@ public interface ShooterIO {
     public double velocityB = 0.0;
   }
 
+public final int Motor1ID = 0;
+public final int Motor2ID = 0;
+
   default void updateInputs(ShooterIOInputs inputs) {}
 
   default void setVelocity(double a, double b) {}
