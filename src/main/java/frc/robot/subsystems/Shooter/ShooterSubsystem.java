@@ -4,16 +4,18 @@
 
 package frc.robot.subsystems.Shooter;
 
-import static edu.wpi.first.units.Units.RPM;
-
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXSConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.TunableNumber;
 import frc.robot.subsystems.Shooter.ShooterIO.ShooterIOInputs;
@@ -37,19 +39,27 @@ public class ShooterSubsystem extends SubsystemBase {
 
   private double m_targetRPM = 0.0;
 
-
+    final TalonFX m_topMotorShooter = new TalonFX(ShooterIO.Motor1ID);
+    final TalonFX m_bottomMotorShooter = new TalonFX(ShooterIO.Motor2ID);
   // public ShooterSubsystem(ShooterIO io) {
   //   this.io = io;
   
     
   // }
   public ShooterSubsystem() {
-   
-    
-   // m_bottomMotorShooter.setInverted(true);
-   // m_bottomMotorShooter.setInverted(false);
-    
 
+    
+    
+    CurrentLimitsConfigs limits = new CurrentLimitsConfigs();
+    limits.SupplyCurrentLimitEnable = true;
+    limits.SupplyCurrentLimit = 40;
+
+m_topMotorShooter.getConfigurator().apply(limits);
+m_bottomMotorShooter.getConfigurator().apply(limits);
+  MotorOutputConfigs output = new MotorOutputConfigs();
+  output.Inverted = InvertedValue.Clockwise_Positive;
+
+  m_topMotorShooter.getConfigurator().apply(output);
   }
 
   @Override
