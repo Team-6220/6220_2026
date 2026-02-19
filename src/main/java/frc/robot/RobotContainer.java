@@ -116,20 +116,20 @@ public class RobotContainer {
         .onTrue(new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
     // Climber servo control - A button toggles servo between deployed (1.0) and retracted (0.0)
-    m_driverController
-        .a()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  double currentPosition = climberSubsystem.getServoPosition();
-                  if (currentPosition > 0.5) {
-                    // Servo is deployed, retract it
-                    climberSubsystem.setServoPosition(0.0);
-                  } else {
-                    // Servo is retracted, deploy it
-                    climberSubsystem.setServoPosition(1.0);
-                  }
-                }));
+    // m_driverController
+    //     .a()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               double currentPosition = climberSubsystem.getServoPosition();
+    //               if (currentPosition > 0.5) {
+    //                 // Servo is deployed, retract it
+    //                 climberSubsystem.setServoPosition(0.0);
+    //               } else {
+    //                 // Servo is retracted, deploy it
+    //                 climberSubsystem.setServoPosition(1.0);
+    //               }
+    //             }));
 
     // Climber control mode toggle - B button toggles between LEFT, RIGHT, and BOTH
     m_driverController.b().onTrue(new InstantCommand(climberSubsystem::toggleControlMode));
@@ -174,7 +174,7 @@ public class RobotContainer {
     // Climber height control - X button zeros climber to bottom using stall detection
     m_driverController.x().whileTrue(new GoToZeroCommand(climberSubsystem));
 
-    m_driverController.rightStick().whileTrue(new AlignHub(s_Swerve));
+    m_driverController.a().whileTrue(new AlignHub(s_Swerve));
   }
 
   /**
