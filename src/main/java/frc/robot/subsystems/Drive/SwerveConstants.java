@@ -217,8 +217,13 @@ public final class SwerveConstants {
     double tw = TRACK_WIDTH.in(Meters);
     double wb = WHEEL_BASE.in(Meters);
     /**
-     * Module order depends on the kinematics coordinate seen here:
+     * The order of Translation2d arguments passed to SwerveDriveKinematics MUST match the module
+     * numbering used throughout the codebase (see Swerve.mSwerveMods array indexing):
+     * 0=BACK_RIGHT, 1=BACK_LEFT, 2=FRONT_RIGHT, 3=FRONT_LEFT.
+     * The signs of the x/y coordinates are determined by WPILib's coordinate system:
      * https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html#robot-drive-kinematics
+     * This ordering is critical - changing it will reintroduce kinematics bugs.
+     * If you reorder it here you'll have to reorder the array where you declared your swerve modules
      */
     KINEMATICS =
         new SwerveDriveKinematics(
