@@ -216,12 +216,20 @@ public final class SwerveConstants {
     // Initialize KINEMATICS once after TRACK_WIDTH and WHEEL_BASE are set
     double tw = TRACK_WIDTH.in(Meters);
     double wb = WHEEL_BASE.in(Meters);
+    /**
+     * Module order depends on the kinematics coordinate seen here:
+     * https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html#robot-drive-kinematics
+     */
     KINEMATICS =
         new SwerveDriveKinematics(
-            new Translation2d(wb / 2.0, tw / 2.0),
-            new Translation2d(wb / 2.0, -tw / 2.0),
+            // BACK_RIGHT
+            new Translation2d(-wb / 2.0, -tw / 2.0),
+            // BACK_LEFT
             new Translation2d(-wb / 2.0, tw / 2.0),
-            new Translation2d(-wb / 2.0, -tw / 2.0));
+            // FRONT_RIGHT
+            new Translation2d(wb / 2.0, -tw / 2.0),
+            // FRONT_LEFT
+            new Translation2d(wb / 2.0, tw / 2.0));
   }
 
   // Convenience helpers that mirror what the old SwerveConfig provided so callers can use
