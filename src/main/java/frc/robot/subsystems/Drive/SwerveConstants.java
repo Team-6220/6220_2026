@@ -223,6 +223,7 @@ public final class SwerveConstants {
      * The signs of the x/y coordinates are determined by WPILib's coordinate system:
      * https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html#robot-drive-kinematics
      * This ordering is critical - changing it will reintroduce kinematics bugs.
+     * If you reorder it here you'll have to reorder the array where you declared your swerve modules
      */
     KINEMATICS =
         new SwerveDriveKinematics(
