@@ -12,6 +12,7 @@ import frc.robot.subsystems.Vision.Limelight;
 
 public class AlignHub extends Command {
   /** Creates a new AlignHub. */
+
   private static String name = "limelight-front";
 
   private static Translation2d translation = new Translation2d(0, 0);
