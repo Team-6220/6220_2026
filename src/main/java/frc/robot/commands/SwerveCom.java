@@ -31,16 +31,14 @@ public class SwerveCom extends Command {
   @Override
   public void execute() {
     if (!DriverStation.isAutonomous()) {
+      System.out.println("im using up swerve");
       /* Get Values, Deadband*/
       double[] driverInputs = IOConstants.getDriverInputs(driver.getHID());
       /* Drive */
-      boolean robotCentric = robotCentricSup.getAsBoolean();
-      boolean fieldRelative = !robotCentric;
-
       s_Swerve.drive(
           new Translation2d(driverInputs[0], driverInputs[1]),
           driverInputs[2],
-          fieldRelative,
+          !robotCentricSup.getAsBoolean(),
           true);
     }
   }
