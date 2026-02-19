@@ -84,7 +84,7 @@ public final class IOConstants {
 
     inputs[0] = IOConstants.modifyMoveAxis(-driver.getRawAxis(translationAxis));
     inputs[1] = IOConstants.modifyMoveAxis(-driver.getRawAxis(strafeAxis));
-    inputs[2] = IOConstants.modifyRotAxis(-driver.getRawAxis(rotationAxis));
+    inputs[2] = IOConstants.modifyRotAxis(driver.getRawAxis(rotationAxis));
 
     inputs[0] = MathUtil.applyDeadband(inputs[0], IOConstants.kDeadband);
     inputs[1] = MathUtil.applyDeadband(inputs[1], IOConstants.kDeadband);

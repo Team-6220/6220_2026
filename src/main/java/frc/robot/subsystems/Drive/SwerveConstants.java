@@ -84,6 +84,9 @@ public final class SwerveConstants {
   private static final double GEORGE_MOTOR_FREE_SPEED_RPM = 6380.0; // Falcon
   private static final Distance GEORGE_TRACK_WIDTH = Inches.of(22.75);
   private static final Distance GEORGE_WHEEL_BASE = Inches.of(22.75);
+  // Remapped so physical module offsets match the new kinematics ordering while
+  // keeping the public names unchanged. This moves the original angle values
+  // between the GEORGE_* variables (old FRONT_LEFT -> BACK_RIGHT, etc.).
   private static final SwerveModuleConstants GEORGE_BACK_RIGHT_MODULE =
       new SwerveModuleConstants(
           1, 2, 3, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-41.22));
