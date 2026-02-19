@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.AlignHub;
 import frc.robot.commands.GoToZeroCommand;
 import frc.robot.commands.SwerveCom;
 import frc.robot.subsystems.Climber.ClimberIOReal;
@@ -153,7 +152,7 @@ public class RobotContainer {
     // Climber height control - X button zeros climber to bottom using stall detection
     m_driverController.x().whileTrue(new GoToZeroCommand(climberSubsystem));
 
-    m_driverController.leftBumper().whileTrue(new AlignHub());
+    // m_driverController.leftBumper().whileTrue(new AlignHub());
   }
 
   /**
