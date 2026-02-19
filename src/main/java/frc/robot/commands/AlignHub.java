@@ -41,7 +41,7 @@ public class AlignHub extends Command {
   @Override
   public void execute() {
     s_Swerve.drive(translation, LimelightHelpers.getTX(name), false, false);
-    // double theta = s_Swerve.getTurnPidSpeed; //get theta out from Swerve
+    // double theta = s_Swerve.getTurnPidSpeed(); //get theta out from Swerve
     // s_Swerve.drive(translation, theta, false, false);
     /*
     if (s_Swerve.getPidAtGoalYaw()) {

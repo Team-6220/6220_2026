@@ -42,9 +42,3 @@ public class Limelight extends SubsystemBase {
     }
   }
 }
-
-/*
-get info on which tags are visible
-change pipline based on tag seen
-pid to turn to tag
-*/

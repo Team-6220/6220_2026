@@ -115,7 +115,7 @@ public class RobotContainer {
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
 
-    m_driverController.leftBumper().whileTrue(new AlignHub());
+    m_driverController.leftBumper().whileTrue(new AlignHub(s_Swerve));
   }
 
   /**
