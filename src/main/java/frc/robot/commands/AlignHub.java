@@ -12,8 +12,8 @@ import frc.robot.subsystems.Vision.Limelight;
 
 public class AlignHub extends Command {
   /** Creates a new AlignHub. */
-
   private static String name = "limelight-front";
+
   private static Translation2d translation = new Translation2d(0, 0);
   private Swerve s_Swerve;
 
@@ -31,7 +31,7 @@ public class AlignHub extends Command {
     s_Swerve.resetTurnController();
     Limelight.setPipeline();
   }
-  
+
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
