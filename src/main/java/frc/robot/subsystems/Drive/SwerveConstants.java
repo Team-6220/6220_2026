@@ -54,15 +54,15 @@ public final class SwerveConstants {
   private static final double COMP_MOTOR_FREE_SPEED_RPM = 6000.0; // Kraken
   private static final Distance COMP_TRACK_WIDTH = Inches.of(22.75);
   private static final Distance COMP_WHEEL_BASE = Inches.of(20.75);
-  private static final SwerveModuleConstants COMP_BACK_RIGHT_MODULE =
+  private static final SwerveModuleConstants COMP_BACK_RIGHT_MODULE = //currently back right
       new SwerveModuleConstants(
           8, 10, 4, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-58.447));
-  private static final SwerveModuleConstants COMP_BACK_LEFT_MODULE =
+  private static final SwerveModuleConstants COMP_BACK_LEFT_MODULE = //currently front right
       new SwerveModuleConstants(
           5, 12, 2, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-94.5));
-  private static final SwerveModuleConstants COMP_FRONT_RIGHT_MODULE =
+  private static final SwerveModuleConstants COMP_FRONT_RIGHT_MODULE = //currently front left
       new SwerveModuleConstants(7, 11, 1, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(23.8));
-  private static final SwerveModuleConstants COMP_FRONT_LEFT_MODULE =
+  private static final SwerveModuleConstants COMP_FRONT_LEFT_MODULE = //currently back left
       new SwerveModuleConstants(6, 9, 3, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(90.5));
   private static final DCMotor COMP_DC_MOTOR = new DCMotor(12, 7.09, 366, 2, 628.32, 1);
   private static final double COMP_DRIVE_KP = 0.12;
