@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.ShooterCommand;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
 
 public class RobotContainer {
@@ -15,17 +14,31 @@ public class RobotContainer {
   // Subsystems
   private final ShooterSubsystem m_shooter = new ShooterSubsystem();
 
-  // Controllers
-  private final CommandXboxController m_driverController = new CommandXboxController(0);
-  private final CommandXboxController m_operatorController = new CommandXboxController(1);
+  // Controller
+  private final CommandXboxController m_controller = new CommandXboxController(1);
 
   public RobotContainer() {
     configureBindings();
   }
 
   private void configureBindings() {
-    // Operator right bumper: hold to spin up shooter
-    m_operatorController.rightBumper().whileTrue(new ShooterCommand(m_shooter));
+    // Left bumper: hold to spin motors 9, 2, 31
+    m_controller
+        .leftBumper()
+        .whileTrue(
+            Commands.runEnd(
+                () -> m_shooter.setBottomGroupPercent(0.2),
+                () -> m_shooter.stopBottomGroup(),
+                m_shooter));
+
+    // Right bumper: hold to spin motors 41, 1
+    m_controller
+        .rightBumper()
+        .whileTrue(
+            Commands.runEnd(
+                () -> m_shooter.setTopGroupPercent(0.2),
+                () -> m_shooter.stopTopGroup(),
+                m_shooter));
 
     // Alternative: right trigger hold (uncomment to use)
     // m_operatorController.rightTrigger(0.1).whileTrue(new ShooterCommand(m_shooter));
