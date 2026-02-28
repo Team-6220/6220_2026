@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 // import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
 import frc.lib.util.TunableNumber;
@@ -82,6 +83,7 @@ public class SwerveModule {
     state.optimize(getState().angle);
 
     // angle control
+    SmartDashboard.putNumber("swerve angle", state.angle.getRotations());
     io.setAnglePosition(RevConfigs.CANCoderAngleToNeoEncoder(state.angle.getRotations()));
 
     // drive control

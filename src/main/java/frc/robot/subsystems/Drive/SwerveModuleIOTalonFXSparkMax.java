@@ -58,8 +58,8 @@ public class SwerveModuleIOTalonFXSparkMax implements SwerveModuleIO {
         .closedLoop
         .pid(SwerveConstants.ANGLE_KP, SwerveConstants.ANGLE_KI, SwerveConstants.ANGLE_KD)
         .positionWrappingEnabled(true)
-        .positionWrappingMinInput(0)
-        .positionWrappingMaxInput(RevConfigs.CANCoderAngleToNeoEncoder(1));
+        .positionWrappingMinInput(RevConfigs.CANCoderAngleToNeoEncoder(-0.5))
+        .positionWrappingMaxInput(RevConfigs.CANCoderAngleToNeoEncoder(0.5));
     angleMotor.configure(
         angleMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
