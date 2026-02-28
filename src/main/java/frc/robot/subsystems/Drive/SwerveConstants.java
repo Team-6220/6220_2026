@@ -56,16 +56,14 @@ public final class SwerveConstants {
   private static final Distance COMP_WHEEL_BASE = Inches.of(20.75);
   private static final SwerveModuleConstants COMP_BACK_RIGHT_MODULE =
       new SwerveModuleConstants(
-          8, 10, 4, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(120.5859375));
+          8, 10, 4, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-58.447));
   private static final SwerveModuleConstants COMP_BACK_LEFT_MODULE =
       new SwerveModuleConstants(
-          5, 12, 2, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-179.208984375));
+          5, 12, 2, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-94.5));
   private static final SwerveModuleConstants COMP_FRONT_RIGHT_MODULE =
-      new SwerveModuleConstants(
-          7, 11, 1, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-94.306640625));
+      new SwerveModuleConstants(7, 11, 1, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(23.8));
   private static final SwerveModuleConstants COMP_FRONT_LEFT_MODULE =
-      new SwerveModuleConstants(
-          6, 9, 3, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(115.927734375));
+      new SwerveModuleConstants(6, 9, 3, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(90.5));
   private static final DCMotor COMP_DC_MOTOR = new DCMotor(12, 7.09, 366, 2, 628.32, 1);
   private static final double COMP_DRIVE_KP = 0.12;
   private static final double COMP_DRIVE_KI = 0;

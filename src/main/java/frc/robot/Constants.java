@@ -30,13 +30,6 @@ public final class Constants {
     SIMBOT
   }
 
-  /**
-   * Flag to indicate the gyro (NAVX) is mounted upside-down on this robot. Set automatically based
-   * on the selected RobotType: COMPBOT is upside-down in our setup. Change this mapping if you
-   * remount the gyro or change robot types.
-   */
-  public static final boolean GYRO_UPSIDEDOWN = (TYPE == RobotType.COMPBOT);
-
   /** Checks whether the correct robot is selected when deploying. */
   public static class CheckDeploy {
     public static void main(String... args) {

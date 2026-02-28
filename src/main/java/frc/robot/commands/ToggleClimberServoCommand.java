@@ -5,31 +5,37 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.ClimberConstants;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
 
-public class SetClimberServoCommand extends Command {
-  /** Creates a new SetClimberServoCommand that sets the servo to the configured angle. */
+public class ToggleClimberServoCommand extends Command {
+  /**
+   * Creates a new ToggleClimberServoCommand that toggles both servos simultaneously between
+   * deployed (1.0) and retracted (0.0) positions based on current position.
+   */
   private final ClimberSubsystem climberSubsystem;
 
-  private final double servoPosition;
-
   /**
-   * Creates a new SetClimberServoCommand.
+   * Creates a new ToggleClimberServoCommand.
    *
    * @param climberSubsystem The climber subsystem to control
-   * @param servoPosition The servo position (0.0 to 1.0)
    */
-  public SetClimberServoCommand(ClimberSubsystem climberSubsystem, double servoPosition) {
+  public ToggleClimberServoCommand(ClimberSubsystem climberSubsystem) {
     this.climberSubsystem = climberSubsystem;
-    this.servoPosition = servoPosition;
     addRequirements(climberSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // Set the servo to the specified position (0.0 to 1.0)
-    climberSubsystem.setServoPosition(servoPosition);
+    // Read current left servo position and calculate new position
+    // (both servos should be in sync, so we only need to check one)
+    double currentPosition = climberSubsystem.getLeftServoPosition();
+    double midpoint = (ClimberConstants.SERVO_MAX + ClimberConstants.SERVO_MIN) / 2.0;
+    double newPosition =
+        (currentPosition > midpoint) ? ClimberConstants.SERVO_MIN : ClimberConstants.SERVO_MAX;
+    // Set both servos to the toggled position simultaneously
+    climberSubsystem.setServoPositions(newPosition);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
