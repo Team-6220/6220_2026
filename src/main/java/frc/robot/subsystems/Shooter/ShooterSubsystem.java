@@ -298,5 +298,26 @@ public class ShooterSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Shooter/AverageVelocityRPS", getAverageVelocityRPS());
     SmartDashboard.putNumber("Shooter/TargetVelocityRPS", m_targetVelocityRPS.get());
     SmartDashboard.putBoolean("Shooter/AtSpeed", isAtSpeed());
+    SmartDashboard.putNumber(
+        "Shooter/Motor41Voltage", m_motor41.getMotorVoltage().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Shooter/Motor1Voltage", m_motor1.getMotorVoltage().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Shooter/Motor9Voltage", m_motor9.getMotorVoltage().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Shooter/Motor31Voltage", m_motor31.getMotorVoltage().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Shooter/Motor2Voltage", m_motor2.getMotorVoltage().getValueAsDouble());
+
+    SmartDashboard.putNumber(
+        "Shooter/Motor41Current", m_motor41.getSupplyCurrent().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Shooter/Motor1Current", m_motor1.getSupplyCurrent().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Shooter/Motor9Current", m_motor9.getSupplyCurrent().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Shooter/Motor31Current", m_motor31.getSupplyCurrent().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Shooter/Motor2Current", m_motor2.getSupplyCurrent().getValueAsDouble());
   }
 }
