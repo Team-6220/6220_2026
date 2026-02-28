@@ -88,12 +88,12 @@ public class ShooterSubsystem extends SubsystemBase {
     outputConfig.NeutralMode = NeutralModeValue.Coast;
 
     // Motor 41 -> Clockwise Positive (inverted)
-    outputConfig.Inverted = InvertedValue.Clockwise_Positive;
+    outputConfig.Inverted = InvertedValue.CounterClockwise_Positive;
     config.MotorOutput = outputConfig;
     m_motor41.getConfigurator().apply(config);
 
     // Motor 1 -> CounterClockwise Positive (flipped to test)
-    outputConfig.Inverted = InvertedValue.CounterClockwise_Positive;
+    outputConfig.Inverted = InvertedValue.Clockwise_Positive;
     config.MotorOutput = outputConfig;
     m_motor1.getConfigurator().apply(config);
 
@@ -153,6 +153,32 @@ public class ShooterSubsystem extends SubsystemBase {
     m_motor9.set(percent);
     m_motor31.set(percent);
     m_motor2.set(percent);
+  }
+
+  /** Runs motors 9, 2, and 31 at percent output. */
+  public void setBottomGroupPercent(double percent) {
+    m_motor9.set(percent);
+    m_motor2.set(percent);
+    m_motor31.set(percent);
+  }
+
+  /** Runs motors 41 and 1 at percent output. */
+  public void setTopGroupPercent(double percent) {
+    m_motor41.set(percent);
+    m_motor1.set(percent);
+  }
+
+  /** Stops motors 9, 2, and 31. */
+  public void stopBottomGroup() {
+    m_motor9.stopMotor();
+    m_motor2.stopMotor();
+    m_motor31.stopMotor();
+  }
+
+  /** Stops motors 41 and 1. */
+  public void stopTopGroup() {
+    m_motor41.stopMotor();
+    m_motor1.stopMotor();
   }
 
   // ========== Velocity Getters ==========

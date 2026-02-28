@@ -26,7 +26,7 @@ public class ShooterCommand extends Command {
   @Override
   public void execute() {
     // Use percent output for basic spin testing (change 0.5 to go faster/slower)
-    m_shooter.setPercentOutput(0.5);
+    m_shooter.setPercentOutput(0.9);
     // Swap to this once PID is tuned:
     // m_shooter.runAtTargetVelocity();
   }
