@@ -27,24 +27,14 @@ public class RobotContainer {
         .leftBumper()
         .whileTrue(
             Commands.runEnd(
-                () -> m_shooter.setBottomGroupPercent(0.2),
-                () -> m_shooter.stopBottomGroup(),
-                m_shooter));
+                () -> m_shooter.setBottomGroupPercent(0.9), () -> m_shooter.stopBottomGroup()));
 
     // Right bumper: hold to spin motors 41, 1
     m_controller
         .rightBumper()
         .whileTrue(
             Commands.runEnd(
-                () -> m_shooter.setTopGroupPercent(0.2),
-                () -> m_shooter.stopTopGroup(),
-                m_shooter));
-
-    // Alternative: right trigger hold (uncomment to use)
-    // m_operatorController.rightTrigger(0.1).whileTrue(new ShooterCommand(m_shooter));
-
-    // Alternative: A button toggle (uncomment to use)
-    // m_operatorController.a().toggleOnTrue(new ShooterCommand(m_shooter));
+                () -> m_shooter.setTopGroupPercent(0.5), () -> m_shooter.stopTopGroup()));
   }
 
   public Command getAutonomousCommand() {
