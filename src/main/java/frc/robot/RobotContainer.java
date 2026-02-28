@@ -60,9 +60,9 @@ public class RobotContainer {
     s_Swerve.configureAutoBuilder();
     s_Swerve.zeroHeading(m_driverController.getHID());
 
-  s_Swerve.setDefaultCommand(
-    new SwerveCom(
-      s_Swerve, m_driverController, () -> m_driverController.getHID().getLeftBumperButton ()));
+    s_Swerve.setDefaultCommand(
+        new SwerveCom(
+            s_Swerve, m_driverController, () -> m_driverController.getHID().getLeftBumperButton()));
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -91,11 +91,12 @@ public class RobotContainer {
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
 
-  // m_driverController
-  //   .rightBumper()
-  //   .onTrue(
-  //     new SwerveCom(
-  //       s_Swerve, m_driverController, () -> m_driverController.getHID().getLeftBumperButton()));
+    // m_driverController
+    //   .rightBumper()
+    //   .onTrue(
+    //     new SwerveCom(
+    //       s_Swerve, m_driverController, () ->
+    // m_driverController.getHID().getLeftBumperButton()));
 
     // Climber servo control - A button toggles servo between deployed (1.0) and retracted (0.0)
     m_driverController

@@ -36,15 +36,12 @@ public class SwerveCom extends Command {
       /* Drive */
       boolean robotCentric = robotCentricSup.getAsBoolean();
       boolean fieldRelative = !robotCentric;
-      // Debug: print current bumper state and chosen reference frame
-      // System.out.println(
-      //     "SwerveCom.execute - leftBumper(robotCentric): "
-      //         + robotCentric
-      //         + ", fieldRelative: "
-      //         + fieldRelative);
 
       s_Swerve.drive(
-          new Translation2d(driverInputs[0], driverInputs[1]), driverInputs[2], fieldRelative, true);
+          new Translation2d(driverInputs[0], driverInputs[1]),
+          driverInputs[2],
+          fieldRelative,
+          true);
     }
   }
 }
