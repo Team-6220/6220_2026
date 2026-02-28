@@ -25,13 +25,13 @@ public class ShooterSubsystem extends SubsystemBase {
   private static final int MOTOR_1_ID = 1;
   private static final int MOTOR_9_ID = 9;
   private static final int MOTOR_31_ID = 31;
-
+  private static final int MOTOR_2_ID = 2;
   // Motors
   private final TalonFX m_motor41; // inverted
   private final TalonFX m_motor1; // inverted
   private final TalonFX m_motor9; // not inverted
   private final TalonFX m_motor31; // not inverted
-
+  private final TalonFX m_motor2;
   // Velocity control request
   private final VelocityVoltage m_velocityRequest;
 
@@ -58,7 +58,7 @@ public class ShooterSubsystem extends SubsystemBase {
     m_motor1 = new TalonFX(MOTOR_1_ID);
     m_motor9 = new TalonFX(MOTOR_9_ID);
     m_motor31 = new TalonFX(MOTOR_31_ID);
-
+    m_motor2 = new TalonFX(MOTOR_2_ID);
     m_velocityRequest = new VelocityVoltage(0).withSlot(0);
 
     configureMotors();
@@ -87,10 +87,14 @@ public class ShooterSubsystem extends SubsystemBase {
     MotorOutputConfigs outputConfig = new MotorOutputConfigs();
     outputConfig.NeutralMode = NeutralModeValue.Coast;
 
-    // Motors 41 and 1 face opposite direction -> Clockwise Positive (inverted)
+    // Motor 41 -> Clockwise Positive (inverted)
     outputConfig.Inverted = InvertedValue.Clockwise_Positive;
     config.MotorOutput = outputConfig;
     m_motor41.getConfigurator().apply(config);
+
+    // Motor 1 -> CounterClockwise Positive (flipped to test)
+    outputConfig.Inverted = InvertedValue.CounterClockwise_Positive;
+    config.MotorOutput = outputConfig;
     m_motor1.getConfigurator().apply(config);
 
     // Motors 9 and 31 spin the same way -> CounterClockwise Positive (default)
@@ -98,6 +102,7 @@ public class ShooterSubsystem extends SubsystemBase {
     config.MotorOutput = outputConfig;
     m_motor9.getConfigurator().apply(config);
     m_motor31.getConfigurator().apply(config);
+    m_motor2.getConfigurator().apply(config);
   }
 
   /** Runs all shooter motors at the tunable target velocity. */
@@ -116,6 +121,7 @@ public class ShooterSubsystem extends SubsystemBase {
     m_motor1.setControl(m_velocityRequest.withVelocity(rps));
     m_motor9.setControl(m_velocityRequest.withVelocity(rps));
     m_motor31.setControl(m_velocityRequest.withVelocity(rps));
+    m_motor2.setControl(m_velocityRequest.withVelocity(rps));
   }
 
   /**
@@ -133,6 +139,7 @@ public class ShooterSubsystem extends SubsystemBase {
     m_motor1.stopMotor();
     m_motor9.stopMotor();
     m_motor31.stopMotor();
+    m_motor2.stopMotor();
   }
 
   /**
@@ -145,6 +152,7 @@ public class ShooterSubsystem extends SubsystemBase {
     m_motor1.set(percent);
     m_motor9.set(percent);
     m_motor31.set(percent);
+    m_motor2.set(percent);
   }
 
   // ========== Velocity Getters ==========
@@ -165,6 +173,10 @@ public class ShooterSubsystem extends SubsystemBase {
     return m_motor31.getVelocity().getValueAsDouble();
   }
 
+  public double getMotor2VelocityRPS() {
+    return m_motor2.getVelocity().getValueAsDouble();
+  }
+
   /**
    * Gets the average velocity of all four shooter motors.
    *
@@ -174,8 +186,9 @@ public class ShooterSubsystem extends SubsystemBase {
     return (getMotor41VelocityRPS()
             + getMotor1VelocityRPS()
             + getMotor9VelocityRPS()
-            + getMotor31VelocityRPS())
-        / 4.0;
+            + getMotor31VelocityRPS()
+            + getMotor2VelocityRPS())
+        / 5.0;
   }
 
   /**
@@ -192,7 +205,8 @@ public class ShooterSubsystem extends SubsystemBase {
     return Math.abs(getMotor41VelocityRPS() - target) < VELOCITY_TOLERANCE_RPS
         && Math.abs(getMotor1VelocityRPS() - target) < VELOCITY_TOLERANCE_RPS
         && Math.abs(getMotor9VelocityRPS() - target) < VELOCITY_TOLERANCE_RPS
-        && Math.abs(getMotor31VelocityRPS() - target) < VELOCITY_TOLERANCE_RPS;
+        && Math.abs(getMotor31VelocityRPS() - target) < VELOCITY_TOLERANCE_RPS
+        && Math.abs(getMotor2VelocityRPS() - target) < VELOCITY_TOLERANCE_RPS;
   }
 
   /**
@@ -218,6 +232,7 @@ public class ShooterSubsystem extends SubsystemBase {
     m_motor1.getConfigurator().apply(pidConfigs);
     m_motor9.getConfigurator().apply(pidConfigs);
     m_motor31.getConfigurator().apply(pidConfigs);
+    m_motor2.getConfigurator().apply(pidConfigs);
   }
 
   /**
@@ -233,6 +248,7 @@ public class ShooterSubsystem extends SubsystemBase {
     m_motor1.getConfigurator().apply(output);
     m_motor9.getConfigurator().apply(output);
     m_motor31.getConfigurator().apply(output);
+    m_motor2.getConfigurator().apply(output);
   }
 
   @Override
@@ -252,6 +268,7 @@ public class ShooterSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Shooter/Motor1VelocityRPS", getMotor1VelocityRPS());
     SmartDashboard.putNumber("Shooter/Motor9VelocityRPS", getMotor9VelocityRPS());
     SmartDashboard.putNumber("Shooter/Motor31VelocityRPS", getMotor31VelocityRPS());
+    SmartDashboard.putNumber("Shooter/Motor2VelocityRPS", getMotor2VelocityRPS());
     SmartDashboard.putNumber("Shooter/AverageVelocityRPS", getAverageVelocityRPS());
     SmartDashboard.putNumber("Shooter/TargetVelocityRPS", m_targetVelocityRPS.get());
     SmartDashboard.putBoolean("Shooter/AtSpeed", isAtSpeed());
