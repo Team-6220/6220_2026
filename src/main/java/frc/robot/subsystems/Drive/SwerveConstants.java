@@ -56,7 +56,7 @@ public final class SwerveConstants {
   private static final Distance COMP_WHEEL_BASE = Inches.of(20.75);
   private static final SwerveModuleConstants COMP_BACK_RIGHT_MODULE =
       new SwerveModuleConstants(
-          8, 10, 4, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(120.58593750000001));
+          8, 10, 4, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(120.5859375));
   private static final SwerveModuleConstants COMP_BACK_LEFT_MODULE =
       new SwerveModuleConstants(
           5, 12, 2, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-179.208984375));
