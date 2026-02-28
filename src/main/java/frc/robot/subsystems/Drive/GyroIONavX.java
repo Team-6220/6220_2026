@@ -27,7 +27,7 @@ public class GyroIONavX implements GyroIO {
       // This correction mirrors what we observe on upside-down mounts: negate the
       // angle sign and add 180 degrees to re-align to the robot frame.
       double correctedDeg = -raw.getDegrees() + 180.0;
-      inputs.yawPosition = new Rotation2d(Math.toRadians(correctedDeg));
+      inputs.yawPosition = Rotation2d.fromDegrees(correctedDeg);
     } else {
       inputs.yawPosition = raw;
     }

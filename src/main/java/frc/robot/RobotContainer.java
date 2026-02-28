@@ -91,13 +91,6 @@ public class RobotContainer {
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
 
-    // m_driverController
-    //   .rightBumper()
-    //   .onTrue(
-    //     new SwerveCom(
-    //       s_Swerve, m_driverController, () ->
-    // m_driverController.getHID().getLeftBumperButton()));
-
     // Climber servo control - A button toggles servo between deployed (1.0) and retracted (0.0)
     m_driverController
         .a()
