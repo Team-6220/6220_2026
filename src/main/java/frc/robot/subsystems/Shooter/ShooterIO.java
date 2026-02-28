@@ -4,29 +4,13 @@
 
 package frc.robot.subsystems.Shooter;
 
-/** Add your docs here. */
+/** Constants for shooter motor CAN IDs */
 public class ShooterIO {
-
-    public static final int Kicker2ID = 0;
-    public static final int Kicker1ID = 0;
-    public static final int Motor3ID = 0;
-    public static final int Motor2ID = 0;
-    public static final int Motor1ID = 0;
-    public static final int HoodID = 0;}
-/** Interface for all shooters to implement */
-public interface ShooterIO {
-  
-  public static class ShooterIOInputs {
-    public double velocityA = 0.0;
-    public double velocityB = 0.0;
-  }
-
-public final int Motor1ID = 0;
-public final int Motor2ID = 0;
-
-  default void updateInputs(ShooterIOInputs inputs) {}
-
-  default void setVelocity(double a, double b) {}
-
-  default void stop() {}
+  // Update these to match your actual CAN IDs
+  public static final int KICKER_1_ID = 20;
+  public static final int KICKER_2_ID = 21;
+  public static final int MOTOR_1_ID = 10;
+  public static final int MOTOR_2_ID = 11;
+  public static final int MOTOR_3_ID = 12;
+  public static final int HOOD_ID = 30;
 }
