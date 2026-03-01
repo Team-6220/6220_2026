@@ -150,10 +150,10 @@ class SwerveModuleTest {
   /**
    * This test is meant to catch the "angle wrap" issue.
    *
-   * <p><If your angle pipeline expects [-0.5, +0.5) rotations, then any commanded angle should be
-   * wrapped into [-0.5, +0.5) BEFORE converting to the NEO setpoint.
+   * If your angle pipeline expects [-0.5, +0.5) rotations, then any commanded angle should be wrapped
+   * into [-0.5, +0.5) BEFORE converting to the NEO setpoint.
    *
-   * <p>If this fails, it's a sign you should wrap with inputModulus(rot, -0.5, +0.5).
+   * If this fails, it's a sign you should wrap with inputModulus(rot, -0.5, +0.5).
    */
   @Test
   void desiredAngleShouldBeWrappedToMinus0p5ToPlus0p5RotationsBeforeSetpoint() {
