@@ -15,6 +15,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.ManualArm;
+import frc.robot.commands.SpinBelt;
+import frc.robot.commands.SpinRollers;
 import frc.robot.commands.AlignHub;
 import frc.robot.commands.DigitalClimberCommand;
 import frc.robot.commands.SwerveCom;
@@ -123,6 +126,9 @@ public class RobotContainer {
             RIGHT_SERVO_TOGGLE_BUTTON));
 
     m_driverController.leftBumper().whileTrue(new AlignHub());
+    m_driverController.a().onTrue(new SpinRollers(m_driverController.getHID()));
+    m_driverController.b().onTrue(new SpinBelt(m_driverController.getHID()));
+    m_driverController.x().onTrue(new ManualArm(m_driverController.getHID()));
   }
 
   /**

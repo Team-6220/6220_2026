@@ -68,9 +68,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private static final class IntakeConstants {
     // ids
-    public static final int beltID = 0;
-    public static final int armMotorID = 0;
-    public static final int rollerMotorID = 0;
+    public static final int beltID = 42;
+    public static final int armMotorID = 18;
+    public static final int rollerMotorID = 15;
 
     // couldnt tell you tbh (claude bs)
     public static final double INTAKESPEED = 0.75;
