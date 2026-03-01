@@ -149,28 +149,26 @@ class SwerveModuleTest {
   }
 
   /**
-   * This test is meant to catch the "angle wrap / negative rotations" issue.
+   * This test is meant to catch the "angle wrap" issue.
    *
-   * If your angle pipeline expects 0..1 rotations, then any commanded angle should be wrapped
-   * into [0, 1) BEFORE converting to the NEO setpoint. Right now, your code likely sends
-   * [-0.5, +0.5) rotations directly.
+   * If your angle pipeline expects [-0.5, +0.5) rotations, then any commanded angle should be wrapped
+   * into [-0.5, +0.5) BEFORE converting to the NEO setpoint.
    *
-   * If this fails, it's a sign you should wrap with inputModulus(rot, 0, 1).
+   * If this fails, it's a sign you should wrap with inputModulus(rot, -0.5, +0.5).
    */
   @Test
   void desiredAngleShouldBeWrappedTo0To1RotationsBeforeSetpoint() {
     io.anglePosRad = 0.0;
     module.periodic();
 
-    // -90 degrees => -0.25 rotations if represented as -180..180
-    var desired = new SwerveModuleState(0.0, Rotation2d.fromDegrees(-90));
+    // 270 degrees => -0.25 rotations if represented as -180..180
+    var desired = new SwerveModuleState(0.0, Rotation2d.fromDegrees(270));
     module.setDesiredState(desired, true);
 
     assertNotNull(io.lastAngleSetpoint);
 
     double rawRot = desired.angle.getRotations();
-    double wrappedRot = MathUtil.inputModulus(rawRot, 0.0, 1.0);
-    double expectedWrappedNeo = RevConfigs.CANCoderAngleToNeoEncoder(wrappedRot);
+    double expectedWrappedNeo = RevConfigs.CANCoderAngleToNeoEncoder(rawRot);
 
     assertEquals(
         expectedWrappedNeo,
