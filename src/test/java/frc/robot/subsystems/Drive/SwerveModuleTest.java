@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.Units;
@@ -151,10 +150,10 @@ class SwerveModuleTest {
   /**
    * This test is meant to catch the "angle wrap" issue.
    *
-   * If your angle pipeline expects [-0.5, +0.5) rotations, then any commanded angle should be wrapped
-   * into [-0.5, +0.5) BEFORE converting to the NEO setpoint.
+   * <p>If your angle pipeline expects [-0.5, +0.5) rotations, then any commanded angle should be
+   * wrapped into [-0.5, +0.5) BEFORE converting to the NEO setpoint.
    *
-   * If this fails, it's a sign you should wrap with inputModulus(rot, -0.5, +0.5).
+   * <p>If this fails, it's a sign you should wrap with inputModulus(rot, -0.5, +0.5).
    */
   @Test
   void desiredAngleShouldBeWrappedTo0To1RotationsBeforeSetpoint() {
