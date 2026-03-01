@@ -18,10 +18,10 @@ public class ClimberSubsystem extends SubsystemBase {
   private final ClimberIO.ClimberIOInputs inputs = new ClimberIO.ClimberIOInputs();
 
   // Tunable thresholds for stall detection
-  private final TunableNumber stallCurrentBottom =
+  private final TunableNumber stallCurrentBottomTN =
       new TunableNumber(
           "Climber/StallCurrentBottom", ClimberConstants.STALL_CURRENT_THRESHOLD_BOTTOM);
-  private final TunableNumber stallCurrentTop =
+  private final TunableNumber stallCurrentTopTN =
       new TunableNumber("Climber/StallCurrentTop", ClimberConstants.STALL_CURRENT_THRESHOLD_TOP);
 
   public ClimberSubsystem(ClimberIO io) {
@@ -72,12 +72,12 @@ public class ClimberSubsystem extends SubsystemBase {
 
   /** Get the current bottom stall current threshold (tunable) */
   private double getStallCurrentThresholdBottom() {
-    return stallCurrentBottom.get();
+    return stallCurrentBottomTN.get();
   }
 
   /** Get the current top stall current threshold (tunable) */
   private double getStallCurrentThresholdTop() {
-    return stallCurrentTop.get();
+    return stallCurrentTopTN.get();
   }
 
   /**
