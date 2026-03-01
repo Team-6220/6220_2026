@@ -201,7 +201,7 @@ public class ClimberSubsystem extends SubsystemBase {
    */
   public void maxClimberToTop(boolean controlLeft, boolean controlRight) {
     // Drive upward (positive speed)
-    double upwardSpeed = 0.75;
+    double upwardSpeed = ClimberConstants.CLIMBER_SPEED;
 
     // Handle left climber
     if (controlLeft) {
