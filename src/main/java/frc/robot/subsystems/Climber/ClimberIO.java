@@ -8,30 +8,17 @@ public interface ClimberIO {
   public static class ClimberIOInputs {
     // Motor inputs
     public double leftMotorVoltage = 0.0;
-    // TODO: Add right motor when installed on full robot
-    // public double rightMotorVoltage = 0.0;
+    public double rightMotorVoltage = 0.0;
     public double leftMotorCurrent = 0.0;
-    // TODO: Add right motor when installed on full robot
-    // public double rightMotorCurrent = 0.0;
+    public double rightMotorCurrent = 0.0;
     public double leftMotorVelocity = 0.0;
-    // TODO: Add right motor when installed on full robot
-    // public double rightMotorVelocity = 0.0;
-    public double leftMotorPosition = 0.0;
-    // TODO: Add right motor when installed on full robot
-    // public double rightMotorPosition = 0.0;
-
-    // Absolute encoder inputs
-    public double leftEncoderPosition = 0.0; // Raw encoder position in rotations
-    public double leftEncoderVelocity = 0.0; // Encoder velocity in rotations per second
-    public double leftClimberHeight = 0.0; // Calculated height in inches/meters
-    // TODO: Add right encoder when installed on full robot
-    // public double rightEncoderPosition = 0.0;
-    // public double rightEncoderVelocity = 0.0;
-    // public double rightClimberHeight = 0.0;
+    public double rightMotorVelocity = 0.0;
 
     // Servo inputs
-    public double servoPosition = 0.0;
-    public double servoSetpoint = 0.0;
+    public double leftServoPosition = 0.0;
+    public double leftServoSetpoint = 0.0;
+    public double rightServoPosition = 0.0;
+    public double rightServoSetpoint = 0.0;
   }
 
   /** Updates the set of loggable inputs */
@@ -40,15 +27,25 @@ public interface ClimberIO {
   /** Set the left motor speed (-1.0 to 1.0) */
   public default void setLeftMotor(double speed) {}
 
-  // TODO: Add right motor when installed on full robot
-  // /** Set the right motor speed (-1.0 to 1.0) */
-  // public default void setRightMotor(double speed) {}
+  /** Set the right motor speed (-1.0 to 1.0) */
+  public default void setRightMotor(double speed) {}
 
-  /** Set the servo position */
-  public default void setServoPosition(double position) {}
+  /** Set both servo positions simultaneously */
+  public default void setServoPositions(double position) {}
 
-  /** Get the current servo position */
-  public default double getServoPosition() {
+  /** Set the left servo position (0.0 to 1.0) */
+  public default void setLeftServoPosition(double position) {}
+
+  /** Set the right servo position (0.0 to 1.0) */
+  public default void setRightServoPosition(double position) {}
+
+  /** Get the current left servo position */
+  public default double getLeftServoPosition() {
+    return 0.0;
+  }
+
+  /** Get the current right servo position */
+  public default double getRightServoPosition() {
     return 0.0;
   }
 }
