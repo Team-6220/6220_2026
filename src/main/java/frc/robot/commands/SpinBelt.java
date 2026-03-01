@@ -29,12 +29,15 @@ public class SpinBelt extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intake.simpleDriveBelt(0);
+    // run belt at ~15% for testing
+    intake.simpleDriveBelt(0.05);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    intake.simpleDriveBelt(0);
+  }
 
   // Returns true when the command should end.
   @Override

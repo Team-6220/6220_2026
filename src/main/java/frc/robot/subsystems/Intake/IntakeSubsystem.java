@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems.Intake;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -55,8 +59,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private String tableKey = "arm_";
 
-  private final SparkMax beltMotor;
-  private final SparkMaxConfig beltMotorConfig = new SparkMaxConfig();
+  private final TalonFX beltMotor;
+  private final TalonFXConfiguration beltMotorConfig = new TalonFXConfiguration();
 
   private final SparkMax armMotor;
   private final SparkMaxConfig armMotorConfig = new SparkMaxConfig();
@@ -78,8 +82,8 @@ public class IntakeSubsystem extends SubsystemBase {
     public static final int CURRENTLIMIT = 30;
 
     // this either fr
-    public static final int stallLimit = 5;
-    public static final int freeLimit = 20;
+    public static final int stallLimit = 30;
+    public static final int freeLimit = 30;
 
     // inverted
     public static final boolean beltInvert = false;
@@ -113,14 +117,29 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public IntakeSubsystem() {
-    beltMotor = new SparkMax(IntakeConstants.beltID, MotorType.kBrushless);
-    beltMotorConfig.inverted(IntakeConstants.beltInvert);
-    beltMotorConfig.smartCurrentLimit(IntakeConstants.stallLimit, IntakeConstants.freeLimit);
-    beltMotorConfig.idleMode(IntakeConstants.beltIdleMode);
-    beltMotor.configure(
-        beltMotorConfig,
-        SparkBase.ResetMode.kResetSafeParameters,
-        SparkBase.PersistMode.kNoPersistParameters);
+    beltMotor = new TalonFX(IntakeConstants.beltID);
+
+    // Configure TalonFX via phoenix6 TalonFXConfiguration fields
+    // Motor invert
+    beltMotorConfig.MotorOutput.Inverted =
+        IntakeConstants.beltInvert
+            ? InvertedValue.Clockwise_Positive
+            : InvertedValue.CounterClockwise_Positive;
+
+    // Map Rev IdleMode to CTRE NeutralModeValue
+    beltMotorConfig.MotorOutput.NeutralMode =
+        (IntakeConstants.beltIdleMode == IdleMode.kBrake)
+            ? NeutralModeValue.Brake
+            : NeutralModeValue.Coast;
+
+    // Current limits: use freeLimit as the active supply limit and stallLimit as the lower limit
+    beltMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    beltMotorConfig.CurrentLimits.SupplyCurrentLimit = IntakeConstants.freeLimit;
+    beltMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = IntakeConstants.stallLimit;
+    beltMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0.1;
+
+    // Apply configuration using CTRE configurator
+    beltMotor.getConfigurator().apply(beltMotorConfig);
 
     armMotor = new SparkMax(IntakeConstants.armMotorID, MotorType.kBrushless);
     armMotorConfig.inverted(IntakeConstants.armInvert);
@@ -310,17 +329,27 @@ public class IntakeSubsystem extends SubsystemBase {
 
   // driving in decimal percents
   public void simpleDriveArm(double motorOutput) {
-    SmartDashboard.putNumber("arm output", motorOutput);
-    armMotor.setVoltage(motorOutput);
+    // motorOutput is percent (-1.0 .. 1.0). Convert to volts for SparkMax/TalonFX
+    double pct = Math.max(-1.0, Math.min(1.0, motorOutput));
+    double volts = pct * 12.0;
+    SmartDashboard.putNumber("arm output pct", pct);
+    SmartDashboard.putNumber("arm output (V)", volts);
+    armMotor.setVoltage(volts);
   }
 
   public void simpleDriveRoller(double motorOutput) {
-    SmartDashboard.putNumber("roller output", motorOutput);
-    rollerMotor.setVoltage(motorOutput);
+    double pct = Math.max(-1.0, Math.min(1.0, motorOutput));
+    double volts = pct * 8.0;
+    SmartDashboard.putNumber("roller output pct", pct);
+    SmartDashboard.putNumber("roller output (V)", volts);
+    rollerMotor.setVoltage(volts);
   }
 
   public void simpleDriveBelt(double motorOutput) {
-    SmartDashboard.putNumber("belt output", motorOutput);
-    beltMotor.setVoltage(motorOutput);
+    double pct = Math.max(-1.0, Math.min(1.0, motorOutput));
+    double volts = pct * 12.0;
+    SmartDashboard.putNumber("belt output pct", pct);
+    SmartDashboard.putNumber("belt output (V)", volts);
+    beltMotor.setVoltage(volts);
   }
 }
