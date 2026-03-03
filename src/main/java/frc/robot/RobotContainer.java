@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.Angler.AnglerSubsystem;
+import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
 
 public class RobotContainer {
@@ -33,16 +33,14 @@ public class RobotContainer {
         .leftBumper()
         .whileTrue(
             Commands.runEnd(
-                () -> m_shooter.setBottomGroupPercent(0.5),
-                () -> m_shooter.stopBottomGroup()));
+                () -> m_shooter.setBottomGroupPercent(0.8), () -> m_shooter.stopBottomGroup()));
 
     // Right bumper: hold to spin motors 41, 1
     m_controller
         .rightBumper()
         .whileTrue(
             Commands.runEnd(
-                () -> m_shooter.setTopGroupPercent(0.5),
-                () -> m_shooter.stopTopGroup()));
+                () -> m_shooter.setTopGroupPercent(0.5), () -> m_shooter.stopTopGroup()));
 
     // Left joystick Y: control angler up/down (slow)
     m_angler.setDefaultCommand(
@@ -60,8 +58,10 @@ public class RobotContainer {
     // A button: hold to test angler motor
     m_controller
         .a()
-        .whileTrue(
-            Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop()));
+        .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop()));
+    m_controller
+        .b()
+        .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop()));
   }
 
   public Command getAutonomousCommand() {
