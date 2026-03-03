@@ -76,11 +76,6 @@ public class IntakeSubsystem extends SubsystemBase {
     public static final int armMotorID = 18;
     public static final int rollerMotorID = 15;
 
-    // couldnt tell you tbh (claude bs)
-    public static final double INTAKESPEED = 0.75;
-    public static final double ARMSPEED = 0.5;
-    public static final int CURRENTLIMIT = 30;
-
     // this either fr
     public static final int stallLimit = 30;
     public static final int freeLimit = 30;

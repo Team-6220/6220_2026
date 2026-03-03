@@ -17,15 +17,15 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignHub;
 import frc.robot.commands.DigitalClimberCommand;
-import frc.robot.commands.ManualArm;
-import frc.robot.commands.SpinBelt;
-import frc.robot.commands.SpinRollers;
 import frc.robot.commands.SwerveCom;
 import frc.robot.subsystems.Climber.ClimberIOReal;
 import frc.robot.subsystems.Climber.ClimberIOSim;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
 import frc.robot.subsystems.Drive.Swerve;
+import frc.robot.subsystems.Intake.ArmSubsystem;
+import frc.robot.subsystems.Intake.BeltSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.Intake.RollerSubsystem;
 import frc.robot.subsystems.Vision.Limelight;
 
 /**
@@ -53,6 +53,10 @@ public class RobotContainer {
   private final GenericHID m_buttonBoard = new GenericHID(2);
 
   private final IntakeSubsystem intake = IntakeSubsystem.getInstance();
+
+  private final ArmSubsystem arm = ArmSubsystem.getInstance();
+  private final BeltSubsystem belt = BeltSubsystem.getInstance();
+  private final RollerSubsystem roller = RollerSubsystem.getInstance();
 
   public RobotContainer() {
     // Initialize climber subsystem based on robot mode
@@ -126,9 +130,10 @@ public class RobotContainer {
             RIGHT_SERVO_TOGGLE_BUTTON));
 
     m_driverController.leftBumper().whileTrue(new AlignHub());
-    m_driverController.a().whileTrue(new SpinRollers(m_driverController.getHID()));
-    m_driverController.b().whileTrue(new SpinBelt(m_driverController.getHID()));
-    m_driverController.x().whileTrue(new ManualArm(m_driverController.getHID()));
+    // m_driverController.a().whileTrue(new SpinRollers(m_driverController.getHID()));
+    // m_driverController.b().whileTrue(new SpinBelt(m_driverController.getHID()));
+    // m_driverController.x().whileTrue(new ManualArm(m_driverController.getHID()));
+
   }
 
   /**
