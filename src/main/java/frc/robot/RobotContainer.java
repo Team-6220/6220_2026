@@ -59,7 +59,7 @@ public class RobotContainer {
     m_controller
         .a()
         .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop()));
-        m_controller
+    m_controller
         .b()
         .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop()));
   }
