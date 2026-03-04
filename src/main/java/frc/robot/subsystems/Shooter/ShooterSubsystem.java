@@ -87,7 +87,7 @@ public class ShooterSubsystem extends SubsystemBase {
     MotorOutputConfigs outputConfig = new MotorOutputConfigs();
     outputConfig.NeutralMode = NeutralModeValue.Coast;
 
-    // Motor 41 -> Clockwise Positive (inverted)
+    // Motor 41 -> CounterClockwise Positive
     outputConfig.Inverted = InvertedValue.CounterClockwise_Positive;
     config.MotorOutput = outputConfig;
     m_motor41.getConfigurator().apply(config);
