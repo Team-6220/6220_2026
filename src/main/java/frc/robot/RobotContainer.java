@@ -130,22 +130,34 @@ public class RobotContainer {
         .leftBumper()
         .whileTrue(
             Commands.runEnd(
-                () -> m_shooter.setBottomGroupPercent(0.8), () -> m_shooter.stopBottomGroup()));
+                () -> m_shooter.setBottomGroupPercent(0.8),
+                () -> m_shooter.stopBottomGroup(),
+                m_shooter));
 
     // Right bumper: hold to spin motors 41, 1
     m_driverController
         .rightBumper()
         .whileTrue(
             Commands.runEnd(
-                () -> m_shooter.setTopGroupPercent(0.5), () -> m_shooter.stopTopGroup()));
+                () -> m_shooter.setTopGroupPercent(0.5),
+                () -> m_shooter.stopTopGroup(),
+                m_shooter));
 
     // A button: hold to test angler motor
     m_driverController
         .a()
-        .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop()));
+        .whileTrue(
+            Commands.runEnd(
+                () -> m_angler.setSpeed(0.15),
+                () -> m_angler.stop(),
+                m_angler));
     m_driverController
         .b()
-        .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop()));
+        .whileTrue(
+            Commands.runEnd(
+                () -> m_angler.setSpeed(-0.15),
+                () -> m_angler.stop(),
+                m_angler));
     m_driverController.leftBumper().whileTrue(new AlignHub());
   }
 
