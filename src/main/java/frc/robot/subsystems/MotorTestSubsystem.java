@@ -2,8 +2,8 @@ package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.PersistMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -22,7 +22,6 @@ public class MotorTestSubsystem extends SubsystemBase {
     private static final double TEST_DURATION = 2.0; // seconds
     private static final double TEST_SPEED = 0.3;    // 30% power
 
-    @SuppressWarnings("removal")
     public MotorTestSubsystem() {
         motors = new SparkMax[motorIDs.length];
         SparkMaxConfig config = new SparkMaxConfig();
