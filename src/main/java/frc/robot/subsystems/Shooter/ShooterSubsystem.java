@@ -75,12 +75,12 @@ public class ShooterSubsystem extends SubsystemBase {
 
     // PID + feedforward (Slot 0)
     Slot0Configs pidConfigs = new Slot0Configs();
-    pidConfigs.kP = m_kp.get();
-    pidConfigs.kI = m_ki.get();
-    pidConfigs.kD = m_kd.get();
-    pidConfigs.kV = m_kv.get();
-    pidConfigs.kS = m_ks.get();
-    pidConfigs.kA = m_ka.get();
+    pidConfigs.kP = m_kpTN.get();
+    pidConfigs.kI = m_kiTN.get();
+    pidConfigs.kD = m_kdTN.get();
+    pidConfigs.kV = m_kvTN.get();
+    pidConfigs.kS = m_ksTN.get();
+    pidConfigs.kA = m_kaTN.get();
     config.Slot0 = pidConfigs;
 
     // Motor output config
@@ -107,7 +107,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   /** Runs all shooter motors at the tunable target velocity. */
   public void runAtTargetVelocity() {
-    double rps = m_targetVelocityRPS.get();
+    double rps = m_targetVelocityRPSTN.get();
     setVelocityRPS(rps);
   }
 
@@ -223,7 +223,7 @@ public class ShooterSubsystem extends SubsystemBase {
    * @return True if all motors are at speed
    */
   public boolean isAtSpeed() {
-    double target = m_targetVelocityRPS.get();
+    double target = m_targetVelocityRPSTN.get();
     if (target == 0.0) {
       return false;
     }
@@ -241,18 +241,18 @@ public class ShooterSubsystem extends SubsystemBase {
    * @return Target velocity in RPS
    */
   public double getTargetVelocityRPS() {
-    return m_targetVelocityRPS.get();
+    return m_targetVelocityRPSTN.get();
   }
 
   /** Updates PID values from tunable numbers (only Slot0, avoids full reconfigure). */
   private void updatePIDValues() {
     Slot0Configs pidConfigs = new Slot0Configs();
-    pidConfigs.kP = m_kp.get();
-    pidConfigs.kI = m_ki.get();
-    pidConfigs.kD = m_kd.get();
-    pidConfigs.kV = m_kv.get();
-    pidConfigs.kS = m_ks.get();
-    pidConfigs.kA = m_ka.get();
+    pidConfigs.kP = m_kpTN.get();
+    pidConfigs.kI = m_kiTN.get();
+    pidConfigs.kD = m_kdTN.get();
+    pidConfigs.kV = m_kvTN.get();
+    pidConfigs.kS = m_ksTN.get();
+    pidConfigs.kA = m_kaTN.get();
 
     m_motor41.getConfigurator().apply(pidConfigs);
     m_motor1.getConfigurator().apply(pidConfigs);
@@ -280,12 +280,12 @@ public class ShooterSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update PID if tunable numbers changed
-    if (m_kp.hasChanged()
-        || m_ki.hasChanged()
-        || m_kd.hasChanged()
-        || m_kv.hasChanged()
-        || m_ks.hasChanged()
-        || m_ka.hasChanged()) {
+    if (m_kpTN.hasChanged()
+        || m_kiTN.hasChanged()
+        || m_kdTN.hasChanged()
+        || m_kvTN.hasChanged()
+        || m_ksTN.hasChanged()
+        || m_kaTN.hasChanged()) {
       updatePIDValues();
     }
 
@@ -296,7 +296,7 @@ public class ShooterSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Shooter/Motor31VelocityRPS", getMotor31VelocityRPS());
     SmartDashboard.putNumber("Shooter/Motor2VelocityRPS", getMotor2VelocityRPS());
     SmartDashboard.putNumber("Shooter/AverageVelocityRPS", getAverageVelocityRPS());
-    SmartDashboard.putNumber("Shooter/TargetVelocityRPS", m_targetVelocityRPS.get());
+    SmartDashboard.putNumber("Shooter/TargetVelocityRPS", m_targetVelocityRPSTN.get());
     SmartDashboard.putBoolean("Shooter/AtSpeed", isAtSpeed());
     SmartDashboard.putNumber(
         "Shooter/Motor41Voltage", m_motor41.getMotorVoltage().getValueAsDouble());

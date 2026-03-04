@@ -146,18 +146,11 @@ public class RobotContainer {
     // A button: hold to test angler motor
     m_driverController
         .a()
-        .whileTrue(
-            Commands.runEnd(
-                () -> m_angler.setSpeed(0.15),
-                () -> m_angler.stop(),
-                m_angler));
+        .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
     m_driverController
         .b()
         .whileTrue(
-            Commands.runEnd(
-                () -> m_angler.setSpeed(-0.15),
-                () -> m_angler.stop(),
-                m_angler));
+            Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));
     m_driverController.leftBumper().whileTrue(new AlignHub());
   }
 

@@ -7,9 +7,9 @@ package frc.robot.subsystems.Shooter;
 /**
  * Shooter IO abstraction.
  *
- * <p>This interface is responsible for reading sensor inputs and controlling the
- * hardware for the shooter subsystem. Implementations of this interface should
- * handle all direct interaction with motors, encoders, etc.
+ * <p>This interface is responsible for reading sensor inputs and controlling the hardware for the
+ * shooter subsystem. Implementations of this interface should handle all direct interaction with
+ * motors, encoders, etc.
  */
 public interface ShooterIO {
   /** Container class for all shooter sensor inputs. */
