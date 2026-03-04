@@ -2,7 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.config;
+package frc.robot.subsystems.Drive;
 
-/** Shooter Config */
-public record ShooterConfig(int leftMotorID, int rightMotorID) {}
+/** Add your docs here. */
+public class SwerveModuleIOSim implements SwerveModuleIO {
+  public SwerveModuleIOSim() {}
+}

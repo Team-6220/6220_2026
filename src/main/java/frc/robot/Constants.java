@@ -14,7 +14,8 @@ import java.util.Optional;
 
 public final class Constants {
 
-  public static boolean TUNING_MODE = true;
+  public static final RobotType TYPE = RobotType.COMPBOT;
+  public static boolean TUNING_MODE = (TYPE != RobotType.COMPBOT);
 
   public static Optional<DriverStation.Alliance> ALLIANCE_COLOR = DriverStation.getAlliance();
 
@@ -22,4 +23,37 @@ public final class Constants {
   public static final MomentOfInertia robotMOI = KilogramSquareMeters.of(4.563);
 
   public static String isRed = "N/A"; // FIXME: MAKE AUTO UPDATE ISRED
+
+  public enum RobotType {
+    COMPBOT,
+    PRACTICEBOT,
+    SIMBOT
+  }
+
+  /**
+   * Flag to indicate the gyro (NAVX) is mounted upside-down on this robot. Set automatically based
+   * on the selected RobotType: COMPBOT is upside-down in our setup. Change this mapping if you
+   * remount the gyro or change robot types.
+   */
+  public static final boolean GYRO_UPSIDEDOWN = (TYPE == RobotType.COMPBOT);
+
+  /** Checks whether the correct robot is selected when deploying. */
+  public static class CheckDeploy {
+    public static void main(String... args) {
+      if (TYPE == RobotType.SIMBOT) {
+        System.err.println("Cannot deploy, invalid robot selected: " + TYPE);
+        System.exit(1);
+      }
+    }
+  }
+
+  /** Checks that the default robot is selected and tuning mode is disabled. */
+  public static class CheckPullRequest {
+    public static void main(String... args) {
+      if (TYPE != RobotType.COMPBOT || TUNING_MODE) {
+        System.err.println("Do not merge, non-default constants are configured.");
+        System.exit(1);
+      }
+    }
+  }
 }

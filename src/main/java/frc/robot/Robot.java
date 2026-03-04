@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.Vision.PhotonVisionSubsystem;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -25,9 +24,6 @@ public class Robot extends TimedRobot {
   private ArrayList<Command> m_autonomousCommandList;
 
   public static final CTREConfigs ctreConfigs = new CTREConfigs();
-
-  private final PhotonVisionSubsystem vision =
-      PhotonVisionSubsystem.getInstance(VisionConstants.cameraNames);
 
   private final RobotContainer m_robotContainer;
 
@@ -83,8 +79,8 @@ public class Robot extends TimedRobot {
     }
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule();
+    if (m_robotContainer.getAutonomousCommand() != null) {
+      CommandScheduler.getInstance().schedule(m_robotContainer.getAutonomousCommand());
     }
   }
 

@@ -2,9 +2,9 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.config.RobotConfig;
+import frc.robot.subsystems.Drive.SwerveConstants;
 
-public final class OIConstants {
+public final class IOConstants {
   public static final int kDriverControllerPort = 0;
 
   public static final double kDeadband = 0.085;
@@ -82,22 +82,22 @@ public final class OIConstants {
   public static double[] getDriverInputs(XboxController driver) {
     double[] inputs = new double[3];
 
-    inputs[0] = OIConstants.modifyMoveAxis(-driver.getRawAxis(translationAxis));
-    inputs[1] = OIConstants.modifyMoveAxis(-driver.getRawAxis(strafeAxis));
-    inputs[2] = OIConstants.modifyRotAxis(-driver.getRawAxis(rotationAxis));
+    inputs[0] = IOConstants.modifyMoveAxis(-driver.getRawAxis(translationAxis));
+    inputs[1] = IOConstants.modifyMoveAxis(-driver.getRawAxis(strafeAxis));
+    inputs[2] = IOConstants.modifyRotAxis(driver.getRawAxis(rotationAxis));
 
-    inputs[0] = MathUtil.applyDeadband(inputs[0], OIConstants.kDeadband);
-    inputs[1] = MathUtil.applyDeadband(inputs[1], OIConstants.kDeadband);
-    inputs[2] = MathUtil.applyDeadband(inputs[2], OIConstants.kDeadband);
+    inputs[0] = MathUtil.applyDeadband(inputs[0], IOConstants.kDeadband);
+    inputs[1] = MathUtil.applyDeadband(inputs[1], IOConstants.kDeadband);
+    inputs[2] = MathUtil.applyDeadband(inputs[2], IOConstants.kDeadband);
 
     int invert = (Constants.isRed.equals("red")) ? -1 : 1;
 
     inputs[0] *= invert;
     inputs[1] *= invert;
 
-    inputs[0] *= RobotConfig.SWERVECONFIG.maxSpeed();
-    inputs[1] *= RobotConfig.SWERVECONFIG.maxSpeed();
-    inputs[2] *= RobotConfig.SWERVECONFIG.maxAngularVelocity();
+    inputs[0] *= SwerveConstants.maxSpeed();
+    inputs[1] *= SwerveConstants.maxSpeed();
+    inputs[2] *= SwerveConstants.maxAngularVelocity();
     return inputs;
   }
 }
