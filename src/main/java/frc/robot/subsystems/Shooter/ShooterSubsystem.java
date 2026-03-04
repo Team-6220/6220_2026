@@ -36,15 +36,15 @@ public class ShooterSubsystem extends SubsystemBase {
   private final VelocityVoltage m_velocityRequest;
 
   // Tunable PID and feedforward values
-  private final TunableNumber m_kp = new TunableNumber("Shooter/kP", 0.1);
-  private final TunableNumber m_ki = new TunableNumber("Shooter/kI", 0.0);
-  private final TunableNumber m_kd = new TunableNumber("Shooter/kD", 0.0);
-  private final TunableNumber m_kv = new TunableNumber("Shooter/kV", 0.12);
-  private final TunableNumber m_ks = new TunableNumber("Shooter/kS", 0.0);
-  private final TunableNumber m_ka = new TunableNumber("Shooter/kA", 0.0);
+  private final TunableNumber m_kpTN = new TunableNumber("Shooter/kP", 0.1);
+  private final TunableNumber m_kiTN = new TunableNumber("Shooter/kI", 0.0);
+  private final TunableNumber m_kdTN = new TunableNumber("Shooter/kD", 0.0);
+  private final TunableNumber m_kvTN = new TunableNumber("Shooter/kV", 0.12);
+  private final TunableNumber m_ksTN = new TunableNumber("Shooter/kS", 0.0);
+  private final TunableNumber m_kaTN = new TunableNumber("Shooter/kA", 0.0);
 
   // Tunable target velocity
-  private final TunableNumber m_targetVelocityRPS =
+  private final TunableNumber m_targetVelocityRPSTN =
       new TunableNumber("Shooter/TargetVelocityRPS", 60.0);
 
   // Tolerance for determining if shooter is at speed (in RPS)
