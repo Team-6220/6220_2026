@@ -95,19 +95,19 @@ public class RobotContainer {
             RIGHT_DOWN_BUTTON,
             LEFT_SERVO_TOGGLE_BUTTON,
             RIGHT_SERVO_TOGGLE_BUTTON));
-            
-            // Left joystick Y: control angler up/down (slow)
-            m_angler.setDefaultCommand(
-                Commands.run(
-                    () -> {
-                      double input = -m_driverController.getLeftY(); // negative so up = up
-                      if (Math.abs(input) < ANGLER_DEADBAND) {
-                        m_angler.stop();
-                      } else {
-                        m_angler.setSpeed(input * ANGLER_MAX_SPEED);
-                      }
-                    },
-                    m_angler));
+
+    // Left joystick Y: control angler up/down (slow)
+    m_angler.setDefaultCommand(
+        Commands.run(
+            () -> {
+              double input = -m_driverController.getLeftY(); // negative so up = up
+              if (Math.abs(input) < ANGLER_DEADBAND) {
+                m_angler.stop();
+              } else {
+                m_angler.setSpeed(input * ANGLER_MAX_SPEED);
+              }
+            },
+            m_angler));
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -122,7 +122,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-     m_driverController
+    m_driverController
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
     // Left bumper: hold to spin motors 9, 31
@@ -138,7 +138,6 @@ public class RobotContainer {
         .whileTrue(
             Commands.runEnd(
                 () -> m_shooter.setTopGroupPercent(0.5), () -> m_shooter.stopTopGroup()));
-
 
     // A button: hold to test angler motor
     m_driverController
