@@ -14,7 +14,23 @@ package frc.robot.subsystems.Shooter;
 public interface ShooterIO {
   /** Container class for all shooter sensor inputs. */
   public static class Inputs {
-    // Add sensor fields here (e.g., velocities, currents, temperatures)
+    public double motor41VelocityRPS = 0.0;
+    public double motor1VelocityRPS = 0.0;
+    public double motor9VelocityRPS = 0.0;
+    public double motor31VelocityRPS = 0.0;
+    public double motor2VelocityRPS = 0.0;
+
+    public double motor41Voltage = 0.0;
+    public double motor1Voltage = 0.0;
+    public double motor9Voltage = 0.0;
+    public double motor31Voltage = 0.0;
+    public double motor2Voltage = 0.0;
+
+    public double motor41Current = 0.0;
+    public double motor1Current = 0.0;
+    public double motor9Current = 0.0;
+    public double motor31Current = 0.0;
+    public double motor2Current = 0.0;
   }
 
   /**
@@ -22,5 +38,46 @@ public interface ShooterIO {
    *
    * @param inputs the container to populate with current sensor values
    */
-  void updateInputs(Inputs inputs);
+  public default void updateInputs(Inputs inputs) {}
+
+  /** Sets all shooter motors to the given velocity in RPS. */
+  public default void setVelocityRPS(double rps) {}
+
+  /** Stops all shooter motors. */
+  public default void stop() {}
+
+  /** Stops motors 41 and 1 (top group). */
+  public default void stopTopGroup() {}
+
+  /** Stops motors 9, 2, and 31 (bottom group). */
+  public default void stopBottomGroup() {}
+
+  /** Sets all shooter motors to a percentage of max output. */
+  public default void setPercentOutput(double percent) {}
+
+  /** Sets motors 41 and 1 (top group) to a percentage of max output. */
+  public default void setTopGroupPercent(double percent) {}
+
+  /** Sets motors 9, 2, and 31 (bottom group) to a percentage of max output. */
+  public default void setBottomGroupPercent(double percent) {}
+
+  /**
+   * Applies PID and feedforward gains to all motors.
+   *
+   * @param kP proportional gain
+   * @param kI integral gain
+   * @param kD derivative gain
+   * @param kV velocity feedforward
+   * @param kS static feedforward
+   * @param kA acceleration feedforward
+   */
+  public default void applyPIDConfigs(
+      double kP, double kI, double kD, double kV, double kS, double kA) {}
+
+  /**
+   * Sets the neutral mode for all motors.
+   *
+   * @param brake true for brake mode, false for coast mode
+   */
+  public default void setNeutralMode(boolean brake) {}
 }

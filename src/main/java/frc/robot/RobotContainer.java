@@ -23,6 +23,8 @@ import frc.robot.subsystems.Climber.ClimberIOSim;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
+import frc.robot.subsystems.Shooter.ShooterIOReal;
+import frc.robot.subsystems.Shooter.ShooterIOSim;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
 import frc.robot.subsystems.Vision.Limelight;
 
@@ -34,7 +36,7 @@ import frc.robot.subsystems.Vision.Limelight;
  */
 public class RobotContainer {
   // Subsystems
-  private final ShooterSubsystem m_shooter = new ShooterSubsystem();
+  private final ShooterSubsystem m_shooter;
   private final AnglerSubsystem m_angler = new AnglerSubsystem();
 
   // Controller
@@ -57,6 +59,13 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
+    // Initialize shooter subsystem based on robot mode
+    if (RobotBase.isSimulation()) {
+      m_shooter = new ShooterSubsystem(new ShooterIOSim());
+    } else {
+      m_shooter = new ShooterSubsystem(new ShooterIOReal());
+    }
+
     // Initialize climber subsystem based on robot mode
     if (RobotBase.isSimulation()) {
       climberSubsystem = new ClimberSubsystem(new ClimberIOSim());

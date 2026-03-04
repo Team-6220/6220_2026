@@ -4,36 +4,14 @@
 
 package frc.robot.subsystems.Shooter;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.TunableNumber;
 
 public class ShooterSubsystem extends SubsystemBase {
 
-  // Motor CAN IDs
-  // Motors 41 and 1 face the opposite direction (inverted)
-  // Motors 9 and 31 spin the same way (not inverted)
-  private static final int MOTOR_41_ID = 41;
-  private static final int MOTOR_1_ID = 1;
-  private static final int MOTOR_9_ID = 9;
-  private static final int MOTOR_31_ID = 31;
-  private static final int MOTOR_2_ID = 2;
-  // Motors
-  private final TalonFX m_motor41; // inverted
-  private final TalonFX m_motor1; // inverted
-  private final TalonFX m_motor9; // not inverted
-  private final TalonFX m_motor31; // not inverted
-  private final TalonFX m_motor2;
-  // Velocity control request
-  private final VelocityVoltage m_velocityRequest;
+  private final ShooterIO io;
+  private final ShooterIO.Inputs inputs = new ShooterIO.Inputs();
 
   // Tunable PID and feedforward values
   private final TunableNumber shooterKPTN = new TunableNumber("Shooter/kP", 0.1);
@@ -50,59 +28,15 @@ public class ShooterSubsystem extends SubsystemBase {
   // Tolerance for determining if shooter is at speed (in RPS)
   private static final double VELOCITY_TOLERANCE_RPS = 2.0;
 
-  // Current limit in amps
-  private static final double CURRENT_LIMIT = 40.0;
-
-  public ShooterSubsystem() {
-    m_motor41 = new TalonFX(MOTOR_41_ID);
-    m_motor1 = new TalonFX(MOTOR_1_ID);
-    m_motor9 = new TalonFX(MOTOR_9_ID);
-    m_motor31 = new TalonFX(MOTOR_31_ID);
-    m_motor2 = new TalonFX(MOTOR_2_ID);
-    m_velocityRequest = new VelocityVoltage(0).withSlot(0);
-
-    configureMotors();
-  }
-
-  private void configureMotors() {
-    TalonFXConfiguration config = new TalonFXConfiguration();
-
-    // Current limits
-    CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
-    currentLimits.SupplyCurrentLimitEnable = true;
-    currentLimits.SupplyCurrentLimit = CURRENT_LIMIT;
-    config.CurrentLimits = currentLimits;
-
-    // PID + feedforward (Slot 0)
-    Slot0Configs pidConfigs = new Slot0Configs();
-    pidConfigs.kP = shooterKPTN.get();
-    pidConfigs.kI = shooterKITN.get();
-    pidConfigs.kD = shooterKDTN.get();
-    pidConfigs.kV = shooterKVTN.get();
-    pidConfigs.kS = shooterKSTN.get();
-    pidConfigs.kA = shooterKATN.get();
-    config.Slot0 = pidConfigs;
-
-    // Motor output config
-    MotorOutputConfigs outputConfig = new MotorOutputConfigs();
-    outputConfig.NeutralMode = NeutralModeValue.Coast;
-
-    // Motor 41 -> CounterClockwise Positive
-    outputConfig.Inverted = InvertedValue.CounterClockwise_Positive;
-    config.MotorOutput = outputConfig;
-    m_motor41.getConfigurator().apply(config);
-
-    // Motor 1 -> CounterClockwise Positive (flipped to test)
-    outputConfig.Inverted = InvertedValue.Clockwise_Positive;
-    config.MotorOutput = outputConfig;
-    m_motor1.getConfigurator().apply(config);
-
-    // Motors 9 and 31 spin the same way -> CounterClockwise Positive (default)
-    outputConfig.Inverted = InvertedValue.CounterClockwise_Positive;
-    config.MotorOutput = outputConfig;
-    m_motor9.getConfigurator().apply(config);
-    m_motor31.getConfigurator().apply(config);
-    m_motor2.getConfigurator().apply(config);
+  public ShooterSubsystem(ShooterIO io) {
+    this.io = io;
+    io.applyPIDConfigs(
+        shooterKPTN.get(),
+        shooterKITN.get(),
+        shooterKDTN.get(),
+        shooterKVTN.get(),
+        shooterKSTN.get(),
+        shooterKATN.get());
   }
 
   /** Runs all shooter motors at the tunable target velocity. */
@@ -117,11 +51,7 @@ public class ShooterSubsystem extends SubsystemBase {
    * @param rps Target velocity in rotations per second
    */
   public void setVelocityRPS(double rps) {
-    m_motor41.setControl(m_velocityRequest.withVelocity(rps));
-    m_motor1.setControl(m_velocityRequest.withVelocity(rps));
-    m_motor9.setControl(m_velocityRequest.withVelocity(rps));
-    m_motor31.setControl(m_velocityRequest.withVelocity(rps));
-    m_motor2.setControl(m_velocityRequest.withVelocity(rps));
+    io.setVelocityRPS(rps);
   }
 
   /**
@@ -135,11 +65,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   /** Stops all shooter motors. */
   public void stop() {
-    m_motor41.stopMotor();
-    m_motor1.stopMotor();
-    m_motor9.stopMotor();
-    m_motor31.stopMotor();
-    m_motor2.stopMotor();
+    io.stop();
   }
 
   /**
@@ -148,63 +74,53 @@ public class ShooterSubsystem extends SubsystemBase {
    * @param percent Percent output from -1.0 to 1.0
    */
   public void setPercentOutput(double percent) {
-    m_motor41.set(percent);
-    m_motor1.set(percent);
-    m_motor9.set(percent);
-    m_motor31.set(percent);
-    m_motor2.set(percent);
+    io.setPercentOutput(percent);
   }
 
   /** Runs motors 9, 2, and 31 at percent output. */
   public void setBottomGroupPercent(double percent) {
-    m_motor9.set(percent);
-    m_motor2.set(percent);
-    m_motor31.set(percent);
+    io.setBottomGroupPercent(percent);
   }
 
   /** Runs motors 41 and 1 at percent output. */
   public void setTopGroupPercent(double percent) {
-    m_motor41.set(percent);
-    m_motor1.set(percent);
+    io.setTopGroupPercent(percent);
   }
 
   /** Stops motors 9, 2, and 31. */
   public void stopBottomGroup() {
-    m_motor9.stopMotor();
-    m_motor2.stopMotor();
-    m_motor31.stopMotor();
+    io.stopBottomGroup();
   }
 
   /** Stops motors 41 and 1. */
   public void stopTopGroup() {
-    m_motor41.stopMotor();
-    m_motor1.stopMotor();
+    io.stopTopGroup();
   }
 
   // ========== Velocity Getters ==========
 
   public double getMotor41VelocityRPS() {
-    return m_motor41.getVelocity().getValueAsDouble();
+    return inputs.motor41VelocityRPS;
   }
 
   public double getMotor1VelocityRPS() {
-    return m_motor1.getVelocity().getValueAsDouble();
+    return inputs.motor1VelocityRPS;
   }
 
   public double getMotor9VelocityRPS() {
-    return m_motor9.getVelocity().getValueAsDouble();
+    return inputs.motor9VelocityRPS;
   }
 
   public double getMotor31VelocityRPS() {
-    return m_motor31.getVelocity().getValueAsDouble();
+    return inputs.motor31VelocityRPS;
   }
 
   public double getMotor2VelocityRPS() {
-    return m_motor2.getVelocity().getValueAsDouble();
+    return inputs.motor2VelocityRPS;
   }
 
   /**
-   * Gets the average velocity of all four shooter motors.
+   * Gets the average velocity of all five shooter motors.
    *
    * @return Average velocity in RPS
    */
@@ -244,41 +160,19 @@ public class ShooterSubsystem extends SubsystemBase {
     return shooterTargetVelocityRPS_TN.get();
   }
 
-  /** Updates PID values from tunable numbers (only Slot0, avoids full reconfigure). */
-  private void updatePIDValues() {
-    Slot0Configs pidConfigs = new Slot0Configs();
-    pidConfigs.kP = shooterKPTN.get();
-    pidConfigs.kI = shooterKITN.get();
-    pidConfigs.kD = shooterKDTN.get();
-    pidConfigs.kV = shooterKVTN.get();
-    pidConfigs.kS = shooterKSTN.get();
-    pidConfigs.kA = shooterKATN.get();
-
-    m_motor41.getConfigurator().apply(pidConfigs);
-    m_motor1.getConfigurator().apply(pidConfigs);
-    m_motor9.getConfigurator().apply(pidConfigs);
-    m_motor31.getConfigurator().apply(pidConfigs);
-    m_motor2.getConfigurator().apply(pidConfigs);
-  }
-
   /**
    * Sets the neutral mode for all motors.
    *
-   * @param mode Brake or Coast
+   * @param brake true for brake mode, false for coast mode
    */
-  public void setNeutralMode(NeutralModeValue mode) {
-    MotorOutputConfigs output = new MotorOutputConfigs();
-    output.NeutralMode = mode;
-
-    m_motor41.getConfigurator().apply(output);
-    m_motor1.getConfigurator().apply(output);
-    m_motor9.getConfigurator().apply(output);
-    m_motor31.getConfigurator().apply(output);
-    m_motor2.getConfigurator().apply(output);
+  public void setNeutralMode(boolean brake) {
+    io.setNeutralMode(brake);
   }
 
   @Override
   public void periodic() {
+    io.updateInputs(inputs);
+
     // Update PID if tunable numbers changed
     if (shooterKPTN.hasChanged()
         || shooterKITN.hasChanged()
@@ -286,38 +180,33 @@ public class ShooterSubsystem extends SubsystemBase {
         || shooterKVTN.hasChanged()
         || shooterKSTN.hasChanged()
         || shooterKATN.hasChanged()) {
-      updatePIDValues();
+      io.applyPIDConfigs(
+          shooterKPTN.get(),
+          shooterKITN.get(),
+          shooterKDTN.get(),
+          shooterKVTN.get(),
+          shooterKSTN.get(),
+          shooterKATN.get());
     }
 
     // Telemetry
-    SmartDashboard.putNumber("Shooter/Motor41VelocityRPS", getMotor41VelocityRPS());
-    SmartDashboard.putNumber("Shooter/Motor1VelocityRPS", getMotor1VelocityRPS());
-    SmartDashboard.putNumber("Shooter/Motor9VelocityRPS", getMotor9VelocityRPS());
-    SmartDashboard.putNumber("Shooter/Motor31VelocityRPS", getMotor31VelocityRPS());
-    SmartDashboard.putNumber("Shooter/Motor2VelocityRPS", getMotor2VelocityRPS());
+    SmartDashboard.putNumber("Shooter/Motor41VelocityRPS", inputs.motor41VelocityRPS);
+    SmartDashboard.putNumber("Shooter/Motor1VelocityRPS", inputs.motor1VelocityRPS);
+    SmartDashboard.putNumber("Shooter/Motor9VelocityRPS", inputs.motor9VelocityRPS);
+    SmartDashboard.putNumber("Shooter/Motor31VelocityRPS", inputs.motor31VelocityRPS);
+    SmartDashboard.putNumber("Shooter/Motor2VelocityRPS", inputs.motor2VelocityRPS);
     SmartDashboard.putNumber("Shooter/AverageVelocityRPS", getAverageVelocityRPS());
     SmartDashboard.putNumber("Shooter/TargetVelocityRPS", shooterTargetVelocityRPS_TN.get());
     SmartDashboard.putBoolean("Shooter/AtSpeed", isAtSpeed());
-    SmartDashboard.putNumber(
-        "Shooter/Motor41Voltage", m_motor41.getMotorVoltage().getValueAsDouble());
-    SmartDashboard.putNumber(
-        "Shooter/Motor1Voltage", m_motor1.getMotorVoltage().getValueAsDouble());
-    SmartDashboard.putNumber(
-        "Shooter/Motor9Voltage", m_motor9.getMotorVoltage().getValueAsDouble());
-    SmartDashboard.putNumber(
-        "Shooter/Motor31Voltage", m_motor31.getMotorVoltage().getValueAsDouble());
-    SmartDashboard.putNumber(
-        "Shooter/Motor2Voltage", m_motor2.getMotorVoltage().getValueAsDouble());
-
-    SmartDashboard.putNumber(
-        "Shooter/Motor41Current", m_motor41.getSupplyCurrent().getValueAsDouble());
-    SmartDashboard.putNumber(
-        "Shooter/Motor1Current", m_motor1.getSupplyCurrent().getValueAsDouble());
-    SmartDashboard.putNumber(
-        "Shooter/Motor9Current", m_motor9.getSupplyCurrent().getValueAsDouble());
-    SmartDashboard.putNumber(
-        "Shooter/Motor31Current", m_motor31.getSupplyCurrent().getValueAsDouble());
-    SmartDashboard.putNumber(
-        "Shooter/Motor2Current", m_motor2.getSupplyCurrent().getValueAsDouble());
+    SmartDashboard.putNumber("Shooter/Motor41Voltage", inputs.motor41Voltage);
+    SmartDashboard.putNumber("Shooter/Motor1Voltage", inputs.motor1Voltage);
+    SmartDashboard.putNumber("Shooter/Motor9Voltage", inputs.motor9Voltage);
+    SmartDashboard.putNumber("Shooter/Motor31Voltage", inputs.motor31Voltage);
+    SmartDashboard.putNumber("Shooter/Motor2Voltage", inputs.motor2Voltage);
+    SmartDashboard.putNumber("Shooter/Motor41Current", inputs.motor41Current);
+    SmartDashboard.putNumber("Shooter/Motor1Current", inputs.motor1Current);
+    SmartDashboard.putNumber("Shooter/Motor9Current", inputs.motor9Current);
+    SmartDashboard.putNumber("Shooter/Motor31Current", inputs.motor31Current);
+    SmartDashboard.putNumber("Shooter/Motor2Current", inputs.motor2Current);
   }
 }
