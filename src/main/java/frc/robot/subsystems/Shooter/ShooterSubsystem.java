@@ -36,15 +36,15 @@ public class ShooterSubsystem extends SubsystemBase {
   private final VelocityVoltage m_velocityRequest;
 
   // Tunable PID and feedforward values
-  private final TunableNumber m_kpTN = new TunableNumber("Shooter/kP", 0.1);
-  private final TunableNumber m_kiTN = new TunableNumber("Shooter/kI", 0.0);
-  private final TunableNumber m_kdTN = new TunableNumber("Shooter/kD", 0.0);
-  private final TunableNumber m_kvTN = new TunableNumber("Shooter/kV", 0.12);
-  private final TunableNumber m_ksTN = new TunableNumber("Shooter/kS", 0.0);
-  private final TunableNumber m_kaTN = new TunableNumber("Shooter/kA", 0.0);
+  private final TunableNumber shooterKPTN = new TunableNumber("Shooter/kP", 0.1);
+  private final TunableNumber shooterKITN = new TunableNumber("Shooter/kI", 0.0);
+  private final TunableNumber shooterKDTN = new TunableNumber("Shooter/kD", 0.0);
+  private final TunableNumber shooterKVTN = new TunableNumber("Shooter/kV", 0.12);
+  private final TunableNumber shooterKSTN = new TunableNumber("Shooter/kS", 0.0);
+  private final TunableNumber shooterKATN = new TunableNumber("Shooter/kA", 0.0);
 
   // Tunable target velocity
-  private final TunableNumber m_targetVelocityRPSTN =
+  private final TunableNumber shooterTargetVelocityRPS_TN =
       new TunableNumber("Shooter/TargetVelocityRPS", 60.0);
 
   // Tolerance for determining if shooter is at speed (in RPS)
@@ -75,12 +75,12 @@ public class ShooterSubsystem extends SubsystemBase {
 
     // PID + feedforward (Slot 0)
     Slot0Configs pidConfigs = new Slot0Configs();
-    pidConfigs.kP = m_kpTN.get();
-    pidConfigs.kI = m_kiTN.get();
-    pidConfigs.kD = m_kdTN.get();
-    pidConfigs.kV = m_kvTN.get();
-    pidConfigs.kS = m_ksTN.get();
-    pidConfigs.kA = m_kaTN.get();
+    pidConfigs.kP = shooterKPTN.get();
+    pidConfigs.kI = shooterKITN.get();
+    pidConfigs.kD = shooterKDTN.get();
+    pidConfigs.kV = shooterKVTN.get();
+    pidConfigs.kS = shooterKSTN.get();
+    pidConfigs.kA = shooterKATN.get();
     config.Slot0 = pidConfigs;
 
     // Motor output config
@@ -107,7 +107,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   /** Runs all shooter motors at the tunable target velocity. */
   public void runAtTargetVelocity() {
-    double rps = m_targetVelocityRPSTN.get();
+    double rps = shooterTargetVelocityRPS_TN.get();
     setVelocityRPS(rps);
   }
 
@@ -223,7 +223,7 @@ public class ShooterSubsystem extends SubsystemBase {
    * @return True if all motors are at speed
    */
   public boolean isAtSpeed() {
-    double target = m_targetVelocityRPSTN.get();
+    double target = shooterTargetVelocityRPS_TN.get();
     if (target == 0.0) {
       return false;
     }
@@ -241,18 +241,18 @@ public class ShooterSubsystem extends SubsystemBase {
    * @return Target velocity in RPS
    */
   public double getTargetVelocityRPS() {
-    return m_targetVelocityRPSTN.get();
+    return shooterTargetVelocityRPS_TN.get();
   }
 
   /** Updates PID values from tunable numbers (only Slot0, avoids full reconfigure). */
   private void updatePIDValues() {
     Slot0Configs pidConfigs = new Slot0Configs();
-    pidConfigs.kP = m_kpTN.get();
-    pidConfigs.kI = m_kiTN.get();
-    pidConfigs.kD = m_kdTN.get();
-    pidConfigs.kV = m_kvTN.get();
-    pidConfigs.kS = m_ksTN.get();
-    pidConfigs.kA = m_kaTN.get();
+    pidConfigs.kP = shooterKPTN.get();
+    pidConfigs.kI = shooterKITN.get();
+    pidConfigs.kD = shooterKDTN.get();
+    pidConfigs.kV = shooterKVTN.get();
+    pidConfigs.kS = shooterKSTN.get();
+    pidConfigs.kA = shooterKATN.get();
 
     m_motor41.getConfigurator().apply(pidConfigs);
     m_motor1.getConfigurator().apply(pidConfigs);
@@ -280,12 +280,12 @@ public class ShooterSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update PID if tunable numbers changed
-    if (m_kpTN.hasChanged()
-        || m_kiTN.hasChanged()
-        || m_kdTN.hasChanged()
-        || m_kvTN.hasChanged()
-        || m_ksTN.hasChanged()
-        || m_kaTN.hasChanged()) {
+    if (shooterKPTN.hasChanged()
+        || shooterKITN.hasChanged()
+        || shooterKDTN.hasChanged()
+        || shooterKVTN.hasChanged()
+        || shooterKSTN.hasChanged()
+        || shooterKATN.hasChanged()) {
       updatePIDValues();
     }
 
@@ -296,7 +296,7 @@ public class ShooterSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Shooter/Motor31VelocityRPS", getMotor31VelocityRPS());
     SmartDashboard.putNumber("Shooter/Motor2VelocityRPS", getMotor2VelocityRPS());
     SmartDashboard.putNumber("Shooter/AverageVelocityRPS", getAverageVelocityRPS());
-    SmartDashboard.putNumber("Shooter/TargetVelocityRPS", m_targetVelocityRPSTN.get());
+    SmartDashboard.putNumber("Shooter/TargetVelocityRPS", shooterTargetVelocityRPS_TN.get());
     SmartDashboard.putBoolean("Shooter/AtSpeed", isAtSpeed());
     SmartDashboard.putNumber(
         "Shooter/Motor41Voltage", m_motor41.getMotorVoltage().getValueAsDouble());
