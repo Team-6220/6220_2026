@@ -63,6 +63,31 @@ public class RobotContainer {
     s_Swerve.setDefaultCommand(
         new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
+    // ==================== BUTTON BOARD CLIMBER BINDINGS ====================
+    final int LEFT_RESET_BUTTON = 1;
+    final int RIGHT_RESET_BUTTON = 2;
+    final int LEFT_UP_BUTTON = 3;
+    final int RIGHT_UP_BUTTON = 4;
+    final int LEFT_DOWN_BUTTON = 5;
+    final int RIGHT_DOWN_BUTTON = 6;
+    final int LEFT_SERVO_TOGGLE_BUTTON = 7;
+    final int RIGHT_SERVO_TOGGLE_BUTTON = 8;
+
+    // Set climber control as the default command - runs continuously
+    // This allows the command to detect buttons even if they're held before robot enable
+    climberSubsystem.setDefaultCommand(
+        new DigitalClimberCommand(
+            climberSubsystem,
+            m_buttonBoard,
+            LEFT_RESET_BUTTON,
+            RIGHT_RESET_BUTTON,
+            LEFT_UP_BUTTON,
+            RIGHT_UP_BUTTON,
+            LEFT_DOWN_BUTTON,
+            RIGHT_DOWN_BUTTON,
+            LEFT_SERVO_TOGGLE_BUTTON,
+            RIGHT_SERVO_TOGGLE_BUTTON));
+
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -89,31 +114,6 @@ public class RobotContainer {
     m_driverController
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
-
-    // ==================== BUTTON BOARD CLIMBER BINDINGS ====================
-    final int LEFT_RESET_BUTTON = 1;
-    final int RIGHT_RESET_BUTTON = 2;
-    final int LEFT_UP_BUTTON = 3;
-    final int RIGHT_UP_BUTTON = 4;
-    final int LEFT_DOWN_BUTTON = 5;
-    final int RIGHT_DOWN_BUTTON = 6;
-    final int LEFT_SERVO_TOGGLE_BUTTON = 7;
-    final int RIGHT_SERVO_TOGGLE_BUTTON = 8;
-
-    // Set climber control as the default command - runs continuously
-    // This allows the command to detect buttons even if they're held before robot enable
-    climberSubsystem.setDefaultCommand(
-        new DigitalClimberCommand(
-            climberSubsystem,
-            m_buttonBoard,
-            LEFT_RESET_BUTTON,
-            RIGHT_RESET_BUTTON,
-            LEFT_UP_BUTTON,
-            RIGHT_UP_BUTTON,
-            LEFT_DOWN_BUTTON,
-            RIGHT_DOWN_BUTTON,
-            LEFT_SERVO_TOGGLE_BUTTON,
-            RIGHT_SERVO_TOGGLE_BUTTON));
 
     m_driverController.leftBumper().whileTrue(new AlignHub());
   }
