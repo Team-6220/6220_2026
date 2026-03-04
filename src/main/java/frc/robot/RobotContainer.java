@@ -90,10 +90,6 @@ public class RobotContainer {
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
 
-    m_driverController
-        .rightBumper()
-        .onTrue(new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
-
     // ==================== BUTTON BOARD CLIMBER BINDINGS ====================
     final int LEFT_RESET_BUTTON = 1;
     final int RIGHT_RESET_BUTTON = 2;
