@@ -8,21 +8,25 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
-import frc.robot.commands.DigitalClimberCommand;
-import frc.robot.commands.GoToZeroCommand;
+import frc.robot.commands.ManualArm;
 import frc.robot.commands.SwerveCom;
-import frc.robot.subsystems.Climber.ClimberIOReal;
-import frc.robot.subsystems.Climber.ClimberIOSim;
-import frc.robot.subsystems.Climber.ClimberSubsystem;
+import frc.robot.commands.TestBeltCommand;
+import frc.robot.commands.TestRollerCommand;
 import frc.robot.subsystems.Drive.Swerve;
+import frc.robot.subsystems.Intake.ArmSubsystem;
+import frc.robot.subsystems.Intake.BeltSubsystem;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.Intake.RollerSubsystem;
+import frc.robot.subsystems.Shooter.AnglerSubsystem;
+import frc.robot.subsystems.Shooter.ShooterSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -38,7 +42,12 @@ public class RobotContainer {
 
   /* Subsystems */
   private final Swerve s_Swerve = new Swerve();
-  private final ClimberSubsystem climberSubsystem;
+  private final ShooterSubsystem m_shooter = new ShooterSubsystem();
+  private final AnglerSubsystem m_angler = new AnglerSubsystem();
+  private final IntakeSubsystem m_intake = new IntakeSubsystem();
+  private final ArmSubsystem arm = ArmSubsystem.getInstance();
+  private final BeltSubsystem belt = BeltSubsystem.getInstance();
+  private final RollerSubsystem roller = RollerSubsystem.getInstance();
 
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
@@ -46,13 +55,11 @@ public class RobotContainer {
 
   private final GenericHID m_buttonBoard = new GenericHID(2);
 
+  private static final double ANGLER_MAX_SPEED = 0.15;
+  private static final double ANGLER_DEADBAND = 0.1;
+
   public RobotContainer() {
     // Initialize climber subsystem based on robot mode
-    if (RobotBase.isSimulation()) {
-      climberSubsystem = new ClimberSubsystem(new ClimberIOSim());
-    } else {
-      climberSubsystem = new ClimberSubsystem(new ClimberIOReal());
-    }
 
     // Configure the trigger bindings
     s_Swerve.configureAutoBuilder();
@@ -61,30 +68,21 @@ public class RobotContainer {
     s_Swerve.setDefaultCommand(
         new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
-    // ==================== BUTTON BOARD CLIMBER BINDINGS ====================
-    final int LEFT_RESET_BUTTON = 1;
-    final int RIGHT_RESET_BUTTON = 2;
-    final int LEFT_UP_BUTTON = 3;
-    final int RIGHT_UP_BUTTON = 4;
-    final int LEFT_DOWN_BUTTON = 5;
-    final int RIGHT_DOWN_BUTTON = 6;
-    final int LEFT_SERVO_TOGGLE_BUTTON = 7;
-    final int RIGHT_SERVO_TOGGLE_BUTTON = 8;
+    m_angler.setDefaultCommand(
+        Commands.run(
+            () -> {
+              double input = -m_driverController.getLeftY(); // negative so up = up
+              if (Math.abs(input) < ANGLER_DEADBAND) {
+                m_angler.stop();
+              } else {
+                m_angler.setSpeed(input * ANGLER_MAX_SPEED);
+              }
+            },
+            m_angler));
 
-    // Set climber control as the default command - runs continuously
-    // This allows the command to detect buttons even if they're held before robot enable
-    climberSubsystem.setDefaultCommand(
-        new DigitalClimberCommand(
-            climberSubsystem,
-            m_buttonBoard,
-            LEFT_RESET_BUTTON,
-            RIGHT_RESET_BUTTON,
-            LEFT_UP_BUTTON,
-            RIGHT_UP_BUTTON,
-            LEFT_DOWN_BUTTON,
-            RIGHT_DOWN_BUTTON,
-            LEFT_SERVO_TOGGLE_BUTTON,
-            RIGHT_SERVO_TOGGLE_BUTTON));
+    belt.setDefaultCommand(new TestBeltCommand());
+
+    m_intake.setDefaultCommand(new ManualArm(m_joystick));
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -109,6 +107,12 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+    Trigger angleUp = new Trigger(() -> m_buttonBoard.getRawButton(5));
+    Trigger angleDown = new Trigger(() -> m_buttonBoard.getRawButton(6));
+    Trigger shoot = new Trigger(() -> m_buttonBoard.getRawButton(8));
+    Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(1));
+    Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(2));
+    
     m_driverController
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
@@ -117,8 +121,19 @@ public class RobotContainer {
         .rightBumper()
         .onTrue(new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
-    // Climber height control - X button zeros climber to bottom using stall detection
-    m_driverController.x().whileTrue(new GoToZeroCommand(climberSubsystem));
+    angleDown.whileTrue(
+        Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
+
+    angleUp.whileTrue(
+        Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));
+
+    shoot.whileTrue(
+        Commands.runEnd(
+            () -> m_shooter.setTopGroupPercent(0.5), () -> m_shooter.stopTopGroup(), m_shooter));
+
+    intakeIn.whileTrue(new TestRollerCommand(true));
+
+    intakeOut.whileTrue(new TestRollerCommand(false));
 
     m_driverController
         .leftBumper()
