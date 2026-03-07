@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import frc.robot.subsystems.Drive.SwerveConstants;
 
 // import com.ctre.phoenix6.signals.InvertedValue;
 
@@ -22,7 +23,7 @@ public final class CTREConfigs {
     swerveDriveFXConfig.MotorOutput.NeutralMode = SwerveConstants.driveNeutralMode;
 
     /* Gear Ratio Config */
-    swerveDriveFXConfig.Feedback.SensorToMechanismRatio = SwerveConstants.driveGearRatio;
+    swerveDriveFXConfig.Feedback.SensorToMechanismRatio = SwerveConstants.DRIVE_GEAR_RATIO;
 
     swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable =
         SwerveConstants.driveEnableCurrentLimit;
@@ -31,17 +32,17 @@ public final class CTREConfigs {
     swerveDriveFXConfig.CurrentLimits.SupplyCurrentLowerTime = SwerveConstants.driveMaxCurrentTime;
 
     /* PID Config */
-    swerveDriveFXConfig.Slot0.kP = SwerveConstants.driveKP;
-    swerveDriveFXConfig.Slot0.kI = SwerveConstants.driveKI;
-    swerveDriveFXConfig.Slot0.kD = SwerveConstants.driveKD;
+    swerveDriveFXConfig.Slot0.kP = SwerveConstants.DRIVE_KP;
+    swerveDriveFXConfig.Slot0.kI = SwerveConstants.DRIVE_KI;
+    swerveDriveFXConfig.Slot0.kD = SwerveConstants.DRIVE_KD;
 
     /* Open and Closed Loop Ramping */
-    swerveDriveFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = SwerveConstants.openLoopRamp;
-    swerveDriveFXConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = SwerveConstants.openLoopRamp;
+    swerveDriveFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = SwerveConstants.OPEN_LOOP_RAMP;
+    swerveDriveFXConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = SwerveConstants.OPEN_LOOP_RAMP;
 
     swerveDriveFXConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod =
-        SwerveConstants.closedLoopRamp;
+        SwerveConstants.CLOSED_LOOP_RAMP;
     swerveDriveFXConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod =
-        SwerveConstants.closedLoopRamp;
+        SwerveConstants.CLOSED_LOOP_RAMP;
   }
 }

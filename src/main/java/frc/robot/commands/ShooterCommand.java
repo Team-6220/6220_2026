@@ -8,8 +8,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
 
 /**
+<<<<<<< HEAD
  * Runs the shooter at the tunable target velocity while the command is active. Stops the shooter
  * when the command ends (e.g., button released).
+=======
+ * Runs all shooter motors at percent output while the command is active. Stops when the command
+ * ends (e.g., button released). Swap to runAtTargetVelocity() once PID is tuned.
+>>>>>>> f422a4876a208394cee7d81b8036836c1a873274
  */
 public class ShooterCommand extends Command {
 
@@ -26,7 +31,11 @@ public class ShooterCommand extends Command {
   @Override
   public void execute() {
     // Use percent output for basic spin testing (change 0.5 to go faster/slower)
+<<<<<<< HEAD
     m_shooter.setPercentOutput(0.9);
+=======
+    m_shooter.setPercentOutput(0.5);
+>>>>>>> f422a4876a208394cee7d81b8036836c1a873274
     // Swap to this once PID is tuned:
     // m_shooter.runAtTargetVelocity();
   }
