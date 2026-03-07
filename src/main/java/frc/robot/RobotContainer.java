@@ -4,38 +4,13 @@
 
 package frc.robot;
 
-<<<<<<< HEAD
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
-=======
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.AlignHub;
-import frc.robot.commands.DigitalClimberCommand;
-import frc.robot.commands.SwerveCom;
-import frc.robot.subsystems.Climber.ClimberIOReal;
-import frc.robot.subsystems.Climber.ClimberIOSim;
-import frc.robot.subsystems.Climber.ClimberSubsystem;
-import frc.robot.subsystems.Drive.Swerve;
-import frc.robot.subsystems.Shooter.AnglerSubsystem;
-import frc.robot.subsystems.Shooter.ShooterSubsystem;
-import frc.robot.subsystems.Vision.Limelight;
->>>>>>> f422a4876a208394cee7d81b8036836c1a873274
 
 public class RobotContainer {
-<<<<<<< HEAD
 
   // Subsystems
   private final ShooterSubsystem m_shooter = new ShooterSubsystem();
@@ -47,120 +22,51 @@ public class RobotContainer {
   // Max angler speed (keep it slow)
   private static final double ANGLER_MAX_SPEED = 0.15;
   private static final double ANGLER_DEADBAND = 0.1;
-=======
-  // Subsystems
-  private final ShooterSubsystem m_shooter = new ShooterSubsystem();
-  private final AnglerSubsystem m_angler = new AnglerSubsystem();
 
-  // Controller
-  private final CommandXboxController m_driverController = new CommandXboxController(0);
-
-  private final Joystick m_joystick = new Joystick(1);
-
-  private final GenericHID m_buttonBoard = new GenericHID(2);
->>>>>>> f422a4876a208394cee7d81b8036836c1a873274
-
-  /* Subsystems */
-  private final Swerve s_Swerve = new Swerve();
-  private final ClimberSubsystem climberSubsystem;
-
-  private final Limelight s_Limelight = new Limelight();
-
-  // Max angler speed (keep it slow)
-  private static final double ANGLER_MAX_SPEED = 0.15;
-  private static final double ANGLER_DEADBAND = 0.1;
-
-  private final SendableChooser<Command> autoChooser;
+  // Test preset for A button (angle in degrees, RPM for top/bottom)
+  private static final double PRESET_ANGLE_DEG = 45.0;
+  private static final double PRESET_TOP_RPM = 4000.0;
+  private static final double PRESET_BOTTOM_RPM = 2500.0;
 
   public RobotContainer() {
-<<<<<<< HEAD
-=======
-    // Initialize climber subsystem based on robot mode
-    if (RobotBase.isSimulation()) {
-      climberSubsystem = new ClimberSubsystem(new ClimberIOSim());
-    } else {
-      climberSubsystem = new ClimberSubsystem(new ClimberIOReal());
-    }
-
-    // Configure the trigger bindings
-    s_Swerve.configureAutoBuilder();
-    s_Swerve.zeroHeading(m_driverController.getHID());
-
-    s_Swerve.setDefaultCommand(
-        new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
-
-    // ==================== BUTTON BOARD CLIMBER BINDINGS ====================
-    final int LEFT_RESET_BUTTON = 1;
-    final int RIGHT_RESET_BUTTON = 2;
-    final int LEFT_UP_BUTTON = 3;
-    final int RIGHT_UP_BUTTON = 4;
-    final int LEFT_DOWN_BUTTON = 5;
-    final int RIGHT_DOWN_BUTTON = 6;
-    final int LEFT_SERVO_TOGGLE_BUTTON = 7;
-    final int RIGHT_SERVO_TOGGLE_BUTTON = 8;
-
-    // Set climber control as the default command - runs continuously
-    // This allows the command to detect buttons even if they're held before robot enable
-    climberSubsystem.setDefaultCommand(
-        new DigitalClimberCommand(
-            climberSubsystem,
-            m_buttonBoard,
-            LEFT_RESET_BUTTON,
-            RIGHT_RESET_BUTTON,
-            LEFT_UP_BUTTON,
-            RIGHT_UP_BUTTON,
-            LEFT_DOWN_BUTTON,
-            RIGHT_DOWN_BUTTON,
-            LEFT_SERVO_TOGGLE_BUTTON,
-            RIGHT_SERVO_TOGGLE_BUTTON));
-
-    // Left joystick Y: control angler up/down (slow)
-    m_angler.setDefaultCommand(
-        Commands.run(
-            () -> {
-              double input = -m_driverController.getLeftY(); // negative so up = up
-              if (Math.abs(input) < ANGLER_DEADBAND) {
-                m_angler.stop();
-              } else {
-                m_angler.setSpeed(input * ANGLER_MAX_SPEED);
-              }
-            },
-            m_angler));
-
-    autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
-
-    // TODO: Register named commands as needed for auto
-    // NamedCommands.registerCommand("AutoClimber", new AutoClimberCommand(climberSubsystem));
-
-    // NamedCommands.registerCommand(null, null);
-    autoChooser.addOption("auto1", new PathPlannerAuto("Auto1"));
-    SmartDashboard.putData(autoChooser);
->>>>>>> f422a4876a208394cee7d81b8036836c1a873274
     configureBindings();
   }
 
   private void configureBindings() {
-<<<<<<< HEAD
-    // Left bumper: hold to spin motors 9, 31
+    // Left bumper: hold to spin bottom motors (9, 31, 2) at tunable RPM
     m_controller
         .leftBumper()
         .whileTrue(
             Commands.runEnd(
-                () -> m_shooter.setBottomGroupPercent(0.8), () -> m_shooter.stopBottomGroup()));
+                () -> m_shooter.setBottomGroupVelocityRPS(m_shooter.getBottomTargetRPM() / 60.0),
+                () -> m_shooter.stopBottomGroup()));
 
-    // Right bumper: hold to spin motors 41, 1
+    // Right bumper: hold to spin top motors (41, 1) at tunable RPM
     m_controller
         .rightBumper()
         .whileTrue(
             Commands.runEnd(
-                () -> m_shooter.setTopGroupPercent(0.5), () -> m_shooter.stopTopGroup()));
+                () -> m_shooter.setTopGroupVelocityRPS(m_shooter.getTopTargetRPM() / 60.0),
+                () -> m_shooter.stopTopGroup()));
 
-    // Left joystick Y: control angler up/down (slow)
+    // A button: auto angle + spin up shooter to preset, hold to maintain
+    m_controller
+        .a()
+        .whileTrue(
+            Commands.parallel(
+                Commands.run(() -> m_angler.setAngle(PRESET_ANGLE_DEG), m_angler),
+                Commands.runEnd(
+                    () -> {
+                      m_shooter.setTopGroupVelocityRPS(PRESET_TOP_RPM / 60.0);
+                      m_shooter.setBottomGroupVelocityRPS(PRESET_BOTTOM_RPM / 60.0);
+                    },
+                    () -> m_shooter.stop())));
+
+    // Left joystick Y: manual angler control (slow)
     m_angler.setDefaultCommand(
         Commands.run(
             () -> {
-              double input = -m_controller.getLeftY(); // negative so up = up
+              double input = -m_controller.getLeftY();
               if (Math.abs(input) < ANGLER_DEADBAND) {
                 m_angler.stop();
               } else {
@@ -168,56 +74,9 @@ public class RobotContainer {
               }
             },
             m_angler));
-
-    // A button: hold to test angler motor
-    m_controller
-        .a()
-        .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop()));
-    m_controller
-        .b()
-        .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop()));
   }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured.");
   }
 }
-=======
-    m_driverController
-        .y()
-        .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
-    // Left bumper: hold to spin motors 9, 31
-    m_driverController
-        .leftBumper()
-        .whileTrue(
-            Commands.runEnd(
-                () -> m_shooter.setBottomGroupPercent(0.8),
-                () -> m_shooter.stopBottomGroup(),
-                m_shooter));
-
-    // Right bumper: hold to spin motors 41, 1
-    m_driverController
-        .rightBumper()
-        .whileTrue(
-            Commands.runEnd(
-                () -> m_shooter.setTopGroupPercent(0.5),
-                () -> m_shooter.stopTopGroup(),
-                m_shooter));
-
-    // A button: hold to test angler motor
-    m_driverController
-        .a()
-        .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
-    m_driverController
-        .b()
-        .whileTrue(
-            Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));
-    m_driverController.leftBumper().whileTrue(new AlignHub());
-  }
-
-  public Command getAutonomousCommand() {
-    System.out.println("auto: " + autoChooser.getSelected());
-    return autoChooser.getSelected();
-  }
-}
->>>>>>> f422a4876a208394cee7d81b8036836c1a873274
