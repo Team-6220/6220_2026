@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DigitalClimberCommand;
+import frc.robot.commands.AlignAndMove;
+import frc.robot.commands.GoToZeroCommand;
 import frc.robot.commands.SwerveCom;
 import frc.robot.subsystems.Climber.ClimberIOReal;
 import frc.robot.subsystems.Climber.ClimberIOSim;
@@ -115,66 +117,13 @@ public class RobotContainer {
         .rightBumper()
         .onTrue(new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
-    // Climber servo control - A button toggles servo between deployed (1.0) and retracted (0.0)
-    // m_driverController
-    //     .a()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () -> {
-    //               double currentPosition = climberSubsystem.getServoPosition();
-    //               if (currentPosition > 0.5) {
-    //                 // Servo is deployed, retract it
-    //                 climberSubsystem.setServoPosition(0.0);
-    //               } else {
-    //                 // Servo is retracted, deploy it
-    //                 climberSubsystem.setServoPosition(1.0);
-    //               }
-    //             }));
-
-    // Climber control mode toggle - B button toggles between LEFT, RIGHT, and BOTH
-    m_driverController.b().onTrue(new InstantCommand(climberSubsystem::toggleControlMode));
-
-    // Climber motor control - continuously read LT and RT analog trigger values
-    // RT: drives up (positive, 0 to 0.75)
-    // LT: drives down (negative, 0 to -0.75)
-    new Trigger(
-            () -> {
-              double leftTrigger = m_driverController.getLeftTriggerAxis();
-              double rightTrigger = m_driverController.getRightTriggerAxis();
-              // Either trigger is pressed
-              return leftTrigger > 0.05 || rightTrigger > 0.05;
-            })
-        .whileTrue(
-            new edu.wpi.first.wpilibj2.command.Command() {
-              {
-                addRequirements(climberSubsystem);
-              }
-
-              @Override
-              public void execute() {
-                double leftTrigger = m_driverController.getLeftTriggerAxis();
-                double rightTrigger = m_driverController.getRightTriggerAxis();
-                // RT (0-1) maps to positive speed (0 to 0.75)
-                // LT (0-1) maps to negative speed (0 to -0.75)
-                double speed = (rightTrigger * 0.75) - (leftTrigger * 0.75);
-                climberSubsystem.setMotorSpeed(speed);
-              }
-
-              @Override
-              public void end(boolean interrupted) {
-                climberSubsystem.stop();
-              }
-
-              @Override
-              public boolean isFinished() {
-                return false;
-              }
-            }.withName("AnalogClimberControl"));
-
     // Climber height control - X button zeros climber to bottom using stall detection
     m_driverController.x().whileTrue(new GoToZeroCommand(climberSubsystem));
 
-    m_driverController.a().whileTrue(new AlignHub(s_Swerve));
+    m_driverController
+        .leftBumper()
+        .whileTrue(
+            new AlignAndMove(s_Swerve, m_driverController, m_driverController.rightBumper()));
   }
 
   /**
