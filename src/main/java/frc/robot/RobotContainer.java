@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -16,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignHub;
+import frc.robot.commands.AutoClimberCommand;
 import frc.robot.commands.DigitalClimberCommand;
 import frc.robot.commands.SwerveCom;
 import frc.robot.subsystems.Climber.ClimberIOReal;
@@ -87,7 +89,7 @@ public class RobotContainer {
             RIGHT_DOWN_BUTTON,
             LEFT_SERVO_TOGGLE_BUTTON,
             RIGHT_SERVO_TOGGLE_BUTTON));
-
+NamedCommands.registerCommand("ACC", new AutoClimberCommand(climberSubsystem));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -96,6 +98,7 @@ public class RobotContainer {
 
     // NamedCommands.registerCommand(null, null);
     autoChooser.addOption("auto1", new PathPlannerAuto("Auto1"));
+    autoChooser.addOption("default", new PathPlannerAuto("default"));
     SmartDashboard.putData(autoChooser);
     configureBindings();
   }
