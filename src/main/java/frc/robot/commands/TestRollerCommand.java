@@ -34,7 +34,7 @@ public class TestRollerCommand extends Command {
 
   @Override
   public void execute() {
-    roller.spin(intake);
+    roller.simpleDrive(intake ? 1 : -1);
   }
 
   @Override

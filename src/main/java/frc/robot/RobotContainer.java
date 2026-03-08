@@ -17,13 +17,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
 import frc.robot.commands.ManualArm;
+import frc.robot.commands.ShooterCommand;
 import frc.robot.commands.SwerveCom;
 import frc.robot.commands.TestBeltCommand;
 import frc.robot.commands.TestRollerCommand;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Intake.ArmSubsystem;
 import frc.robot.subsystems.Intake.BeltSubsystem;
-import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.Intake.RollerSubsystem;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
@@ -44,7 +44,6 @@ public class RobotContainer {
   private final Swerve s_Swerve = new Swerve();
   private final ShooterSubsystem m_shooter = new ShooterSubsystem();
   private final AnglerSubsystem m_angler = new AnglerSubsystem();
-  private final IntakeSubsystem m_intake = new IntakeSubsystem();
   private final ArmSubsystem arm = ArmSubsystem.getInstance();
   private final BeltSubsystem belt = BeltSubsystem.getInstance();
   private final RollerSubsystem roller = RollerSubsystem.getInstance();
@@ -57,6 +56,8 @@ public class RobotContainer {
 
   private static final double ANGLER_MAX_SPEED = 0.15;
   private static final double ANGLER_DEADBAND = 0.1;
+  private static final double PRESET_TOP_RPM = 700.0;
+  private static final double PRESET_BOTTOM_RPM = 4000.0;
 
   public RobotContainer() {
     // Initialize climber subsystem based on robot mode
@@ -82,7 +83,7 @@ public class RobotContainer {
 
     belt.setDefaultCommand(new TestBeltCommand());
 
-    m_intake.setDefaultCommand(new ManualArm(m_joystick));
+    arm.setDefaultCommand(new ManualArm(m_joystick));
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -109,10 +110,10 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     Trigger angleUp = new Trigger(() -> m_buttonBoard.getRawButton(5));
     Trigger angleDown = new Trigger(() -> m_buttonBoard.getRawButton(6));
-    Trigger shoot = new Trigger(() -> m_buttonBoard.getRawButton(8));
+    Trigger shoot = new Trigger(() -> m_buttonBoard.getRawButton(3));
     Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(1));
     Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(2));
-    
+
     m_driverController
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
@@ -127,13 +128,19 @@ public class RobotContainer {
     angleUp.whileTrue(
         Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));
 
-    shoot.whileTrue(
-        Commands.runEnd(
-            () -> m_shooter.setTopGroupPercent(0.5), () -> m_shooter.stopTopGroup(), m_shooter));
-
     intakeIn.whileTrue(new TestRollerCommand(true));
 
     intakeOut.whileTrue(new TestRollerCommand(false));
+
+    shoot
+        .whileTrue(
+            Commands.parallel(
+                Commands.runEnd(
+                    () -> {
+                      m_shooter.setTopGroupVelocityRPS(PRESET_TOP_RPM / 60.0);
+                      m_shooter.setBottomGroupVelocityRPS(PRESET_BOTTOM_RPM / 60.0);
+                    },
+                    () -> m_shooter.stop())));
 
     m_driverController
         .leftBumper()

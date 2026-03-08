@@ -91,7 +91,7 @@ public class ArmSubsystem extends SubsystemBase {
     armMotor.configure(
         armMotorConfig,
         SparkBase.ResetMode.kResetSafeParameters,
-        SparkBase.PersistMode.kNoPersistParameters);
+        SparkBase.PersistMode.kPersistParameters);
 
     armEncoder = armMotor.getEncoder();
 
@@ -171,12 +171,14 @@ public class ArmSubsystem extends SubsystemBase {
     return m_Controller.atGoal();
   }
 
-  public void simpleDrive(double motorOutput) {
-    double pct = Math.max(-1.0, Math.min(1.0, motorOutput));
-    double volts = pct * 12.0;
-    SmartDashboard.putNumber(tableKey + "motorOutputManuel", pct);
-    SmartDashboard.putNumber(tableKey + "output (V)", volts);
-    armMotor.setVoltage(volts);
+  public void simpleDriveArm(double motorOutput) {
+    // motorOutput is percent (-1.0 .. 1.0). Convert to volts for SparkMax/TalonFX
+    // double pct = Math.max(-1.0, Math.min(1.0, motorOutput));
+    // double volts = pct * 12.0;
+    // SmartDashboard.putNumber("arm output pct", pct);
+    // SmartDashboard.putNumber("arm output (V)", volts);
+    // armMotor.setVoltage(volts);
+    armMotor.setVoltage(motorOutput * 6);
   }
 
   public void maintain() {

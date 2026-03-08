@@ -24,8 +24,8 @@ public class RollerSubsystem extends SubsystemBase {
   private static final class RollerConstants {
     public static final int rollerMotorID = 15;
 
-    public static final int stallLimit = 30;
-    public static final int freeLimit = 30;
+    public static final int stallLimit = 40;
+    public static final int freeLimit = 40;
 
     public static final boolean rollerInvert = false;
     public static final IdleMode rollerIdleMode = IdleMode.kBrake;
@@ -39,7 +39,7 @@ public class RollerSubsystem extends SubsystemBase {
     rollerMotor.configure(
         rollerMotorConfig,
         SparkBase.ResetMode.kResetSafeParameters,
-        SparkBase.PersistMode.kNoPersistParameters);
+        SparkBase.PersistMode.kPersistParameters);
   }
 
   @Override
@@ -47,10 +47,10 @@ public class RollerSubsystem extends SubsystemBase {
 
   public void simpleDrive(double motorOutput) {
     double pct = Math.max(-1.0, Math.min(1.0, motorOutput));
-    double volts = pct * 8.0;
+    double volts = motorOutput * 8.0;
     SmartDashboard.putNumber(tableKey + "output pct", pct);
-    SmartDashboard.putNumber(tableKey + "output (V)", volts);
-    rollerMotor.setVoltage(volts);
+    SmartDashboard.putNumber(tableKey + "output (V)", rollerMotor.getBusVoltage());
+    rollerMotor.setVoltage(motorOutput * 8.0);
   }
 
   public void spin(boolean intake) {

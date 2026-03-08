@@ -6,18 +6,18 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.Intake.ArmSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ManualArm extends Command {
   /** Creates a new ManualArm. */
-  private IntakeSubsystem intake;
+  private ArmSubsystem intake;
 
   private Joystick m_joystick;
 
   public ManualArm(Joystick joystick) {
     // Use addRequirements() here to declare subsystem dependencies.
-    intake = IntakeSubsystem.getInstance();
+    intake = ArmSubsystem.getInstance();
     this.m_joystick = joystick;
     addRequirements(intake);
   }
@@ -29,7 +29,7 @@ public class ManualArm extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double input = m_joystick.getY();
+    double input = m_joystick.getRawAxis(1);
     if (Math.abs(input) < 0.1) {
       input = 0;
     }
