@@ -155,7 +155,7 @@ public class Swerve extends SubsystemBase {
     turnPidController.setIZone(AutoConstants.angularKIzoneTN.get());
     turnPidController.setTolerance(AutoConstants.angularToleranceRad());
 
-    turnPidController.enableContinuousInput(-(Math.PI / 2.0), (Math.PI / 2.0));
+    turnPidController.enableContinuousInput(-(Math.PI), (Math.PI));
 
     // Set up custom logging to add the current path to a field 2d widget
     PathPlannerLogging.setLogActivePathCallback(
