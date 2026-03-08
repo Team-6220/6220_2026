@@ -31,14 +31,14 @@ public class AlignHub extends Command {
   public void initialize() {
     Limelight.setPipeline();
     s_Swerve.resetTurnController();
-    s_Swerve.setTurnControllerGoal(
+    s_Swerve.setAutoTurnHeading(
         Degree.of(LimelightHelpers.getTX(name) + s_Swerve.getHeadingDegrees()));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    s_Swerve.setTurnControllerGoal(
+    s_Swerve.setAutoTurnHeading(
         Degree.of(LimelightHelpers.getTX(name) + s_Swerve.getHeadingDegrees()));
     s_Swerve.drive(translation, s_Swerve.getTurnPidSpeed(), false, false);
     System.out.println("Aligning to hub????????????? we shall see");

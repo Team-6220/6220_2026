@@ -380,10 +380,6 @@ public class Swerve extends SubsystemBase {
     turnPidController.reset(getHeading().getRadians());
   }
 
-  public void setTurnControllerGoal(Angle goal) {
-    turnPidController.setGoal(goal.in(Radians));
-  }
-
   /**
    * @return gets the angular velocity of turning
    */

@@ -36,7 +36,7 @@ public class AlignAndMove extends Command {
     s_Swerve.resetModulesToAbsolute();
     Limelight.setPipeline();
     s_Swerve.resetTurnController();
-    s_Swerve.setTurnControllerGoal(
+    s_Swerve.setAutoTurnHeading(
         Degree.of(LimelightHelpers.getTX(name) + s_Swerve.getHeadingDegrees()));
   }
 
@@ -50,7 +50,7 @@ public class AlignAndMove extends Command {
       Limelight.setPipeline();
     }
     if (!DriverStation.isAutonomous()) {
-      s_Swerve.setTurnControllerGoal(
+      s_Swerve.setAutoTurnHeading(
           Degree.of(LimelightHelpers.getTX(name) + s_Swerve.getHeadingDegrees()));
       /* Get Values, Deadband*/
       double[] driverInputs = IOConstants.getDriverInputs(driver.getHID());
