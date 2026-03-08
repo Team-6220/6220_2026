@@ -56,7 +56,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public ShooterSubsystem() {
     m_motor41 = new TalonFX(MOTOR_41_ID);
-    m_motor34 = new TalonFX (MOTOR_34_ID);
+    m_motor34 = new TalonFX(MOTOR_34_ID);
     m_motor9 = new TalonFX(MOTOR_9_ID);
     m_motor31 = new TalonFX(MOTOR_31_ID);
     m_motor35 = new TalonFX(MOTOR_35_ID);
@@ -210,10 +210,8 @@ public class ShooterSubsystem extends SubsystemBase {
       return false;
     }
 
-    return Math.abs(m_motor41.getVelocity().getValueAsDouble() - topTarget)
-            < VELOCITY_TOLERANCE_RPS
-        && Math.abs(m_motor34.getVelocity().getValueAsDouble() - topTarget)
-            < VELOCITY_TOLERANCE_RPS
+    return Math.abs(m_motor41.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
+        && Math.abs(m_motor34.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
         && Math.abs(m_motor9.getVelocity().getValueAsDouble() - bottomTarget)
             < VELOCITY_TOLERANCE_RPS
         && Math.abs(m_motor31.getVelocity().getValueAsDouble() - bottomTarget)
