@@ -42,7 +42,10 @@ public class AlignAndMove extends Command {
 
   @Override
   public void execute() {
-    if (LimelightHelpers.getTX(name) == 0.0 && LimelightHelpers.getTY(name) == 0.0 && ticks >= 50) {
+    double epsilon = 0.001;
+    if (Math.abs(LimelightHelpers.getTX(name)) < epsilon
+        && Math.abs(LimelightHelpers.getTY(name)) < epsilon
+        && ticks >= 50) {
       Limelight.setPipeline();
       ticks = 0;
     }
