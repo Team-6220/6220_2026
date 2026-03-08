@@ -38,6 +38,7 @@ public class AlignAndMove extends Command {
     s_Swerve.resetTurnController();
     s_Swerve.setTurnControllerGoal(
         Degree.of(LimelightHelpers.getTX(name) + s_Swerve.getHeadingDegrees()));
+    ticks = 0;
   }
 
   @Override
