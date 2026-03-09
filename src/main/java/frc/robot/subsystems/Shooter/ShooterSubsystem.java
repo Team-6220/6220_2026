@@ -26,11 +26,11 @@ public class ShooterSubsystem extends SubsystemBase {
   private static final int MOTOR_35_ID = 35;
 
   // Motors
-  private final TalonFX m_motor41; // top group
-  private final TalonFX m_motor34; // top group
-  private final TalonFX m_motor9; // bottom group
-  private final TalonFX m_motor31; // bottom group
-  private final TalonFX m_motor35; // bottom group
+  private final TalonFX m_motor41; // bottom group
+  private final TalonFX m_motor34; // bottom group
+  private final TalonFX m_motor9; // top group
+  private final TalonFX m_motor31; // top group
+  private final TalonFX m_motor35; // top group
 
   // Velocity control request
   private final VelocityVoltage m_velocityRequest;

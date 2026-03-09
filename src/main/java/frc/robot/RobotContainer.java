@@ -56,8 +56,8 @@ public class RobotContainer {
 
   private static final double ANGLER_MAX_SPEED = 0.15;
   private static final double ANGLER_DEADBAND = 0.1;
-  private static final double PRESET_TOP_RPM = 700.0;
-  private static final double PRESET_BOTTOM_RPM = 4000.0;
+  private static final double PRESET_TOP_RPM = 4000.0;
+  private static final double PRESET_BOTTOM_RPM = 1000.0;
 
   public RobotContainer() {
     // Initialize climber subsystem based on robot mode
@@ -114,7 +114,7 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     Trigger angleUp = new Trigger(() -> m_buttonBoard.getRawButton(5));
     Trigger angleDown = new Trigger(() -> m_buttonBoard.getRawButton(6));
-    Trigger shoot = new Trigger(() -> m_buttonBoard.getRawButton(3));
+    Trigger shoot = m_driverController.a();
     Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(1));
     Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(2));
 
