@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
 import frc.robot.commands.ManualArm;
-import frc.robot.commands.ShooterCommand;
 import frc.robot.commands.SwerveCom;
 import frc.robot.commands.TestBeltCommand;
 import frc.robot.commands.TestRollerCommand;
@@ -132,15 +131,14 @@ public class RobotContainer {
 
     intakeOut.whileTrue(new TestRollerCommand(false));
 
-    shoot
-        .whileTrue(
-            Commands.parallel(
-                Commands.runEnd(
-                    () -> {
-                      m_shooter.setTopGroupVelocityRPS(PRESET_TOP_RPM / 60.0);
-                      m_shooter.setBottomGroupVelocityRPS(PRESET_BOTTOM_RPM / 60.0);
-                    },
-                    () -> m_shooter.stop())));
+    shoot.whileTrue(
+        Commands.parallel(
+            Commands.runEnd(
+                () -> {
+                  m_shooter.setTopGroupVelocityRPS(PRESET_TOP_RPM / 60.0);
+                  m_shooter.setBottomGroupVelocityRPS(PRESET_BOTTOM_RPM / 60.0);
+                },
+                () -> m_shooter.stop())));
 
     m_driverController
         .leftBumper()
