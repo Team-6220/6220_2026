@@ -1,5 +1,3 @@
 package frc.robot.subsystems.Test;
 
-public class TestMotors {
-
-}
+public class TestMotors {}

@@ -18,11 +18,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignHub;
 import frc.robot.commands.GoToZeroCommand;
 import frc.robot.commands.SwerveCom;
-import frc.robot.subsystems.MotorTestSubsystem;
 import frc.robot.subsystems.Climber.ClimberIOReal;
 import frc.robot.subsystems.Climber.ClimberIOSim;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
 import frc.robot.subsystems.Drive.Swerve;
+import frc.robot.subsystems.MotorTestSubsystem;
 import frc.robot.subsystems.Vision.Limelight;
 
 /**
@@ -100,10 +100,9 @@ public class RobotContainer {
     m_driverController.leftBumper().whileTrue(new AlignHub());
 
     // Motor test - press Start to test next motor
-    m_driverController.start().onTrue(
-        new InstantCommand(() -> motorTest.startNextMotorTest(), motorTest)
-    );
-
+    m_driverController
+        .start()
+        .onTrue(new InstantCommand(() -> motorTest.startNextMotorTest(), motorTest));
 
     // Climber servo control - A button toggles servo between deployed (1.0) and retracted (0.0)
     m_driverController
@@ -176,8 +175,6 @@ public class RobotContainer {
     System.out.println("auto: " + autoChooser.getSelected());
     return autoChooser.getSelected();
   }
-
-
 
   // An example command will be run in autonomous
 
