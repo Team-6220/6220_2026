@@ -11,11 +11,14 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.Intake.ArmSubsystem;
+import frc.robot.subsystems.Intake.RollerSubsystem;
 
 public class AnglerSubsystem extends SubsystemBase {
 
   private static final int ANGLER_MOTOR_ID = 19;
   private static final int CURRENT_LIMIT = 30;
+  private static AnglerSubsystem INSTANCE = null;
 
   private final SparkMax m_anglerMotor;
 
@@ -44,4 +47,9 @@ public class AnglerSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {}
+
+public static AnglerSubsystem getInstance() {
+    if (INSTANCE == null) INSTANCE = new AnglerSubsystem();
+    return INSTANCE;
+}
 }

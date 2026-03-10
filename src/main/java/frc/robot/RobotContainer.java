@@ -21,6 +21,7 @@ import frc.robot.commands.AutoClimberCommand;
 import frc.robot.commands.DigitalClimberCommand;
 import frc.robot.commands.AlignAndMove;
 import frc.robot.commands.ManualArm;
+import frc.robot.commands.ShooterCommand;
 import frc.robot.commands.SwerveCom;
 import frc.robot.commands.TestBeltCommand;
 import frc.robot.commands.TestRollerCommand;
@@ -50,6 +51,8 @@ public class RobotContainer {
   private final ArmSubsystem arm = ArmSubsystem.getInstance();
   private final BeltSubsystem belt = BeltSubsystem.getInstance();
   private final RollerSubsystem roller = RollerSubsystem.getInstance();
+    private final AnglerSubsystem angler = AnglerSubsystem.getInstance();
+  private final ShooterSubsystem shooter = ShooterSubsystem.getInstance();
 
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
@@ -86,7 +89,7 @@ public class RobotContainer {
 
     // Set climber control as the default command - runs continuously
     // This allows the command to detect buttons even if they're held before robot enable
-
+NamedCommands.registerCommand("null", new ShooterCommand(m_shooter));
     belt.setDefaultCommand(new TestBeltCommand());
 
     arm.setDefaultCommand(new ManualArm(m_joystick));
