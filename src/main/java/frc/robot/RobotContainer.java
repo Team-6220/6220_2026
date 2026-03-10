@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
 import frc.robot.commands.ManualArm;
 import frc.robot.commands.SwerveCom;
-import frc.robot.commands.TestBeltCommand;
 import frc.robot.commands.TestRollerCommand;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Intake.ArmSubsystem;
@@ -55,8 +54,8 @@ public class RobotContainer {
 
   private static final double ANGLER_MAX_SPEED = 0.15;
   private static final double ANGLER_DEADBAND = 0.1;
-  private static final double PRESET_TOP_RPM = 4000.0;
-  private static final double PRESET_BOTTOM_RPM = 1000.0;
+  private static final double PRESET_TOP_RPM = 1000.0;
+  private static final double PRESET_BOTTOM_RPM = 4000.0;
 
   public RobotContainer() {
     // Initialize climber subsystem based on robot mode
@@ -80,7 +79,7 @@ public class RobotContainer {
             },
             m_angler));
 
-    belt.setDefaultCommand(new TestBeltCommand());
+    /// belt.setDefaultCommand(new TestBeltCommand());
 
     arm.setDefaultCommand(new ManualArm(m_joystick));
 
@@ -112,6 +111,10 @@ public class RobotContainer {
     Trigger shoot = m_driverController.a();
     Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(1));
     Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(2));
+
+    Trigger resetEncoder = new Trigger(() -> m_buttonBoard.getRawButton(3));
+    resetEncoder.onTrue(Commands.runOnce(() -> m_angler.resetEncoder()));
+
 
     m_driverController
         .y()
