@@ -4,21 +4,28 @@
 
 package frc.robot;
 
-// import frc.robot.commands.Autos;
-import frc.robot.commands.TeleopSwerve;
-import frc.robot.commands.photonAlignCmd;
-import frc.robot.subsystems.Drive.Swerve;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.AlignAndMove;
+import frc.robot.commands.ManualArm;
+import frc.robot.commands.SwerveCom;
+import frc.robot.commands.TestBeltCommand;
+import frc.robot.commands.TestRollerCommand;
+import frc.robot.subsystems.Drive.Swerve;
+import frc.robot.subsystems.Intake.ArmSubsystem;
+import frc.robot.subsystems.Intake.BeltSubsystem;
+import frc.robot.subsystems.Intake.RollerSubsystem;
+import frc.robot.subsystems.Shooter.AnglerSubsystem;
+import frc.robot.subsystems.Shooter.ShooterSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -32,7 +39,13 @@ public class RobotContainer {
 
   private final SendableChooser<Command> autoChooser;
 
+  /* Subsystems */
   private final Swerve s_Swerve = new Swerve();
+  private final ShooterSubsystem m_shooter = new ShooterSubsystem();
+  private final AnglerSubsystem m_angler = new AnglerSubsystem();
+  private final ArmSubsystem arm = ArmSubsystem.getInstance();
+  private final BeltSubsystem belt = BeltSubsystem.getInstance();
+  private final RollerSubsystem roller = RollerSubsystem.getInstance();
 
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
@@ -40,22 +53,46 @@ public class RobotContainer {
 
   private final GenericHID m_buttonBoard = new GenericHID(2);
 
+  private static final double ANGLER_MAX_SPEED = 0.15;
+  private static final double ANGLER_DEADBAND = 0.1;
+  private static final double PRESET_TOP_RPM = 700.0;
+  private static final double PRESET_BOTTOM_RPM = 4000.0;
+
   public RobotContainer() {
+    // Initialize climber subsystem based on robot mode
+
     // Configure the trigger bindings
     s_Swerve.configureAutoBuilder();
     s_Swerve.zeroHeading(m_driverController.getHID());
 
-    
-    
     s_Swerve.setDefaultCommand(
-      new TeleopSwerve(s_Swerve, m_driverController, m_driverController.leftBumper()));
-      
-      autoChooser = AutoBuilder.buildAutoChooser();
-      SmartDashboard.putData("Auto Chooser", autoChooser);
-      
-    // TODO: Register named commands as needed for auto
-    // NamedCommands.registerCommand(null, null);
+        new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
+    m_angler.setDefaultCommand(
+        Commands.run(
+            () -> {
+              double input = -m_driverController.getLeftY(); // negative so up = up
+              if (Math.abs(input) < ANGLER_DEADBAND) {
+                m_angler.stop();
+              } else {
+                m_angler.setSpeed(input * ANGLER_MAX_SPEED);
+              }
+            },
+            m_angler));
+
+    belt.setDefaultCommand(new TestBeltCommand());
+
+    arm.setDefaultCommand(new ManualArm(m_joystick));
+
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    // TODO: Register named commands as needed for auto
+    // NamedCommands.registerCommand("AutoClimber", new AutoClimberCommand(climberSubsystem));
+
+    // NamedCommands.registerCommand(null, null);
+    autoChooser.addOption("auto1", new PathPlannerAuto("Auto1"));
+    SmartDashboard.putData(autoChooser);
     configureBindings();
   }
 
@@ -70,11 +107,43 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+    Trigger angleUp = new Trigger(() -> m_buttonBoard.getRawButton(5));
+    Trigger angleDown = new Trigger(() -> m_buttonBoard.getRawButton(6));
+    Trigger shoot = new Trigger(() -> m_buttonBoard.getRawButton(3));
+    Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(1));
+    Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(2));
+
     m_driverController
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
 
-    m_driverController.rightBumper().onTrue(new TeleopSwerve(s_Swerve, m_driverController, m_driverController.leftBumper()));
+    m_driverController
+        .rightBumper()
+        .onTrue(new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
+
+    angleDown.whileTrue(
+        Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
+
+    angleUp.whileTrue(
+        Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));
+
+    intakeIn.whileTrue(new TestRollerCommand(true));
+
+    intakeOut.whileTrue(new TestRollerCommand(false));
+
+    shoot.whileTrue(
+        Commands.parallel(
+            Commands.runEnd(
+                () -> {
+                  m_shooter.setTopGroupVelocityRPS(PRESET_TOP_RPM / 60.0);
+                  m_shooter.setBottomGroupVelocityRPS(PRESET_BOTTOM_RPM / 60.0);
+                },
+                () -> m_shooter.stop())));
+
+    m_driverController
+        .leftBumper()
+        .whileTrue(
+            new AlignAndMove(s_Swerve, m_driverController, m_driverController.rightBumper()));
   }
 
   /**
@@ -83,7 +152,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
+    System.out.println("auto: " + autoChooser.getSelected());
     return autoChooser.getSelected();
   }
   // An example command will be run in autonomous

@@ -2,7 +2,6 @@ package frc.lib.util;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-
 import edu.wpi.first.math.util.Units;
 
 /* Contains values and required settings for common COTS swerve modules. */
@@ -359,7 +358,7 @@ public class COTSTalonFXSwerveConstants {
         double angleKD = 0.1;
 
         InvertedValue driveMotorInvert = InvertedValue.CounterClockwise_Positive;
-        InvertedValue angleMotorInvert = InvertedValue.Clockwise_Positive;
+        InvertedValue angleMotorInvert = InvertedValue.CounterClockwise_Positive;
         SensorDirectionValue cancoderInvert = SensorDirectionValue.CounterClockwise_Positive;
         return new COTSTalonFXSwerveConstants(
             wheelDiameter,
