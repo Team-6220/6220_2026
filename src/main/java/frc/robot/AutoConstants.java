@@ -25,10 +25,10 @@ public final class AutoConstants {
   public static final double translation_kI = 0.05;
   public static final double translation_kD = 0;
   public static final double angular_kP =
-      0.45; // Used to be 6 but that was never used in autobuilder(and maybe way too high)
-  public static final double angular_kI = 0;
+      3.5; // Used to be 6 but that was never used in autobuilder(and maybe way too high)
+  public static final double angular_kI = 0.1;
   public static final double angular_kIzone = 0.05;
-  public static final double angular_kD = 0.05;
+  public static final double angular_kD = 0.02;
 
   public static final LinearVelocity translationMaxVelocityMps = MetersPerSecond.of(5);
   public static final LinearAcceleration translationMaxAcceleratMpsSq =
