@@ -26,13 +26,13 @@ public class AnglerSubsystem extends SubsystemBase {
   // 15 motor rotations = 1 shaft rotation
   // Position conversion factor: 1/15 = output rotations per motor rotation
   // Then * 360 to get degrees
-  private static final double GEAR_RATIO = 1 / 15.0;
+  private static final double GEAR_RATIO = 1;
 
   /** We use shaft rotation to control angler height/angle */
   private static final double MIN_SHAFT_ROT = 0.0;
 
   /** We use shaft rotation to control angler height/angle */
-  private static final double MAX_SHAFT_ROT = 2.4;
+  private static final double MAX_SHAFT_ROT = 36;
 
   private final SparkMax m_anglerMotor;
   private final RelativeEncoder m_encoder;

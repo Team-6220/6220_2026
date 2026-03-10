@@ -115,6 +115,12 @@ public class RobotContainer {
     Trigger resetEncoder = new Trigger(() -> m_buttonBoard.getRawButton(3));
     resetEncoder.onTrue(Commands.runOnce(() -> m_angler.resetEncoder()));
 
+    // Test buttons for angler PID: button 4 -> set to 1.0, button 11 -> set to 0.5
+    Trigger anglerTestOne = new Trigger(() -> m_buttonBoard.getRawButton(4));
+    Trigger anglerTestHalf = new Trigger(() -> m_buttonBoard.getRawButton(11));
+    anglerTestOne.whileTrue(Commands.runOnce(() -> m_angler.setAngle(5), m_angler));
+    anglerTestHalf.whileTrue(Commands.runOnce(() -> m_angler.setAngle(10), m_angler));
+
     m_driverController
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
