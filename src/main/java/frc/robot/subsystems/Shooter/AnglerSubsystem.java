@@ -30,7 +30,7 @@ public class AnglerSubsystem extends SubsystemBase {
 
   // Angle limits in degrees
   private static final double MIN_ANGLE_DEG = 0.0;
-  private static final double MAX_ANGLE_DEG = 2.5;
+  private static final double MAX_ANGLE_DEG = 2.4;
 
   private final SparkMax m_anglerMotor;
   private final RelativeEncoder m_encoder;
