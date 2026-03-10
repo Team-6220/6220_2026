@@ -26,11 +26,13 @@ public class AnglerSubsystem extends SubsystemBase {
   // 15 motor rotations = 1 shaft rotation
   // Position conversion factor: 1/15 = output rotations per motor rotation
   // Then * 360 to get degrees
-  private static final double GEAR_RATIO = 1/15.0;
+  private static final double GEAR_RATIO = 1 / 15.0;
 
-  // Angle limits in degrees
-  private static final double MIN_ANGLE_DEG = 0.0;
-  private static final double MAX_ANGLE_DEG = 2.4;
+  /** We use shaft rotation to control angler height/angle */
+  private static final double MIN_SHAFT_ROT = 0.0;
+
+  /** We use shaft rotation to control angler height/angle */
+  private static final double MAX_SHAFT_ROT = 2.4;
 
   private final SparkMax m_anglerMotor;
   private final RelativeEncoder m_encoder;
@@ -52,7 +54,6 @@ public class AnglerSubsystem extends SubsystemBase {
     configureMotor();
     m_encoder = m_anglerMotor.getEncoder();
     m_closedLoopController = m_anglerMotor.getClosedLoopController();
-
   }
 
   private void configureMotor() {
@@ -60,9 +61,7 @@ public class AnglerSubsystem extends SubsystemBase {
     config.smartCurrentLimit(CURRENT_LIMIT).idleMode(IdleMode.kBrake).inverted(false);
     config.inverted(true);
     // Configure encoder with gear ratio so position reads in degrees
-    config.encoder
-        .positionConversionFactor(GEAR_RATIO)
-        .velocityConversionFactor(GEAR_RATIO);
+    config.encoder.positionConversionFactor(GEAR_RATIO).velocityConversionFactor(GEAR_RATIO);
     // Use the primary (relative) encoder for closed loop
     config
         .closedLoop
@@ -70,8 +69,7 @@ public class AnglerSubsystem extends SubsystemBase {
         .pid(m_anglerKp.get(), m_anglerKi.get(), m_anglerKd.get())
         .outputRange(-0.3, 0.3);
 
-    m_anglerMotor.configure(
-        config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_anglerMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   /**
@@ -104,7 +102,7 @@ public class AnglerSubsystem extends SubsystemBase {
     //   m_anglerMotor.set(0);
     //   return;
     // }
-    if (currentAngle >= MAX_ANGLE_DEG && speed > 0) {
+    if (currentAngle >= MAX_SHAFT_ROT && speed > 0) {
       m_anglerMotor.set(0);
       return;
     }
@@ -119,7 +117,7 @@ public class AnglerSubsystem extends SubsystemBase {
    * @param degrees Target angle in degrees
    */
   public void setAngle(double degrees) {
-    double clampedDegrees = MathUtil.clamp(degrees, MIN_ANGLE_DEG, MAX_ANGLE_DEG);
+    double clampedDegrees = MathUtil.clamp(degrees, MIN_SHAFT_ROT, MAX_SHAFT_ROT);
     m_closedLoopController.setReference(clampedDegrees, SparkMax.ControlType.kPosition);
   }
 
@@ -134,8 +132,8 @@ public class AnglerSubsystem extends SubsystemBase {
   }
 
   /**
-   * Gets the current angle from the relative encoder in degrees. Already accounts for the 15:1
-   * gear ratio via the position conversion factor.
+   * Gets the current angle from the relative encoder in degrees. Already accounts for the 15:1 gear
+   * ratio via the position conversion factor.
    *
    * @return Current angle in degrees
    */
@@ -162,12 +160,12 @@ public class AnglerSubsystem extends SubsystemBase {
     return m_targetAngle.get();
   }
 
-  public double getMinAngleDeg() {
-    return MIN_ANGLE_DEG;
+  public double getMinShaftRot() {
+    return MIN_SHAFT_ROT;
   }
 
-  public double getMaxAngleDeg() {
-    return MAX_ANGLE_DEG;
+  public double getMaxShaftRot() {
+    return MAX_SHAFT_ROT;
   }
 
   @Override
@@ -183,7 +181,7 @@ public class AnglerSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("Angler/AtTarget", isAtTargetAngle());
     SmartDashboard.putNumber("Angler/MotorOutput", m_anglerMotor.getAppliedOutput());
     SmartDashboard.putNumber("Angler/MotorCurrent", m_anglerMotor.getOutputCurrent());
-    SmartDashboard.putNumber("Angler/MinAngleDeg", MIN_ANGLE_DEG);
-    SmartDashboard.putNumber("Angler/MaxAngleDeg", MAX_ANGLE_DEG);
+    SmartDashboard.putNumber("Angler/MinAngleDeg", MIN_SHAFT_ROT);
+    SmartDashboard.putNumber("Angler/MaxAngleDeg", MAX_SHAFT_ROT);
   }
 }

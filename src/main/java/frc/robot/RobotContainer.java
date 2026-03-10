@@ -115,7 +115,6 @@ public class RobotContainer {
     Trigger resetEncoder = new Trigger(() -> m_buttonBoard.getRawButton(3));
     resetEncoder.onTrue(Commands.runOnce(() -> m_angler.resetEncoder()));
 
-
     m_driverController
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
