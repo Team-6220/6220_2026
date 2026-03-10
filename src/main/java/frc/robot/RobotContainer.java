@@ -125,10 +125,10 @@ public class RobotContainer {
         .onTrue(new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
     angleDown.whileTrue(
-        Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
+        Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));
 
     angleUp.whileTrue(
-        Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));
+        Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
 
     intakeIn.whileTrue(new TestRollerCommand(true));
 

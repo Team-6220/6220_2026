@@ -26,13 +26,11 @@ public class AnglerSubsystem extends SubsystemBase {
   // 15 motor rotations = 1 shaft rotation
   // Position conversion factor: 1/15 = output rotations per motor rotation
   // Then * 360 to get degrees
-  private static final double GEAR_RATIO = 15.0;
-  private static final double POSITION_CONVERSION_FACTOR = 360.0 / GEAR_RATIO;
-  private static final double VELOCITY_CONVERSION_FACTOR = 360.0 / GEAR_RATIO;
+  private static final double GEAR_RATIO = 1/15.0;
 
   // Angle limits in degrees
-  private static final double MIN_ANGLE_DEG = 10.0;
-  private static final double MAX_ANGLE_DEG = 80.0;
+  private static final double MIN_ANGLE_DEG = 0.0;
+  private static final double MAX_ANGLE_DEG = 2.5;
 
   private final SparkMax m_anglerMotor;
   private final RelativeEncoder m_encoder;
@@ -51,21 +49,20 @@ public class AnglerSubsystem extends SubsystemBase {
 
   public AnglerSubsystem() {
     m_anglerMotor = new SparkMax(ANGLER_MOTOR_ID, MotorType.kBrushless);
+    configureMotor();
     m_encoder = m_anglerMotor.getEncoder();
     m_closedLoopController = m_anglerMotor.getClosedLoopController();
 
-    configureMotor();
   }
 
   private void configureMotor() {
     SparkMaxConfig config = new SparkMaxConfig();
     config.smartCurrentLimit(CURRENT_LIMIT).idleMode(IdleMode.kBrake).inverted(false);
-
+    config.inverted(true);
     // Configure encoder with gear ratio so position reads in degrees
     config.encoder
-        .positionConversionFactor(POSITION_CONVERSION_FACTOR)
-        .velocityConversionFactor(VELOCITY_CONVERSION_FACTOR);
-
+        .positionConversionFactor(GEAR_RATIO)
+        .velocityConversionFactor(GEAR_RATIO);
     // Use the primary (relative) encoder for closed loop
     config
         .closedLoop
@@ -103,10 +100,10 @@ public class AnglerSubsystem extends SubsystemBase {
     double currentAngle = getCurrentAngleDeg();
 
     // Prevent moving past limits
-    if (currentAngle <= MIN_ANGLE_DEG && speed < 0) {
-      m_anglerMotor.set(0);
-      return;
-    }
+    // if (currentAngle <= MIN_ANGLE_DEG && speed < 0) {
+    //   m_anglerMotor.set(0);
+    //   return;
+    // }
     if (currentAngle >= MAX_ANGLE_DEG && speed > 0) {
       m_anglerMotor.set(0);
       return;
