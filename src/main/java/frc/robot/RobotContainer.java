@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
 import frc.robot.commands.ManualArm;
+import frc.robot.commands.ShooterCommand;
 import frc.robot.commands.SwerveCom;
 import frc.robot.commands.TestBeltCommand;
 import frc.robot.commands.TestRollerCommand;
@@ -46,7 +48,6 @@ public class RobotContainer {
   private final ArmSubsystem arm = ArmSubsystem.getInstance();
   private final BeltSubsystem belt = BeltSubsystem.getInstance();
   private final RollerSubsystem roller = RollerSubsystem.getInstance();
-
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
   private final Joystick m_joystick = new Joystick(1);
@@ -80,6 +81,9 @@ public class RobotContainer {
             },
             m_angler));
 
+    // Set climber control as the default command - runs continuously
+    // This allows the command to detect buttons even if they're held before robot enable
+    NamedCommands.registerCommand("null", new ShooterCommand(m_shooter));
     belt.setDefaultCommand(new TestBeltCommand());
 
     arm.setDefaultCommand(new ManualArm(m_joystick));
@@ -92,6 +96,7 @@ public class RobotContainer {
 
     // NamedCommands.registerCommand(null, null);
     autoChooser.addOption("auto1", new PathPlannerAuto("Auto1"));
+    autoChooser.addOption("default", new PathPlannerAuto("default"));
     SmartDashboard.putData(autoChooser);
     configureBindings();
   }
