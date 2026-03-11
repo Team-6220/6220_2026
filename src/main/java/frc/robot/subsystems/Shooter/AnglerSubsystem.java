@@ -175,7 +175,6 @@ public class AnglerSubsystem extends SubsystemBase {
       configureMotor();
     }
 
-
     // Telemetry
     SmartDashboard.putNumber("Angler/CurrentAngleRot", getCurrentAngleDeg());
     SmartDashboard.putNumber("Angler/TargetAngleRot", m_closedLoopController.getSetpoint());

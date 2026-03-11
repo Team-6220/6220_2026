@@ -55,8 +55,8 @@ public class RobotContainer {
 
   private static final double ANGLER_MAX_SPEED = 0.15;
   private static final double ANGLER_DEADBAND = 0.1;
-  private static final double PRESET_TOP_RPM = 1000.0;
-  private static final double PRESET_BOTTOM_RPM = 4000.0;
+  private static final double PRESET_TOP_RPM = 1000.0; // for bottom, bad naming
+  private static final double PRESET_BOTTOM_RPM = 4000.0; // for top, bad naming
 
   public RobotContainer() {
     // Initialize climber subsystem based on robot mode
@@ -148,7 +148,7 @@ public class RobotContainer {
         Commands.parallel(
             Commands.runEnd(
                 () -> {
-                  m_shooter.setTopGroupVelocityRPS(PRESET_TOP_RPM / 60.0);
+                  // m_shooter.setTopGroupVelocityRPS(PRESET_TOP_RPM / 60.0);
                   m_shooter.setBottomGroupVelocityRPS(PRESET_BOTTOM_RPM / 60.0);
                 },
                 () -> m_shooter.stop())));
