@@ -11,8 +11,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.Intake.ArmSubsystem;
-import frc.robot.subsystems.Intake.RollerSubsystem;
 
 public class AnglerSubsystem extends SubsystemBase {
 
@@ -48,8 +46,8 @@ public class AnglerSubsystem extends SubsystemBase {
   @Override
   public void periodic() {}
 
-public static AnglerSubsystem getInstance() {
+  public static AnglerSubsystem getInstance() {
     if (INSTANCE == null) INSTANCE = new AnglerSubsystem();
     return INSTANCE;
-}
+  }
 }
