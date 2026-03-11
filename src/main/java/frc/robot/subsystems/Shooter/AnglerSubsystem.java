@@ -16,7 +16,6 @@ public class AnglerSubsystem extends SubsystemBase {
 
   private static final int ANGLER_MOTOR_ID = 19;
   private static final int CURRENT_LIMIT = 30;
-  private static AnglerSubsystem INSTANCE = null;
 
   private final SparkMax m_anglerMotor;
 
@@ -45,9 +44,4 @@ public class AnglerSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {}
-
-  public static AnglerSubsystem getInstance() {
-    if (INSTANCE == null) INSTANCE = new AnglerSubsystem();
-    return INSTANCE;
-  }
 }

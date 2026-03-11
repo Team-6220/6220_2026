@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.TunableNumber;
 
 public class ShooterSubsystem extends SubsystemBase {
-  private static ShooterSubsystem INSTANCE;
+
   // Motor CAN IDs
   private static final int MOTOR_41_ID = 41;
   private static final int MOTOR_34_ID = 34;
@@ -302,10 +302,5 @@ public class ShooterSubsystem extends SubsystemBase {
         "Shooter/Motor31Current", m_motor31.getSupplyCurrent().getValueAsDouble());
     SmartDashboard.putNumber(
         "Shooter/Motor2Current", m_motor35.getSupplyCurrent().getValueAsDouble());
-  }
-
-  public static ShooterSubsystem getInstance() {
-    if (INSTANCE == null) INSTANCE = new ShooterSubsystem();
-    return INSTANCE;
   }
 }
