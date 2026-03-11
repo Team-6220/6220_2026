@@ -67,7 +67,7 @@ public class AnglerSubsystem extends SubsystemBase {
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pid(m_anglerKp.get(), m_anglerKi.get(), m_anglerKd.get())
-        .outputRange(-0.3, 0.3);
+        .outputRange(-0.8, 0.8);
 
     m_anglerMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
@@ -118,7 +118,7 @@ public class AnglerSubsystem extends SubsystemBase {
    */
   public void setAngle(double degrees) {
     double clampedDegrees = MathUtil.clamp(degrees, MIN_SHAFT_ROT, MAX_SHAFT_ROT);
-    m_closedLoopController.setReference(clampedDegrees, SparkMax.ControlType.kPosition);
+    m_closedLoopController.setSetpoint(clampedDegrees, SparkMax.ControlType.kPosition);
   }
 
   /** Moves the angler to the tunable target angle. */
@@ -175,9 +175,10 @@ public class AnglerSubsystem extends SubsystemBase {
       configureMotor();
     }
 
+
     // Telemetry
-    SmartDashboard.putNumber("Angler/CurrentAngleDeg", getCurrentAngleDeg());
-    SmartDashboard.putNumber("Angler/TargetAngleDeg", m_targetAngle.get());
+    SmartDashboard.putNumber("Angler/CurrentAngleRot", getCurrentAngleDeg());
+    SmartDashboard.putNumber("Angler/TargetAngleRot", m_closedLoopController.getSetpoint());
     SmartDashboard.putBoolean("Angler/AtTarget", isAtTargetAngle());
     SmartDashboard.putNumber("Angler/MotorOutput", m_anglerMotor.getAppliedOutput());
     SmartDashboard.putNumber("Angler/MotorCurrent", m_anglerMotor.getOutputCurrent());
