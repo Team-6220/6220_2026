@@ -48,9 +48,6 @@ public class RobotContainer {
   private final ArmSubsystem arm = ArmSubsystem.getInstance();
   private final BeltSubsystem belt = BeltSubsystem.getInstance();
   private final RollerSubsystem roller = RollerSubsystem.getInstance();
-  private final AnglerSubsystem angler = AnglerSubsystem.getInstance();
-  private final ShooterSubsystem shooter = ShooterSubsystem.getInstance();
-
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
   private final Joystick m_joystick = new Joystick(1);
