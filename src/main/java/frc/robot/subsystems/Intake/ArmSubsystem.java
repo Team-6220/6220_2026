@@ -78,8 +78,8 @@ public class ArmSubsystem extends SubsystemBase {
     public static final double armIdleVoltage = 0.0;
     public static final double armVoltage = 5;
 
-    public static final double maxDegrees = 0;
-    public static final double minDegrees = 0;
+    public static final double maxDegrees = 1000;
+    public static final double minDegrees = -10000;
   }
 
   public ArmSubsystem() {
@@ -205,7 +205,16 @@ public class ArmSubsystem extends SubsystemBase {
     lastUpdate = Timer.getFPGATimestamp();
     PIDOutput = m_Controller.calculate(getPosition());
 
+    // System.out.println("pos=" + getPosition() + " goal=" + m_Controller.getGoal().position 
+    // + " pid=" + PIDOutput + " ff=" + feedForwardOutput);
+
     armMotor.setVoltage(PIDOutput + feedForwardOutput);
+
+    
+  }
+
+   public void resetArmEncoder() {
+    armEncoder.setPosition(0);
   }
 
   public void resetPID() {

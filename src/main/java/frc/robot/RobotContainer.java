@@ -55,7 +55,7 @@ public class RobotContainer {
   // ARM_POSITION_ZERO: resting/home position (usually 0 if arm boots from rest)
   // ARM_POSITION_UP: raised position — start small (e.g. 5) and increase carefully
   private static final double ARM_POSITION_ZERO = 0.0;
-  private static final double ARM_POSITION_UP = 5.0; // <-- TUNE THIS
+  private static final double ARM_POSITION_UP = -10; // <-- TUNE THIS
 
   public RobotContainer() {
     s_Swerve.configureAutoBuilder();
@@ -94,7 +94,10 @@ public class RobotContainer {
     Trigger shoot = new Trigger(() -> m_buttonBoard.getRawButton(3));
     Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(1));
     Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(2));
-
+    Trigger resetArmEncoder = new Trigger (() -> m_buttonBoard.getRawButton(11)); // change later cuz its in shooter branch
+    
+    resetArmEncoder.onTrue(Commands.runOnce(() -> arm.resetArmEncoder()));
+    
     m_driverController
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
