@@ -11,11 +11,11 @@ import frc.robot.subsystems.Shooter.ShooterSubsystem;
  * Runs all shooter motors at the tunable target velocity while the command is active. Stops when
  * the command ends (e.g., button released).
  */
-public class ShooterCommand extends Command {
+public class ShooterTESTER extends Command {
 
   private final ShooterSubsystem m_shooter;
 
-  public ShooterCommand(ShooterSubsystem shooter) {
+  public ShooterTESTER(ShooterSubsystem shooter) {
     m_shooter = shooter;
     addRequirements(m_shooter);
   }

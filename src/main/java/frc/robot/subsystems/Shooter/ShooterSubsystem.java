@@ -44,9 +44,9 @@ public class ShooterSubsystem extends SubsystemBase {
   private final TunableNumber m_ka = new TunableNumber("Shooter/kA", 0.0);
 
   // Separate tunable RPM for top and bottom groups
-  private final TunableNumber m_topTargetRPM = new TunableNumber("Shooter/TopTargetRPM", 4000.0);
+  private final TunableNumber m_topTargetRPM = new TunableNumber("Shooter/TopTargetRPM", ShooterConstants.topTESTrpm);
   private final TunableNumber m_bottomTargetRPM =
-      new TunableNumber("Shooter/BottomTargetRPM", 2500.0);
+      new TunableNumber("Shooter/BottomTargetRPM", ShooterConstants.bottomTESTrpm);
 
   // Tolerance for determining if shooter is at speed (in RPS)
   private static final double VELOCITY_TOLERANCE_RPS = 2.0;
@@ -118,13 +118,13 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   /** Sets top group motors (41, 1) to the given velocity in RPS. */
-  public void setTopGroupVelocityRPS(double rps) {
+  public void setBottomGroupVelocityRPS(double rps) {
     m_motor41.setControl(m_velocityRequest.withVelocity(rps));
     m_motor34.setControl(m_velocityRequest.withVelocity(rps));
   }
 
   /** Sets bottom group motors (9, 31, 2) to the given velocity in RPS. */
-  public void setBottomGroupVelocityRPS(double rps) {
+  public void setTopGroupVelocityRPS(double rps) {
     m_motor9.setControl(m_velocityRequest.withVelocity(rps));
     m_motor31.setControl(m_velocityRequest.withVelocity(rps));
     m_motor35.setControl(m_velocityRequest.withVelocity(rps));
