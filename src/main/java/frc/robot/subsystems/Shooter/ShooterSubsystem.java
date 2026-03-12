@@ -44,7 +44,8 @@ public class ShooterSubsystem extends SubsystemBase {
   private final TunableNumber m_ka = new TunableNumber("Shooter/kA", 0.0);
 
   // Separate tunable RPM for top and bottom groups
-  private final TunableNumber m_topTargetRPM = new TunableNumber("Shooter/TopTargetRPM", ShooterConstants.topTESTrpm);
+  private final TunableNumber m_topTargetRPM =
+      new TunableNumber("Shooter/TopTargetRPM", ShooterConstants.topTESTrpm);
   private final TunableNumber m_bottomTargetRPM =
       new TunableNumber("Shooter/BottomTargetRPM", ShooterConstants.bottomTESTrpm);
 
