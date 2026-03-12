@@ -22,13 +22,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   private static ArmSubsystem INSTANCE = null;
 
-  private final TunableNumber ArmKp = new TunableNumber("arm kP", ArmConstants.armKp);
-  private final TunableNumber ArmKi = new TunableNumber("arm kI", ArmConstants.armKi);
-  private final TunableNumber ArmKd = new TunableNumber("arm kD", ArmConstants.armKd);
-  private final TunableNumber ArmKg = new TunableNumber("arm kG", ArmConstants.armKg);
-  private final TunableNumber ArmKv = new TunableNumber("arm kV", ArmConstants.armKv);
-  private final TunableNumber ArmKs = new TunableNumber("arm kS", ArmConstants.armKs);
-  private final TunableNumber ArmKa = new TunableNumber("arm kA", ArmConstants.armKa);
+  // Non-gain tunables (kept as TunableNumber)
   private final TunableNumber ArmIZone = new TunableNumber("arm izone", ArmConstants.armIZone);
   private final TunableNumber ArmTolerance =
       new TunableNumber("arm tolerance", ArmConstants.armTolerance);
@@ -40,6 +34,9 @@ public class ArmSubsystem extends SubsystemBase {
   private final TunableNumber ArmVoltage =
       new TunableNumber("arm voltage", ArmConstants.armVoltage);
 
+  // Tracked gain values — compared each loop to detect SmartDashboard edits
+  private double lastKp, lastKi, lastKd, lastKs, lastKg, lastKv;
+
   private double idleOutVolt = ArmConstants.armIdleVoltage;
   private double intakeOutVolt = ArmConstants.armVoltage;
 
@@ -49,7 +46,9 @@ public class ArmSubsystem extends SubsystemBase {
   private double feedForwardOutput, PIDOutput;
   private double lastUpdate = 0;
 
+  // Telemetry keys
   private final String tableKey = "arm_";
+  private final String tuningKey = "arm_tune_";
 
   private final SparkMax armMotor;
   private final SparkMaxConfig armMotorConfig = new SparkMaxConfig();
@@ -64,13 +63,13 @@ public class ArmSubsystem extends SubsystemBase {
     public static final boolean armInvert = false;
     public static final IdleMode armIdleMode = IdleMode.kBrake;
 
-    public static final double armKp = 0.;
-    public static final double armKi = 0.;
+    public static final double armKp = 0.0;
+    public static final double armKi = 0.0;
     public static final double armKd = 0.0;
     public static final double armKa = 0.0;
     public static final double armKg = 0.0;
     public static final double armKv = 0.0;
-    public static final double armKs = 0;
+    public static final double armKs = 0.0;
     public static final double armIZone = 5;
     public static final double armTolerance = 0.5;
     public static final double armMaxVel = 200;
@@ -95,32 +94,64 @@ public class ArmSubsystem extends SubsystemBase {
 
     armEncoder = armMotor.getEncoder();
 
-    m_Constraints = new TrapezoidProfile.Constraints(ArmMaxVel.get(), ArmMaxAccel.get());
-    m_Controller = new ProfiledPIDController(ArmKp.get(), ArmKi.get(), ArmKd.get(), m_Constraints);
-    m_Feedforward = new ArmFeedforward(ArmKs.get(), ArmKg.get(), ArmKv.get(), ArmKa.get());
+    m_Constraints =
+        new TrapezoidProfile.Constraints(ArmConstants.armMaxVel, ArmConstants.armMaxAccel);
+    m_Controller =
+        new ProfiledPIDController(
+            ArmConstants.armKp, ArmConstants.armKi, ArmConstants.armKd, m_Constraints);
+    m_Feedforward =
+        new ArmFeedforward(
+            ArmConstants.armKs, ArmConstants.armKg, ArmConstants.armKv, ArmConstants.armKa);
     m_Controller.setIZone(ArmIZone.get());
     m_Controller.setTolerance(ArmTolerance.get());
+
+    // Seed tracked values so we can detect changes in periodic()
+    lastKp = ArmConstants.armKp;
+    lastKi = ArmConstants.armKi;
+    lastKd = ArmConstants.armKd;
+    lastKs = ArmConstants.armKs;
+    lastKg = ArmConstants.armKg;
+    lastKv = ArmConstants.armKv;
+
+    // Push initial gain values to SmartDashboard — these will show as editable fields
+    SmartDashboard.putNumber(tuningKey + "kP", lastKp);
+    SmartDashboard.putNumber(tuningKey + "kI", lastKi);
+    SmartDashboard.putNumber(tuningKey + "kD", lastKd);
+    SmartDashboard.putNumber(tuningKey + "kS", lastKs);
+    SmartDashboard.putNumber(tuningKey + "kG", lastKg);
+    SmartDashboard.putNumber(tuningKey + "kV", lastKv);
   }
 
   @Override
   public void periodic() {
-    if (ArmKp.hasChanged() || ArmKi.hasChanged() || ArmKd.hasChanged()) {
-      m_Controller.setPID(ArmKp.get(), ArmKi.get(), ArmKd.get());
-      System.out.println("new PID;P:" + ArmKp.get() + "I:" + ArmKi.get() + "D:" + ArmKd.get());
+    // --- Live gain tuning via SmartDashboard ---
+    // Read whatever is currently in the dashboard fields
+    double sdKp = SmartDashboard.getNumber(tuningKey + "kP", lastKp);
+    double sdKi = SmartDashboard.getNumber(tuningKey + "kI", lastKi);
+    double sdKd = SmartDashboard.getNumber(tuningKey + "kD", lastKd);
+    double sdKs = SmartDashboard.getNumber(tuningKey + "kS", lastKs);
+    double sdKg = SmartDashboard.getNumber(tuningKey + "kG", lastKg);
+    double sdKv = SmartDashboard.getNumber(tuningKey + "kV", lastKv);
+
+    // If P, I, or D changed, push update to controller
+    if (sdKp != lastKp || sdKi != lastKi || sdKd != lastKd) {
+      m_Controller.setPID(sdKp, sdKi, sdKd);
+      lastKp = sdKp;
+      lastKi = sdKi;
+      lastKd = sdKd;
+      System.out.println("[Arm] PID updated -> P:" + sdKp + " I:" + sdKi + " D:" + sdKd);
     }
 
-    if (ArmKs.hasChanged() || ArmKg.hasChanged() || ArmKv.hasChanged()) {
-      m_Feedforward = new ArmFeedforward(ArmKs.get(), ArmKg.get(), ArmKv.get(), ArmConstants.armKa);
-      System.out.println("new ff;s:" + ArmKs.get() + "g:" + ArmKg.get() + "v:" + ArmKv.get());
+    // If Ks, Kg, or Kv changed, rebuild feedforward
+    if (sdKs != lastKs || sdKg != lastKg || sdKv != lastKv) {
+      m_Feedforward = new ArmFeedforward(sdKs, sdKg, sdKv, ArmConstants.armKa);
+      lastKs = sdKs;
+      lastKg = sdKg;
+      lastKv = sdKv;
+      System.out.println("[Arm] FF updated -> Ks:" + sdKs + " Kg:" + sdKg + " Kv:" + sdKv);
     }
 
-    if (ArmMaxVel.hasChanged() || ArmMaxAccel.hasChanged()) {
-      m_Constraints = new TrapezoidProfile.Constraints(ArmMaxVel.get(), ArmMaxAccel.get());
-      m_Controller.setConstraints(m_Constraints);
-      System.out.println(
-          "new constraints;max vel:" + ArmMaxVel.get() + "max accel:" + ArmMaxAccel.get());
-    }
-
+    // --- Other TunableNumber updates ---
     if (ArmIZone.hasChanged()) {
       m_Controller.setIZone(ArmIZone.get());
     }
@@ -128,6 +159,34 @@ public class ArmSubsystem extends SubsystemBase {
     if (ArmTolerance.hasChanged()) {
       m_Controller.setTolerance(ArmTolerance.get());
     }
+
+    if (ArmMaxVel.hasChanged() || ArmMaxAccel.hasChanged()) {
+      m_Constraints = new TrapezoidProfile.Constraints(ArmMaxVel.get(), ArmMaxAccel.get());
+      m_Controller.setConstraints(m_Constraints);
+    }
+
+    // --- Telemetry ---
+
+    // Position & controller state
+    SmartDashboard.putNumber(tableKey + "position", getPosition());
+    SmartDashboard.putNumber(tableKey + "goal", m_Controller.getGoal().position);
+    SmartDashboard.putNumber(tableKey + "setpoint_pos", m_Controller.getSetpoint().position);
+    SmartDashboard.putNumber(tableKey + "setpoint_vel", m_Controller.getSetpoint().velocity);
+    SmartDashboard.putNumber(tableKey + "position_error", m_Controller.getPositionError());
+    SmartDashboard.putNumber(tableKey + "velocity_error", m_Controller.getVelocityError());
+    SmartDashboard.putBoolean(tableKey + "at_setpoint", m_Controller.atSetpoint());
+    SmartDashboard.putBoolean(tableKey + "at_goal", m_Controller.atGoal());
+
+    // Controller outputs
+    SmartDashboard.putNumber(tableKey + "ff_output", feedForwardOutput);
+    SmartDashboard.putNumber(tableKey + "pid_output", PIDOutput);
+    SmartDashboard.putNumber(tableKey + "total_output", feedForwardOutput + PIDOutput);
+
+    // Motor diagnostics
+    SmartDashboard.putNumber(
+        tableKey + "motor_output_volts", armMotor.getBusVoltage() * armMotor.getAppliedOutput());
+    SmartDashboard.putNumber(tableKey + "motor_current_amps", armMotor.getOutputCurrent());
+    SmartDashboard.putNumber(tableKey + "motor_temp_celsius", armMotor.getMotorTemperature());
   }
 
   public void setGoal(double goal) {
@@ -146,17 +205,7 @@ public class ArmSubsystem extends SubsystemBase {
     lastUpdate = Timer.getFPGATimestamp();
     PIDOutput = m_Controller.calculate(getPosition());
 
-    double calculatedOutput = PIDOutput + feedForwardOutput;
-
-    SmartDashboard.putNumber(tableKey + "ffOut", feedForwardOutput);
-    SmartDashboard.putNumber(tableKey + "pidOut", PIDOutput);
-    SmartDashboard.putNumber(tableKey + "calculatedOutput", calculatedOutput);
-    SmartDashboard.putNumber(tableKey + "setPoint", m_Controller.getSetpoint().position);
-    SmartDashboard.putNumber(tableKey + "setPointVelocity", m_Controller.getSetpoint().velocity);
-    SmartDashboard.putBoolean(tableKey + "atSetpoint", m_Controller.atSetpoint());
-    SmartDashboard.putNumber(tableKey + "goal", m_Controller.getGoal().position);
-
-    armMotor.setVoltage(calculatedOutput);
+    armMotor.setVoltage(PIDOutput + feedForwardOutput);
   }
 
   public void resetPID() {
@@ -172,12 +221,6 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void simpleDriveArm(double motorOutput) {
-    // motorOutput is percent (-1.0 .. 1.0). Convert to volts for SparkMax/TalonFX
-    // double pct = Math.max(-1.0, Math.min(1.0, motorOutput));
-    // double volts = pct * 12.0;
-    // SmartDashboard.putNumber("arm output pct", pct);
-    // SmartDashboard.putNumber("arm output (V)", volts);
-    // armMotor.setVoltage(volts);
     armMotor.setVoltage(motorOutput * 6);
   }
 

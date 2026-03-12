@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
+import frc.robot.commands.ArmToPositionCommand;
 import frc.robot.commands.ManualArm;
 import frc.robot.commands.SwerveCom;
 import frc.robot.commands.TestBeltCommand;
@@ -27,15 +28,7 @@ import frc.robot.subsystems.Intake.RollerSubsystem;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
 
-/**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
- */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
-  // private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
   private final SendableChooser<Command> autoChooser;
 
@@ -58,10 +51,13 @@ public class RobotContainer {
   private static final double PRESET_TOP_RPM = 700.0;
   private static final double PRESET_BOTTOM_RPM = 4000.0;
 
-  public RobotContainer() {
-    // Initialize climber subsystem based on robot mode
+  // !! TUNE THESE before running !!
+  // ARM_POSITION_ZERO: resting/home position (usually 0 if arm boots from rest)
+  // ARM_POSITION_UP: raised position — start small (e.g. 5) and increase carefully
+  private static final double ARM_POSITION_ZERO = 0.0;
+  private static final double ARM_POSITION_UP = 5.0; // <-- TUNE THIS
 
-    // Configure the trigger bindings
+  public RobotContainer() {
     s_Swerve.configureAutoBuilder();
     s_Swerve.zeroHeading(m_driverController.getHID());
 
@@ -71,7 +67,7 @@ public class RobotContainer {
     m_angler.setDefaultCommand(
         Commands.run(
             () -> {
-              double input = -m_driverController.getLeftY(); // negative so up = up
+              double input = -m_driverController.getLeftY();
               if (Math.abs(input) < ANGLER_DEADBAND) {
                 m_angler.stop();
               } else {
@@ -80,33 +76,19 @@ public class RobotContainer {
             },
             m_angler));
 
-    belt.setDefaultCommand(new TestBeltCommand());
+    //belt.setDefaultCommand(new TestBeltCommand());
 
     arm.setDefaultCommand(new ManualArm(m_joystick));
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    // TODO: Register named commands as needed for auto
-    // NamedCommands.registerCommand("AutoClimber", new AutoClimberCommand(climberSubsystem));
-
-    // NamedCommands.registerCommand(null, null);
     autoChooser.addOption("auto1", new PathPlannerAuto("Auto1"));
     SmartDashboard.putData(autoChooser);
     configureBindings();
   }
 
-  /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
-   */
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     Trigger angleUp = new Trigger(() -> m_buttonBoard.getRawButton(5));
     Trigger angleDown = new Trigger(() -> m_buttonBoard.getRawButton(6));
     Trigger shoot = new Trigger(() -> m_buttonBoard.getRawButton(3));
@@ -120,6 +102,11 @@ public class RobotContainer {
     m_driverController
         .rightBumper()
         .onTrue(new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
+
+    // Arm position commands — a() = home (0), b() = raised position
+    // Commands finish automatically when the arm reaches the goal, then hold via maintain()
+    m_driverController.a().onTrue(new ArmToPositionCommand(arm, ARM_POSITION_ZERO));
+    m_driverController.b().onTrue(new ArmToPositionCommand(arm, ARM_POSITION_UP));
 
     angleDown.whileTrue(
         Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
@@ -146,15 +133,8 @@ public class RobotContainer {
             new AlignAndMove(s_Swerve, m_driverController, m_driverController.rightBumper()));
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
   public Command getAutonomousCommand() {
     System.out.println("auto: " + autoChooser.getSelected());
     return autoChooser.getSelected();
   }
-  // An example command will be run in autonomous
-
 }
