@@ -63,12 +63,12 @@ public class ArmSubsystem extends SubsystemBase {
     public static final boolean armInvert = false;
     public static final IdleMode armIdleMode = IdleMode.kBrake;
 
-    public static final double armKp = 0.0;
-    public static final double armKi = 0.0;
+    public static final double armKp = 0.45;
+    public static final double armKi = 0.1;
     public static final double armKd = 0.0;
     public static final double armKa = 0.0;
-    public static final double armKg = 0.0;
-    public static final double armKv = 0.0;
+    public static final double armKg = 0.3;
+    public static final double armKv = 0.2;
     public static final double armKs = 0.0;
     public static final double armIZone = 5;
     public static final double armTolerance = 0.5;
