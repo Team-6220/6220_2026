@@ -118,7 +118,7 @@ public class AnglerSubsystem extends SubsystemBase {
    */
   public void setAngle(double degrees) {
     double clampedDegrees = MathUtil.clamp(degrees, MIN_SHAFT_ROT, MAX_SHAFT_ROT);
-    m_closedLoopController.setReference(clampedDegrees, SparkMax.ControlType.kPosition);
+    m_closedLoopController.setSetpoint(clampedDegrees, SparkMax.ControlType.kPosition);
   }
 
   /** Moves the angler to the tunable target angle. */

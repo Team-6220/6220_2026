@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
 import frc.robot.commands.ManualArm;
+import frc.robot.commands.ShooterCommand;
 import frc.robot.commands.SwerveCom;
 import frc.robot.commands.TestRollerCommand;
 import frc.robot.subsystems.Drive.Swerve;
@@ -45,7 +47,6 @@ public class RobotContainer {
   private final ArmSubsystem arm = ArmSubsystem.getInstance();
   private final BeltSubsystem belt = BeltSubsystem.getInstance();
   private final RollerSubsystem roller = RollerSubsystem.getInstance();
-
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
   private final Joystick m_joystick = new Joystick(1);
@@ -54,8 +55,8 @@ public class RobotContainer {
 
   private static final double ANGLER_MAX_SPEED = 0.15;
   private static final double ANGLER_DEADBAND = 0.1;
-  private static final double PRESET_TOP_RPM = 1000.0;
-  private static final double PRESET_BOTTOM_RPM = 4000.0;
+  private static final double PRESET_TOP_RPM = 1000.0; // for bottom, bad naming
+  private static final double PRESET_BOTTOM_RPM = 4000.0; // for top, bad naming
 
   public RobotContainer() {
     // Initialize climber subsystem based on robot mode
@@ -91,6 +92,7 @@ public class RobotContainer {
 
     // NamedCommands.registerCommand(null, null);
     autoChooser.addOption("auto1", new PathPlannerAuto("Auto1"));
+    autoChooser.addOption("default", new PathPlannerAuto("default"));
     SmartDashboard.putData(autoChooser);
     configureBindings();
   }
@@ -143,7 +145,7 @@ public class RobotContainer {
         Commands.parallel(
             Commands.runEnd(
                 () -> {
-                  m_shooter.setTopGroupVelocityRPS(PRESET_TOP_RPM / 60.0);
+                  // m_shooter.setTopGroupVelocityRPS(PRESET_TOP_RPM / 60.0);
                   m_shooter.setBottomGroupVelocityRPS(PRESET_BOTTOM_RPM / 60.0);
                 },
                 () -> m_shooter.stop())));
