@@ -12,9 +12,12 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.TunableNumber;
+import frc.robot.LimelightHelpers;
+import frc.robot.LimelightHelpers.*;
 
 public class ShooterSubsystem extends SubsystemBase {
 
@@ -26,11 +29,11 @@ public class ShooterSubsystem extends SubsystemBase {
   private static final int MOTOR_35_ID = 35;
 
   // Motors
-  private final TalonFX m_motor41; // top group
-  private final TalonFX m_motor34; // top group
-  private final TalonFX m_motor9; // bottom group
-  private final TalonFX m_motor31; // bottom group
-  private final TalonFX m_motor35; // bottom group
+  private final TalonFX m_motor41; // bottom group
+  private final TalonFX m_motor34; // bottom group
+  private final TalonFX m_motor9; // top group
+  private final TalonFX m_motor31; // top group
+  private final TalonFX m_motor35; // top group
 
   // Velocity control request
   private final VelocityVoltage m_velocityRequest;
@@ -44,9 +47,10 @@ public class ShooterSubsystem extends SubsystemBase {
   private final TunableNumber m_ka = new TunableNumber("Shooter/kA", 0.0);
 
   // Separate tunable RPM for top and bottom groups
-  private final TunableNumber m_topTargetRPM = new TunableNumber("Shooter/TopTargetRPM", 4000.0);
+  private final TunableNumber m_topTargetRPM =
+      new TunableNumber("Shooter/TopTargetRPM", ShooterConstants.topTESTrpm);
   private final TunableNumber m_bottomTargetRPM =
-      new TunableNumber("Shooter/BottomTargetRPM", 2500.0);
+      new TunableNumber("Shooter/BottomTargetRPM", ShooterConstants.bottomTESTrpm);
 
   // Tolerance for determining if shooter is at speed (in RPS)
   private static final double VELOCITY_TOLERANCE_RPS = 2.0;
@@ -114,17 +118,19 @@ public class ShooterSubsystem extends SubsystemBase {
     double topRPS = m_topTargetRPM.get() / 60.0;
     double bottomRPS = m_bottomTargetRPM.get() / 60.0;
     setTopGroupVelocityRPS(topRPS);
-    setBottomGroupVelocityRPS(bottomRPS);
+    if (isAtSpeedFly()) {
+      setBottomGroupVelocityRPS(bottomRPS);
+    }
   }
 
   /** Sets top group motors (41, 1) to the given velocity in RPS. */
-  public void setTopGroupVelocityRPS(double rps) {
+  public void setBottomGroupVelocityRPS(double rps) {
     m_motor41.setControl(m_velocityRequest.withVelocity(rps));
     m_motor34.setControl(m_velocityRequest.withVelocity(rps));
   }
 
   /** Sets bottom group motors (9, 31, 2) to the given velocity in RPS. */
-  public void setBottomGroupVelocityRPS(double rps) {
+  public void setTopGroupVelocityRPS(double rps) {
     m_motor9.setControl(m_velocityRequest.withVelocity(rps));
     m_motor31.setControl(m_velocityRequest.withVelocity(rps));
     m_motor35.setControl(m_velocityRequest.withVelocity(rps));
@@ -203,20 +209,15 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   /** Checks if all shooter motors are within tolerance of their target velocity. */
-  public boolean isAtSpeed() {
+  public boolean isAtSpeedFly() {
     double topTarget = m_topTargetRPM.get() / 60.0;
-    double bottomTarget = m_bottomTargetRPM.get() / 60.0;
-    if (topTarget == 0.0 && bottomTarget == 0.0) {
+    if (topTarget == 0.0) {
       return false;
     }
 
-    return Math.abs(m_motor41.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
-        && Math.abs(m_motor34.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
-        && Math.abs(m_motor9.getVelocity().getValueAsDouble() - bottomTarget)
-            < VELOCITY_TOLERANCE_RPS
-        && Math.abs(m_motor31.getVelocity().getValueAsDouble() - bottomTarget)
-            < VELOCITY_TOLERANCE_RPS
-        && Math.abs(m_motor35.getVelocity().getValueAsDouble() - bottomTarget)
+    return Math.abs(m_motor9.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
+        && Math.abs(m_motor31.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
+        && Math.abs(m_motor35.getVelocity().getValueAsDouble() - topTarget)
             < VELOCITY_TOLERANCE_RPS;
   }
 
@@ -268,6 +269,9 @@ public class ShooterSubsystem extends SubsystemBase {
         || m_ka.hasChanged()) {
       updatePIDValues();
     }
+    Pose3d targetPose = LimelightHelpers.getTargetPose3d_CameraSpace("limelight-front");
+    double forwardDistance = targetPose.getZ(); // meters from camera to tag
+    SmartDashboard.putNumber("Shooter/ForwardDistance", forwardDistance);
 
     // RPM Telemetry
     SmartDashboard.putNumber("Shooter/Motor41RPM", getMotor41RPM());
@@ -277,7 +281,7 @@ public class ShooterSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Shooter/Motor2RPM", getMotor2RPM());
     SmartDashboard.putNumber("Shooter/TopTargetRPM", m_topTargetRPM.get());
     SmartDashboard.putNumber("Shooter/BottomTargetRPM", m_bottomTargetRPM.get());
-    SmartDashboard.putBoolean("Shooter/AtSpeed", isAtSpeed());
+    SmartDashboard.putBoolean("Shooter/AtSpeed", isAtSpeedFly());
 
     // Voltage Telemetry
     SmartDashboard.putNumber(
