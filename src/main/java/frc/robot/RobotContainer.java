@@ -17,7 +17,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
 import frc.robot.commands.ManualArm;
+import frc.robot.commands.ShooterTESTER;
 import frc.robot.commands.SwerveCom;
+import frc.robot.commands.TestBeltCommand;
 import frc.robot.commands.TestRollerCommand;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Intake.ArmSubsystem;
@@ -78,7 +80,7 @@ public class RobotContainer {
             },
             m_angler));
 
-    /// belt.setDefaultCommand(new TestBeltCommand());
+    // belt.setDefaultCommand(new TestBeltCommand());
 
     arm.setDefaultCommand(new ManualArm(m_joystick));
 
@@ -140,19 +142,21 @@ public class RobotContainer {
     intakeOut.whileTrue(new TestRollerCommand(false));
 
     // this is the command for autonomous shooting, will need to be changed according to bot position
-    m_driverController
-        .a()
-        .whileTrue(
-            Commands.parallel(
-                Commands.runEnd(
-                    () -> {
-                      m_shooter.setTopGroupVelocityRPS(4000.0 / 60.0);
-                      m_shooter.setBottomGroupVelocityRPS(1500.0 / 60.0);
-                    },
-                    () -> m_shooter.stop()),
-                Commands.runEnd(() -> m_angler.setAngle(7), () -> m_angler.stop(), m_angler)));
+    // m_driverController
+    //     .a()
+    //     .whileTrue(
+    //         Commands.parallel(
+    //             Commands.runEnd(
+    //                 () -> {
+    //                   m_shooter.setTopGroupVelocityRPS(4000.0 / 60.0);
+                      
+    //                   m_shooter.setBottomGroupVelocityRPS(1500.0 / 60.0);
+    //                 },
+    //                 () -> m_shooter.stop()),
+    //             Commands.runEnd(() -> m_angler.setAngle(7), () -> m_angler.stop(), m_angler)));
 
-    //   shoot.whileTrue(new ShooterTESTER(m_shooter));
+
+      shoot.whileTrue(new ShooterTESTER(m_shooter));
 
     m_driverController
         .leftBumper()
