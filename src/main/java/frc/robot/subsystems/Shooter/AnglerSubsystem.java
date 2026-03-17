@@ -42,9 +42,7 @@ public class AnglerSubsystem extends SubsystemBase {
   private final TunableNumber m_anglerKp = new TunableNumber("Angler/kP", 0.02);
   private final TunableNumber m_anglerKi = new TunableNumber("Angler/kI", 0.0);
   private final TunableNumber m_anglerKd = new TunableNumber("Angler/kD", 0.0);
-
-  // Tunable target angle (degrees)
-  private final TunableNumber m_targetAngle = new TunableNumber("Angler/TargetAngleDeg", 45.0);
+  private final TunableNumber m_targetAngle = new TunableNumber("Angler/TargetAngleDeg", 20.0);
 
   // Tolerance for determining if angler is at position (degrees)
   private static final double ANGLE_TOLERANCE_DEG = 2.0;
@@ -183,5 +181,9 @@ public class AnglerSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Angler/MotorCurrent", m_anglerMotor.getOutputCurrent());
     SmartDashboard.putNumber("Angler/MinAngleDeg", MIN_SHAFT_ROT);
     SmartDashboard.putNumber("Angler/MaxAngleDeg", MAX_SHAFT_ROT);
+  }
+
+  public double getAnglerAngle() {
+    return m_targetAngle.get();
   }
 }

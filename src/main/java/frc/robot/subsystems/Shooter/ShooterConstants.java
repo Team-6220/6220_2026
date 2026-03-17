@@ -8,11 +8,15 @@ import java.util.HashMap;
 
 /** Add your docs here. */
 public class ShooterConstants {
+  //first number is distance
+  //first number of array is rpm
+  //second number of array is angler angle
   public static HashMap<Double, Double[]> rpmAngle =
       new HashMap<Double, Double[]>() {
         {
-          put(0.1, new Double[] {1000.0, 13.0});
-          put(0.2, new Double[] {4000.0, 13.0});
+          put(1.0, new Double[] {2150.0, 6.28});
+          put(1.1, new Double[] {2000.0, 13.0});
+          put(1.7, new Double[] {});
         }
       };
 

@@ -17,10 +17,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
 import frc.robot.commands.ManualArm;
-import frc.robot.commands.ShooterTESTER;
 import frc.robot.commands.SwerveCom;
-import frc.robot.commands.TestBeltCommand;
 import frc.robot.commands.TestRollerCommand;
+import frc.robot.commands.ShooterTESTER;
+import frc.robot.commands.TestBeltCommand;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Intake.ArmSubsystem;
 import frc.robot.subsystems.Intake.BeltSubsystem;
@@ -80,7 +80,7 @@ public class RobotContainer {
             },
             m_angler));
 
-    // belt.setDefaultCommand(new TestBeltCommand());
+     // belt.setDefaultCommand(new TestBeltCommand());
 
     arm.setDefaultCommand(new ManualArm(m_joystick));
 
@@ -119,10 +119,7 @@ public class RobotContainer {
 
     // Test buttons for angler PID: button 4 -> set to 1.0, button 11 -> set to 0.5
     Trigger anglerTestOne = new Trigger(() -> m_buttonBoard.getRawButton(4));
-    Trigger anglerTestHalf = new Trigger(() -> m_buttonBoard.getRawButton(11));
-    anglerTestOne.whileTrue(Commands.runOnce(() -> m_angler.setAngle(5), m_angler));
-    anglerTestHalf.whileTrue(Commands.runOnce(() -> m_angler.setAngle(10), m_angler));
-
+    anglerTestOne.whileTrue(Commands.runOnce(() -> m_angler.setAngle(m_angler.getAnglerAngle()), m_angler));
     m_driverController
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
@@ -141,7 +138,8 @@ public class RobotContainer {
 
     intakeOut.whileTrue(new TestRollerCommand(false));
 
-    // this is the command for autonomous shooting, will need to be changed according to bot position
+    // this is the command for autonomous shooting, will need to be changed according to bot
+    // position
     // m_driverController
     //     .a()
     //     .whileTrue(
@@ -149,12 +147,10 @@ public class RobotContainer {
     //             Commands.runEnd(
     //                 () -> {
     //                   m_shooter.setTopGroupVelocityRPS(4000.0 / 60.0);
-                      
     //                   m_shooter.setBottomGroupVelocityRPS(1500.0 / 60.0);
     //                 },
     //                 () -> m_shooter.stop()),
-    //             Commands.runEnd(() -> m_angler.setAngle(7), () -> m_angler.stop(), m_angler)));
-
+    //             Commands.runEnd(() -> m_angler.setAngle(20), () -> m_angler.stop(), m_angler)));
 
       shoot.whileTrue(new ShooterTESTER(m_shooter));
 
