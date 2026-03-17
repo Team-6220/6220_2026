@@ -80,7 +80,7 @@ public class RobotContainer {
             },
             m_angler));
 
-     // belt.setDefaultCommand(new TestBeltCommand());
+      belt.setDefaultCommand(new TestBeltCommand());
 
     arm.setDefaultCommand(new ManualArm(m_joystick));
 
