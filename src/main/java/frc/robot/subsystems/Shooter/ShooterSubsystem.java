@@ -12,7 +12,6 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.TunableNumber;
@@ -114,6 +113,15 @@ public class ShooterSubsystem extends SubsystemBase {
    * Runs top and bottom groups at their respective tunable RPM targets. Top motors (41, 1) run at
    * TopTargetRPM. Bottom motors (9, 31, 2) run at BottomTargetRPM.
    */
+  public void runAtTargetVelocity(double topRPS) {
+    // double topRPS = m_topTargetRPM.get() / 60.0;
+    double bottomRPS = m_bottomTargetRPM.get() / 60.0;
+    setTopGroupVelocityRPS(topRPS / 60);
+    if (isAtSpeedFly()) {
+      setBottomGroupVelocityRPS(bottomRPS);
+    }
+  }
+
   public void runAtTargetVelocity() {
     double topRPS = m_topTargetRPM.get() / 60.0;
     double bottomRPS = m_bottomTargetRPM.get() / 60.0;
@@ -210,7 +218,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   /** Checks if all shooter motors are within tolerance of their target velocity. */
   public boolean isAtSpeedFly() {
-    double topTarget = m_topTargetRPM.get() / 60.0;
+    double topTarget = ShooterConstants.rpmAngle.get(getDist())[0] / 60.0;
     if (topTarget == 0.0) {
       return false;
     }
@@ -258,6 +266,16 @@ public class ShooterSubsystem extends SubsystemBase {
     m_motor35.getConfigurator().apply(output);
   }
 
+  public double getDist() {
+    try {
+      int a = ((int) (LimelightHelpers.getTargetPose3d_CameraSpace("limelight-front").getZ() * 10));
+      double b = (double) a;
+      return b / 10;
+    }
+    catch (Exception e) {}
+    return -1.0;
+  }
+
   @Override
   public void periodic() {
     // Update PID if tunable numbers changed
@@ -269,9 +287,7 @@ public class ShooterSubsystem extends SubsystemBase {
         || m_ka.hasChanged()) {
       updatePIDValues();
     }
-    Pose3d targetPose = LimelightHelpers.getTargetPose3d_CameraSpace("limelight-front");
-    double forwardDistance = targetPose.getZ(); // meters from camera to tag
-    SmartDashboard.putNumber("Shooter/ForwardDistance", forwardDistance);
+    SmartDashboard.putNumber("Shooter/ForwardDistance", getDist());
 
     // RPM Telemetry
     SmartDashboard.putNumber("Shooter/Motor41RPM", getMotor41RPM());

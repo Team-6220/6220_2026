@@ -46,8 +46,10 @@ public class RollerSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber(tableKey + "output (V)", rollerMotor.getMotorVoltage().getValueAsDouble());
-    SmartDashboard.putNumber(tableKey + "output pct", rollerMotor.getDutyCycle().getValueAsDouble());
+    SmartDashboard.putNumber(
+        tableKey + "output (V)", rollerMotor.getMotorVoltage().getValueAsDouble());
+    SmartDashboard.putNumber(
+        tableKey + "output pct", rollerMotor.getDutyCycle().getValueAsDouble());
   }
 
   public void simpleDrive(double motorOutput) {
