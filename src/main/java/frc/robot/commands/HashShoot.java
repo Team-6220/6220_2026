@@ -34,7 +34,8 @@ public class HashShoot extends Command {
       degrees = ShooterConstants.rpmAngle.get(dist)[1];
     } catch (Exception e) {
       System.out.println("Error occurred while initializing HashShoot command.");
-      end(true);
+      rpm = ShooterConstants.rpmAngle.get(0.0)[0];
+      degrees = ShooterConstants.rpmAngle.get(0.0)[1];
     }
   }
 
