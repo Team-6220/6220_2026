@@ -4,10 +4,10 @@
 
 package frc.robot.subsystems.Intake;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,8 +18,8 @@ public class BeltSubsystem extends SubsystemBase {
 
   private final String tableKey = "belt_";
 
-  private final TalonFX beltMotor;
-  private final TalonFXConfiguration beltMotorConfig = new TalonFXConfiguration();
+  private final SparkMax beltMotor;
+  private final SparkMaxConfig beltMotorConfig = new SparkMaxConfig();
 
   private static final class BeltConstants {
     public static final int beltID = 42;
@@ -32,24 +32,14 @@ public class BeltSubsystem extends SubsystemBase {
   }
 
   public BeltSubsystem() {
-    beltMotor = new TalonFX(BeltConstants.beltID);
-
-    beltMotorConfig.MotorOutput.Inverted =
-        BeltConstants.beltInvert
-            ? InvertedValue.Clockwise_Positive
-            : InvertedValue.CounterClockwise_Positive;
-
-    beltMotorConfig.MotorOutput.NeutralMode =
-        (BeltConstants.beltIdleMode == IdleMode.kBrake)
-            ? NeutralModeValue.Brake
-            : NeutralModeValue.Coast;
-
-    beltMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    beltMotorConfig.CurrentLimits.SupplyCurrentLimit = BeltConstants.freeLimit;
-    beltMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = BeltConstants.stallLimit;
-    beltMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0.1;
-
-    beltMotor.getConfigurator().apply(beltMotorConfig);
+    beltMotor = new SparkMax(BeltConstants.beltID, MotorType.kBrushless);
+    beltMotorConfig.inverted(BeltConstants.beltInvert);
+    beltMotorConfig.smartCurrentLimit(BeltConstants.stallLimit, BeltConstants.freeLimit);
+    beltMotorConfig.idleMode(BeltConstants.beltIdleMode);
+    beltMotor.configure(
+        beltMotorConfig,
+        SparkBase.ResetMode.kResetSafeParameters,
+        SparkBase.PersistMode.kPersistParameters);
   }
 
   @Override
