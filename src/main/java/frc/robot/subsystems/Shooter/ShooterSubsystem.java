@@ -218,15 +218,31 @@ public class ShooterSubsystem extends SubsystemBase {
 
   /** Checks if all shooter motors are within tolerance of their target velocity. */
   public boolean isAtSpeedFly() {
-    double topTarget = ShooterConstants.rpmAngle.get(getDist())[0] / 60.0;
+    double topTarget;
+    try {
+      topTarget = ShooterConstants.rpmAngle.get(getDist())[0] / 60.0;
+    } catch (Exception e) {
+      // TODO: handle exception
+      topTarget = 0.0;
+    }
     if (topTarget == 0.0) {
       return false;
     }
 
-    return Math.abs(m_motor9.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
+    if( Math.abs(m_motor9.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
         && Math.abs(m_motor31.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
         && Math.abs(m_motor35.getVelocity().getValueAsDouble() - topTarget)
-            < VELOCITY_TOLERANCE_RPS;
+            < VELOCITY_TOLERANCE_RPS) {
+              try {
+                System.out.println("WAITING rpm = " + m_motor9.getVelocity().getValueAsDouble());
+                wait(500);
+                System.out.println("DONE WAYTINGNIGSDLKSJDFKLJSDKFL rpm + " + m_motor9.getVelocity().getValueAsDouble());
+              } catch (Exception e) {
+                // TODO: handle exception
+              }
+              return true;
+            }
+            return false;
   }
 
   public double getTopTargetRPM() {
