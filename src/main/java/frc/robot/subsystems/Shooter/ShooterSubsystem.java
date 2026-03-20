@@ -220,12 +220,15 @@ public class ShooterSubsystem extends SubsystemBase {
     double topTarget = getTopTargetRPM();
     if (topTarget == 0.0) {
       return false;
+    // Convert top target from RPM to RPS to match TalonFX velocity units
+    double topTargetRps = getTopTargetRPM() / 60.0;
+    if (topTargetRps == 0.0) {
+      return false;
     }
 
-    return Math.abs(m_motor9.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
-        && Math.abs(m_motor31.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
-        && Math.abs(m_motor35.getVelocity().getValueAsDouble() - topTarget)
-            < VELOCITY_TOLERANCE_RPS;
+    return Math.abs(m_motor9.getVelocity().getValueAsDouble() - topTargetRps) < VELOCITY_TOLERANCE_RPS
+        && Math.abs(m_motor31.getVelocity().getValueAsDouble() - topTargetRps) < VELOCITY_TOLERANCE_RPS
+        && Math.abs(m_motor35.getVelocity().getValueAsDouble() - topTargetRps)
   }
 
   /** Checks if all shooter motors are within tolerance of their target velocity. */
