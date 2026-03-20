@@ -16,9 +16,10 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
+import frc.robot.commands.HashShoot;
 import frc.robot.commands.ManualArm;
-import frc.robot.commands.ShooterTESTER;
 import frc.robot.commands.SwerveCom;
+import frc.robot.commands.TestBeltCommand;
 import frc.robot.commands.TestRollerCommand;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Intake.ArmSubsystem;
@@ -79,7 +80,7 @@ public class RobotContainer {
             },
             m_angler));
 
-    /// belt.setDefaultCommand(new TestBeltCommand());
+    belt.setDefaultCommand(new TestBeltCommand());
 
     arm.setDefaultCommand(new ManualArm(m_joystick));
 
@@ -112,15 +113,20 @@ public class RobotContainer {
     Trigger shoot = m_driverController.a();
     Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(1));
     Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(2));
+    Trigger belt = new Trigger(() -> m_buttonBoard.getRawButton(7));
 
     Trigger resetEncoder = new Trigger(() -> m_buttonBoard.getRawButton(3));
     resetEncoder.onTrue(Commands.runOnce(() -> m_angler.resetEncoder()));
 
-    // Test buttons for angler PID: button 4 -> set to 1.0, button 11 -> set to 0.5
+    // Test buttons for angler PID: button 4 -> set to 1.0,
     Trigger anglerTestOne = new Trigger(() -> m_buttonBoard.getRawButton(4));
-    Trigger anglerTestHalf = new Trigger(() -> m_buttonBoard.getRawButton(11));
-    anglerTestOne.whileTrue(Commands.runOnce(() -> m_angler.setAngle(5), m_angler));
-    anglerTestHalf.whileTrue(Commands.runOnce(() -> m_angler.setAngle(10), m_angler));
+    Trigger anglerTest0 = new Trigger(() -> m_buttonBoard.getRawButton(11));
+    anglerTestOne.onTrue(
+        Commands.run(() -> m_angler.setAngle(m_angler.getAnglerAngle()), m_angler)
+            .until(() -> m_angler.isAtAngle(m_angler.getAnglerAngle())));
+
+    anglerTest0.onTrue(
+        Commands.run(() -> m_angler.setAngle(0), m_angler).until(() -> m_angler.isAtAngle(0)));
 
     m_driverController
         .y()
@@ -136,20 +142,17 @@ public class RobotContainer {
     angleUp.whileTrue(
         Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
 
+    belt.whileTrue(new TestBeltCommand());
+
     intakeIn.whileTrue(new TestRollerCommand(true));
 
     intakeOut.whileTrue(new TestRollerCommand(false));
 
-    // shoot.whileTrue(
-    //     Commands.parallel(
-    //         Commands.runEnd(
-    //             () -> {
-    //               // m_shooter.setTopGroupVelocityRPS(PRESET_TOP_RPM / 60.0);
-    //               m_shooter.setBottomGroupVelocityRPS(PRESET_BOTTOM_RPM / 60.0);
-    //             },
-    //             () -> m_shooter.stop())));
+    // this is the command for autonomous shooting, will need to be changed according to bot
+    // position
+    // m_driverController.b().whileTrue(new ShooterTESTER(m_shooter));
 
-    shoot.whileTrue(new ShooterTESTER(m_shooter));
+    m_driverController.a().whileTrue(new HashShoot(m_angler, m_shooter));
 
     m_driverController
         .leftBumper()

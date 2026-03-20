@@ -39,12 +39,10 @@ public class AnglerSubsystem extends SubsystemBase {
   private final SparkClosedLoopController m_closedLoopController;
 
   // Tunable PID for angler position control
-  private final TunableNumber m_anglerKp = new TunableNumber("Angler/kP", 0.02);
+  private final TunableNumber m_anglerKp = new TunableNumber("Angler/kP", 0.4);
   private final TunableNumber m_anglerKi = new TunableNumber("Angler/kI", 0.0);
   private final TunableNumber m_anglerKd = new TunableNumber("Angler/kD", 0.0);
-
-  // Tunable target angle (degrees)
-  private final TunableNumber m_targetAngle = new TunableNumber("Angler/TargetAngleDeg", 45.0);
+  private final TunableNumber m_targetAngle = new TunableNumber("Angler/TargetAngleDeg", 20.0);
 
   // Tolerance for determining if angler is at position (degrees)
   private static final double ANGLE_TOLERANCE_DEG = 2.0;
@@ -67,7 +65,7 @@ public class AnglerSubsystem extends SubsystemBase {
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pid(m_anglerKp.get(), m_anglerKi.get(), m_anglerKd.get())
-        .outputRange(-0.3, 0.3);
+        .outputRange(-0.7, 0.7);
 
     m_anglerMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
@@ -98,7 +96,7 @@ public class AnglerSubsystem extends SubsystemBase {
     double currentAngle = getCurrentAngleDeg();
 
     // Prevent moving past limits
-    // if (currentAngle <= MIN_ANGLE_DEG && speed < 0) {
+    // if (currentAngle <= MIN_SHAFT_ROT && speed < 0) {
     //   m_anglerMotor.set(0);
     //   return;
     // }
@@ -183,5 +181,9 @@ public class AnglerSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Angler/MotorCurrent", m_anglerMotor.getOutputCurrent());
     SmartDashboard.putNumber("Angler/MinAngleDeg", MIN_SHAFT_ROT);
     SmartDashboard.putNumber("Angler/MaxAngleDeg", MAX_SHAFT_ROT);
+  }
+
+  public double getAnglerAngle() {
+    return m_targetAngle.get();
   }
 }
