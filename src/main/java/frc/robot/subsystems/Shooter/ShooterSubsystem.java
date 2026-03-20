@@ -38,12 +38,12 @@ public class ShooterSubsystem extends SubsystemBase {
   private final VelocityVoltage m_velocityRequest;
 
   // Tunable PID and feedforward values
-  private final TunableNumber m_kp = new TunableNumber("Shooter/kP", 0.1);
+  private final TunableNumber m_kp = new TunableNumber("Shooter/kP", 0.12);
   private final TunableNumber m_ki = new TunableNumber("Shooter/kI", 0.0);
-  private final TunableNumber m_kd = new TunableNumber("Shooter/kD", 0.0);
+  private final TunableNumber m_kd = new TunableNumber("Shooter/kD", 0.003);
   private final TunableNumber m_kv = new TunableNumber("Shooter/kV", 0.12);
   private final TunableNumber m_ks = new TunableNumber("Shooter/kS", 0.0);
-  private final TunableNumber m_ka = new TunableNumber("Shooter/kA", 0.0);
+  private final TunableNumber m_ka = new TunableNumber("Shooter/kA", 0.01);
 
   // Separate tunable RPM for top and bottom groups
   private final TunableNumber m_topTargetRPM =
@@ -52,7 +52,7 @@ public class ShooterSubsystem extends SubsystemBase {
       new TunableNumber("Shooter/BottomTargetRPM", ShooterConstants.bottomTESTrpm);
 
   // Tolerance for determining if shooter is at speed (in RPS)
-  private static final double VELOCITY_TOLERANCE_RPS = 2.0;
+  private static final double VELOCITY_TOLERANCE_RPS = 0.5;
 
   // Current limit in amps
   private static final double CURRENT_LIMIT = 40.0;
@@ -126,7 +126,7 @@ public class ShooterSubsystem extends SubsystemBase {
     double topRPS = m_topTargetRPM.get() / 60.0;
     double bottomRPS = m_bottomTargetRPM.get() / 60.0;
     setTopGroupVelocityRPS(topRPS);
-    if (isAtSpeedFly()) {
+    if (isAtSpeedFlyMAN()) {
       setBottomGroupVelocityRPS(bottomRPS);
     }
   }
@@ -216,6 +216,19 @@ public class ShooterSubsystem extends SubsystemBase {
     return m_motor35.getVelocity().getValueAsDouble() * 60.0;
   }
 
+   boolean isAtSpeedFlyMAN() {
+    double topTarget = getTopTargetRPM();
+    if (topTarget == 0.0) {
+      return false;
+    }
+
+
+    return Math.abs(m_motor9.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
+        && Math.abs(m_motor31.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
+        && Math.abs(m_motor35.getVelocity().getValueAsDouble() - topTarget)
+            < VELOCITY_TOLERANCE_RPS;
+  }
+
   /** Checks if all shooter motors are within tolerance of their target velocity. */
   public boolean isAtSpeedFly() {
     double topTarget;
@@ -229,20 +242,20 @@ public class ShooterSubsystem extends SubsystemBase {
       return false;
     }
 
-    if( Math.abs(m_motor9.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
+    if (Math.abs(m_motor9.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
         && Math.abs(m_motor31.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
         && Math.abs(m_motor35.getVelocity().getValueAsDouble() - topTarget)
             < VELOCITY_TOLERANCE_RPS) {
-              try {
-                System.out.println("WAITING rpm = " + m_motor9.getVelocity().getValueAsDouble());
-                wait(500);
-                System.out.println("DONE WAYTINGNIGSDLKSJDFKLJSDKFL rpm + " + m_motor9.getVelocity().getValueAsDouble());
-              } catch (Exception e) {
-                // TODO: handle exception
-              }
-              return true;
-            }
-            return false;
+      try {
+        System.out.println("WAITING rpm = " + m_motor9.getVelocity().getValueAsDouble());
+        System.out.println(
+            "DONE WAYTINGNIGSDLKSJDFKLJSDKFL rpm + " + m_motor9.getVelocity().getValueAsDouble());
+      } catch (Exception e) {
+        // TODO: handle exception
+      }
+      return true;
+    }
+    return false;
   }
 
   public double getTopTargetRPM() {
@@ -284,11 +297,14 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public double getDist() {
     try {
-      int a = ((int) (LimelightHelpers.getTargetPose3d_CameraSpace("limelight-front").getZ() * 10));
+      int a =
+          ((int) (LimelightHelpers.getTargetPose3d_CameraSpace("limelight-front").getZ() * 100));
       double b = (double) a;
-      return b / 10;
+      b = b / 20.0;
+      b = Math.round(b) * 2.0;
+      return b / 10.0;
+    } catch (Exception e) {
     }
-    catch (Exception e) {}
     return -1.0;
   }
 
