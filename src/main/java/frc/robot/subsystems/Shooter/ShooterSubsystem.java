@@ -222,15 +222,19 @@ public class ShooterSubsystem extends SubsystemBase {
     double topTarget = getTopTargetRPM();
     if (topTarget == 0.0) {
       return false;
+    }
     // Convert top target from RPM to RPS to match TalonFX velocity units
-    double topTargetRps = getTopTargetRPM() / 60.0;
+    double topTargetRps = topTarget / 60.0;
     if (topTargetRps == 0.0) {
       return false;
     }
 
-    return Math.abs(m_motor9.getVelocity().getValueAsDouble() - topTargetRps) < VELOCITY_TOLERANCE_RPS
-        && Math.abs(m_motor31.getVelocity().getValueAsDouble() - topTargetRps) < VELOCITY_TOLERANCE_RPS
+    return Math.abs(m_motor9.getVelocity().getValueAsDouble() - topTargetRps)
+            < VELOCITY_TOLERANCE_RPS
+        && Math.abs(m_motor31.getVelocity().getValueAsDouble() - topTargetRps)
+            < VELOCITY_TOLERANCE_RPS
         && Math.abs(m_motor35.getVelocity().getValueAsDouble() - topTargetRps)
+            < VELOCITY_TOLERANCE_RPS;
   }
 
   /** Checks if all shooter motors are within tolerance of their target velocity. */
@@ -241,6 +245,7 @@ public class ShooterSubsystem extends SubsystemBase {
     } catch (Exception e) {
       // TODO: handle exception
       topTarget = 0.0;
+      System.out.println("target out of range");
     }
     if (topTarget == 0.0) {
       return false;
@@ -308,6 +313,7 @@ public class ShooterSubsystem extends SubsystemBase {
       b = Math.round(b) * 2.0;
       return b / 10.0;
     } catch (Exception e) {
+      System.out.println("distance doens't work");
     }
     return -1.0;
   }
