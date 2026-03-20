@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
 import frc.robot.commands.HashShoot;
 import frc.robot.commands.ManualArm;
-import frc.robot.commands.ShooterTESTER;
 import frc.robot.commands.SwerveCom;
 import frc.robot.commands.TestBeltCommand;
 import frc.robot.commands.TestRollerCommand;
@@ -144,13 +143,14 @@ public class RobotContainer {
         Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
 
     belt.whileTrue(new TestBeltCommand());
+
     intakeIn.whileTrue(new TestRollerCommand(true));
 
     intakeOut.whileTrue(new TestRollerCommand(false));
 
     // this is the command for autonomous shooting, will need to be changed according to bot
     // position
-    m_driverController.b().whileTrue(new ShooterTESTER(m_shooter));
+    // m_driverController.b().whileTrue(new ShooterTESTER(m_shooter));
 
     m_driverController.a().whileTrue(new HashShoot(m_angler, m_shooter));
 
