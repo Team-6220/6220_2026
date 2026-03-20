@@ -112,11 +112,13 @@ public class ShooterSubsystem extends SubsystemBase {
   /**
    * Runs top and bottom groups at their respective tunable RPM targets. Top motors (41, 1) run at
    * TopTargetRPM. Bottom motors (9, 31, 2) run at BottomTargetRPM.
+   *
+   * @param topRPM Desired top-group velocity in RPM.
    */
-  public void runAtTargetVelocity(double topRPS) {
-    // double topRPS = m_topTargetRPM.get() / 60.0;
+  public void runAtTargetVelocity(double topRPM) {
+    double topRPS = topRPM / 60.0;
     double bottomRPS = m_bottomTargetRPM.get() / 60.0;
-    setTopGroupVelocityRPS(topRPS / 60);
+    setTopGroupVelocityRPS(topRPS);
     if (isAtSpeedFly()) {
       setBottomGroupVelocityRPS(bottomRPS);
     }
