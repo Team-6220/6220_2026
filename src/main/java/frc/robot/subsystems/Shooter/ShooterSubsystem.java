@@ -112,11 +112,13 @@ public class ShooterSubsystem extends SubsystemBase {
   /**
    * Runs top and bottom groups at their respective tunable RPM targets. Top motors (41, 1) run at
    * TopTargetRPM. Bottom motors (9, 31, 2) run at BottomTargetRPM.
+   *
+   * @param topRPM Desired top-group velocity in RPM.
    */
-  public void runAtTargetVelocity(double topRPS) {
-    // double topRPS = m_topTargetRPM.get() / 60.0;
+  public void runAtTargetVelocity(double topRPM) {
+    double topRPS = topRPM / 60.0;
     double bottomRPS = m_bottomTargetRPM.get() / 60.0;
-    setTopGroupVelocityRPS(topRPS / 60);
+    setTopGroupVelocityRPS(topRPS);
     if (isAtSpeedFly()) {
       setBottomGroupVelocityRPS(bottomRPS);
     }
@@ -220,12 +222,15 @@ public class ShooterSubsystem extends SubsystemBase {
     double topTarget = getTopTargetRPM();
     if (topTarget == 0.0) {
       return false;
+    // Convert top target from RPM to RPS to match TalonFX velocity units
+    double topTargetRps = getTopTargetRPM() / 60.0;
+    if (topTargetRps == 0.0) {
+      return false;
     }
 
-    return Math.abs(m_motor9.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
-        && Math.abs(m_motor31.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
-        && Math.abs(m_motor35.getVelocity().getValueAsDouble() - topTarget)
-            < VELOCITY_TOLERANCE_RPS;
+    return Math.abs(m_motor9.getVelocity().getValueAsDouble() - topTargetRps) < VELOCITY_TOLERANCE_RPS
+        && Math.abs(m_motor31.getVelocity().getValueAsDouble() - topTargetRps) < VELOCITY_TOLERANCE_RPS
+        && Math.abs(m_motor35.getVelocity().getValueAsDouble() - topTargetRps)
   }
 
   /** Checks if all shooter motors are within tolerance of their target velocity. */
