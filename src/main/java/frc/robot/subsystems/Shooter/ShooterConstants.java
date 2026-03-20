@@ -14,8 +14,8 @@ public class ShooterConstants {
   public static HashMap<Double, Double[]> rpmAngle =
       new HashMap<Double, Double[]>() {
         {
-          put(-1.0, new Double[] {0.0, 0.0}); // Testing pruposes
-          put(0.0, new Double[] {0.0, 0.0}); // Testing pruposes
+          put(-1.0, new Double[] {0.0, 0.0}); // Testing purposes
+          put(0.0, new Double[] {0.0, 0.0}); // Testing purposes
           put(1.0, new Double[] {2150.0, 6.47});
           put(1.2, new Double[] {2060.0, 5.85});
           put(1.4, new Double[] {2075.0, 5.78});
