@@ -150,9 +150,9 @@ public class RobotContainer {
 
     // this is the command for autonomous shooting, will need to be changed according to bot
     // position
-      m_driverController.b().whileTrue(new ShooterTESTER(m_shooter));
+    m_driverController.b().whileTrue(new ShooterTESTER(m_shooter));
 
-     m_driverController.a().whileTrue(new HashShoot(m_angler, m_shooter));
+    m_driverController.a().whileTrue(new HashShoot(m_angler, m_shooter));
 
     m_driverController
         .leftBumper()

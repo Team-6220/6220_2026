@@ -216,12 +216,11 @@ public class ShooterSubsystem extends SubsystemBase {
     return m_motor35.getVelocity().getValueAsDouble() * 60.0;
   }
 
-   boolean isAtSpeedFlyMAN() {
+  boolean isAtSpeedFlyMAN() {
     double topTarget = getTopTargetRPM();
     if (topTarget == 0.0) {
       return false;
     }
-
 
     return Math.abs(m_motor9.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
         && Math.abs(m_motor31.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
