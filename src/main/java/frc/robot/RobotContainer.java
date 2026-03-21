@@ -55,8 +55,6 @@ public class RobotContainer {
 
   private static final double ANGLER_MAX_SPEED = 0.15;
   private static final double ANGLER_DEADBAND = 0.1;
-  private static final double PRESET_TOP_RPM = 1000.0; // for bottom, bad naming
-  private static final double PRESET_BOTTOM_RPM = 4000.0; // for top, bad naming
 
   public RobotContainer() {
     // Initialize climber subsystem based on robot mode
@@ -110,10 +108,8 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     Trigger angleUp = new Trigger(() -> m_buttonBoard.getRawButton(5));
     Trigger angleDown = new Trigger(() -> m_buttonBoard.getRawButton(6));
-    Trigger shoot = m_driverController.a();
-    Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(1));
-    Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(2));
-    Trigger belt = new Trigger(() -> m_buttonBoard.getRawButton(7));
+    Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(2));
+    Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(1));
 
     Trigger resetEncoder = new Trigger(() -> m_buttonBoard.getRawButton(3));
     resetEncoder.onTrue(Commands.runOnce(() -> m_angler.resetEncoder()));
@@ -121,6 +117,7 @@ public class RobotContainer {
     // Test buttons for angler PID: button 4 -> set to 1.0,
     Trigger anglerTestOne = new Trigger(() -> m_buttonBoard.getRawButton(4));
     Trigger anglerTest0 = new Trigger(() -> m_buttonBoard.getRawButton(11));
+
     anglerTestOne.onTrue(
         Commands.run(() -> m_angler.setAngle(m_angler.getAnglerAngle()), m_angler)
             .until(() -> m_angler.isAtAngle(m_angler.getAnglerAngle())));
@@ -139,23 +136,26 @@ public class RobotContainer {
     angleDown.whileTrue(
         Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));
 
+    m_driverController
+        .a()
+        .whileTrue(
+            Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));
+
     angleUp.whileTrue(
         Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
 
-    belt.whileTrue(new TestBeltCommand());
+    m_driverController
+        .b()
+        .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
 
     intakeIn.whileTrue(new TestRollerCommand(true));
 
     intakeOut.whileTrue(new TestRollerCommand(false));
 
-    // this is the command for autonomous shooting, will need to be changed according to bot
-    // position
-    // m_driverController.b().whileTrue(new ShooterTESTER(m_shooter));
-
-    m_driverController.a().whileTrue(new HashShoot(m_angler, m_shooter));
+    m_driverController.rightTrigger().whileTrue(new HashShoot(m_angler, m_shooter));
 
     m_driverController
-        .leftBumper()
+        .leftTrigger()
         .whileTrue(
             new AlignAndMove(s_Swerve, m_driverController, m_driverController.rightBumper()));
   }
