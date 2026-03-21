@@ -54,7 +54,7 @@ public class RollerSubsystem extends SubsystemBase {
 
   public void simpleDrive(double motorOutput) {
     double pct = Math.max(-1.0, Math.min(1.0, motorOutput));
-    rollerMotor.setControl(voltageRequest.withOutput(pct * 8.0));
+    rollerMotor.setControl(voltageRequest.withOutput(pct * 10.0));
   }
 
   public void spin(boolean intake) {

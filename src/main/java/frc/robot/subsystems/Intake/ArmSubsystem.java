@@ -178,7 +178,7 @@ public class ArmSubsystem extends SubsystemBase {
     // SmartDashboard.putNumber("arm output pct", pct);
     // SmartDashboard.putNumber("arm output (V)", volts);
     // armMotor.setVoltage(volts);
-    armMotor.setVoltage(motorOutput * 6);
+    armMotor.setVoltage(motorOutput * 4);
   }
 
   public void maintain() {

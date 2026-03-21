@@ -19,6 +19,7 @@ import frc.robot.commands.AlignAndMove;
 import frc.robot.commands.HashShoot;
 import frc.robot.commands.ManualArm;
 import frc.robot.commands.PassToAlliance;
+import frc.robot.commands.ShooterTESTER;
 import frc.robot.commands.SwerveCom;
 import frc.robot.commands.TestBeltCommand;
 import frc.robot.commands.TestRollerCommand;
@@ -139,8 +140,7 @@ public class RobotContainer {
 
     m_driverController
         .a()
-        .whileTrue(
-            Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));
+        .onTrue(Commands.run(() -> m_angler.setAngle(0), m_angler).until(() -> m_angler.isAtAngle(0)));
 
     angleUp.whileTrue(
         Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
@@ -148,6 +148,8 @@ public class RobotContainer {
     m_driverController
         .b()
         .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
+
+    m_driverController.x().whileTrue(new ShooterTESTER(m_shooter));
 
     pass.whileTrue(new PassToAlliance(m_angler, m_shooter));
 
