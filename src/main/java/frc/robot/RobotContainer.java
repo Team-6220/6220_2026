@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
 import frc.robot.commands.HashShoot;
 import frc.robot.commands.ManualArm;
+import frc.robot.commands.PassToAlliance;
 import frc.robot.commands.SwerveCom;
 import frc.robot.commands.TestBeltCommand;
 import frc.robot.commands.TestRollerCommand;
@@ -110,7 +111,7 @@ public class RobotContainer {
     Trigger angleDown = new Trigger(() -> m_buttonBoard.getRawButton(6));
     Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(2));
     Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(1));
-
+    Trigger pass = new Trigger(() -> m_buttonBoard.getRawButton(4));
     Trigger resetEncoder = new Trigger(() -> m_buttonBoard.getRawButton(3));
     resetEncoder.onTrue(Commands.runOnce(() -> m_angler.resetEncoder()));
 
@@ -147,6 +148,8 @@ public class RobotContainer {
     m_driverController
         .b()
         .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
+
+    pass.whileTrue(new PassToAlliance(m_angler, m_shooter));
 
     intakeIn.whileTrue(new TestRollerCommand(true));
 
