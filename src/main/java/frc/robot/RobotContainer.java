@@ -22,6 +22,7 @@ import frc.robot.commands.PassToAlliance;
 import frc.robot.commands.SwerveCom;
 import frc.robot.commands.TestBeltCommand;
 import frc.robot.commands.TestRollerCommand;
+import frc.robot.commands.Autos.BasicAuto;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Intake.ArmSubsystem;
 import frc.robot.subsystems.Intake.BeltSubsystem;
@@ -92,6 +93,7 @@ public class RobotContainer {
     // NamedCommands.registerCommand(null, null);
     autoChooser.addOption("auto1", new PathPlannerAuto("Auto1"));
     autoChooser.addOption("default", new PathPlannerAuto("default"));
+    autoChooser.addOption("fallback", new BasicAuto(s_Swerve));
     SmartDashboard.putData(autoChooser);
     configureBindings();
   }
