@@ -43,7 +43,7 @@ public class HashShoot extends Command {
   @Override
   public void execute() {
     m_angler.setAngle(degrees);
-    m_shoot.runAtTargetVelocity(rpm);
+    m_shoot.runAtTargetVelocity(rpm, false);
   }
 
   // Called once the command ends or is interrupted.

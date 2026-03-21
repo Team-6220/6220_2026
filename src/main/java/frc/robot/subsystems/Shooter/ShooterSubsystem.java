@@ -115,12 +115,22 @@ public class ShooterSubsystem extends SubsystemBase {
    *
    * @param topRPM Desired top-group velocity in RPM.
    */
-  public void runAtTargetVelocity(double topRPM) {
-    double topRPS = topRPM / 60.0;
-    double bottomRPS = m_bottomTargetRPM.get() / 60.0;
-    setTopGroupVelocityRPS(topRPS);
-    if (isAtSpeedFly()) {
-      setBottomGroupVelocityRPS(bottomRPS);
+  public void runAtTargetVelocity(double topRPM, boolean pass) {
+    if (!pass) {
+      double topRPS = topRPM / 60.0;
+      double bottomRPS = m_bottomTargetRPM.get() / 60.0;
+      setTopGroupVelocityRPS(topRPS);
+      if (isAtSpeedFly()) {
+        setBottomGroupVelocityRPS(bottomRPS);
+      }
+    }
+    else {
+      double topRPS = m_topTargetRPM.get() / 60.0;
+      double bottomRPS = m_bottomTargetRPM.get() / 60.0;
+      setTopGroupVelocityRPS(topRPS);
+      if (isAtSpeedFlyMAN()) {
+        setBottomGroupVelocityRPS(bottomRPS);
+      }
     }
   }
 
@@ -219,12 +229,8 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   boolean isAtSpeedFlyMAN() {
-    double topTarget = getTopTargetRPM();
-    if (topTarget == 0.0) {
-      return false;
-    }
     // Convert top target from RPM to RPS to match TalonFX velocity units
-    double topTargetRps = topTarget / 60.0;
+    double topTargetRps = getTopTargetRPM() / 60.0;
     if (topTargetRps == 0.0) {
       return false;
     }

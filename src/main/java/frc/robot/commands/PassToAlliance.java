@@ -30,7 +30,7 @@ public class PassToAlliance extends Command {
   @Override
   public void execute() {
     m_angler.setAngle(35);
-    m_shoot.runAtTargetVelocity(2000);
+    m_shoot.runAtTargetVelocity(2000, true);
   }
 
   // Called once the command ends or is interrupted.
