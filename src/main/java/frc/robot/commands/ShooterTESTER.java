@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Intake.BeltSubsystem;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
 
 /**
@@ -13,10 +14,12 @@ import frc.robot.subsystems.Shooter.ShooterSubsystem;
  */
 public class ShooterTESTER extends Command {
 
-  private final ShooterSubsystem m_shooter;
+  ShooterSubsystem m_shooter;
+  BeltSubsystem m_belt;
 
-  public ShooterTESTER(ShooterSubsystem shooter) {
+  public ShooterTESTER(ShooterSubsystem shooter, BeltSubsystem m_belt) {
     m_shooter = shooter;
+    this.m_belt = m_belt;
     addRequirements(m_shooter);
   }
 
@@ -26,6 +29,7 @@ public class ShooterTESTER extends Command {
   @Override
   public void execute() {
     m_shooter.runAtTargetVelocity();
+    m_belt.simpleDrive(-0.3);
   }
 
   @Override

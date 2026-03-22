@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Intake.BeltSubsystem;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
@@ -15,14 +16,17 @@ public class HashShoot extends Command {
   AnglerSubsystem m_angler;
 
   ShooterSubsystem m_shoot;
+
+  BeltSubsystem m_belt;
   double degrees;
   double rpm;
   double dist;
 
-  public HashShoot(AnglerSubsystem m_angler, ShooterSubsystem m_shoot) {
+  public HashShoot(AnglerSubsystem m_angler, ShooterSubsystem m_shoot, BeltSubsystem m_belt) {
     this.m_angler = m_angler;
     this.m_shoot = m_shoot;
-    addRequirements(m_angler, m_shoot);
+    this.m_belt = m_belt;
+    addRequirements(m_angler, m_shoot, m_belt);
   }
 
   // Called when the command is initially scheduled.
@@ -44,6 +48,7 @@ public class HashShoot extends Command {
   public void execute() {
     m_angler.setAngle(degrees);
     m_shoot.runAtTargetVelocity(rpm);
+    m_belt.simpleDrive(-0.3);
   }
 
   // Called once the command ends or is interrupted.

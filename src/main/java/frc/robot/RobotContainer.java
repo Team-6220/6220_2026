@@ -21,7 +21,6 @@ import frc.robot.commands.ManualArm;
 import frc.robot.commands.PassToAlliance;
 import frc.robot.commands.ShooterTESTER;
 import frc.robot.commands.SwerveCom;
-import frc.robot.commands.TestBeltCommand;
 import frc.robot.commands.TestRollerCommand;
 import frc.robot.commands.Autos.BasicAuto;
 import frc.robot.subsystems.Drive.Swerve;
@@ -81,7 +80,7 @@ public class RobotContainer {
             },
             m_angler));
 
-    belt.setDefaultCommand(new TestBeltCommand());
+    // belt.setDefaultCommand(new TestBeltCommand());
 
     arm.setDefaultCommand(new ManualArm(m_joystick));
 
@@ -142,7 +141,8 @@ public class RobotContainer {
 
     m_driverController
         .a()
-        .onTrue(Commands.run(() -> m_angler.setAngle(0), m_angler).until(() -> m_angler.isAtAngle(0)));
+        .onTrue(
+            Commands.run(() -> m_angler.setAngle(0), m_angler).until(() -> m_angler.isAtAngle(0)));
 
     angleUp.whileTrue(
         Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
@@ -151,15 +151,15 @@ public class RobotContainer {
         .b()
         .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
 
-    m_driverController.x().whileTrue(new ShooterTESTER(m_shooter));
+    m_driverController.x().whileTrue(new ShooterTESTER(m_shooter, belt));
 
-    pass.whileTrue(new PassToAlliance(m_angler, m_shooter));
+    pass.whileTrue(new PassToAlliance(m_angler, m_shooter, belt));
 
     intakeIn.whileTrue(new TestRollerCommand(true));
 
     intakeOut.whileTrue(new TestRollerCommand(false));
 
-    m_driverController.rightTrigger().whileTrue(new HashShoot(m_angler, m_shooter));
+    m_driverController.rightTrigger().whileTrue(new HashShoot(m_angler, m_shooter, belt));
 
     m_driverController
         .leftTrigger()
