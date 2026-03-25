@@ -43,6 +43,7 @@ public class PassToAlliance extends Command {
   public void end(boolean interrupted) {
     m_angler.stop();
     m_shoot.stop();
+    m_belt.stop();
   }
 
   // Returns true when the command should end.
