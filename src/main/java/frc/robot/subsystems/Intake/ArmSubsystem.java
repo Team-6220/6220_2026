@@ -57,8 +57,8 @@ public class ArmSubsystem extends SubsystemBase {
   private static final class ArmConstants {
     public static final int armMotorID = 18;
 
-    public static final int stallLimit = 30;
-    public static final int freeLimit = 30;
+    public static final int stallLimit = 40;
+    public static final int freeLimit = 40;
 
     public static final boolean armInvert = false;
     public static final IdleMode armIdleMode = IdleMode.kBrake;
@@ -205,15 +205,13 @@ public class ArmSubsystem extends SubsystemBase {
     lastUpdate = Timer.getFPGATimestamp();
     PIDOutput = m_Controller.calculate(getPosition());
 
-    // System.out.println("pos=" + getPosition() + " goal=" + m_Controller.getGoal().position 
+    // System.out.println("pos=" + getPosition() + " goal=" + m_Controller.getGoal().position
     // + " pid=" + PIDOutput + " ff=" + feedForwardOutput);
 
     armMotor.setVoltage(PIDOutput + feedForwardOutput);
-
-    
   }
 
-   public void resetArmEncoder() {
+  public void resetArmEncoder() {
     armEncoder.setPosition(0);
   }
 
