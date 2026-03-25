@@ -118,7 +118,10 @@ public class RobotContainer {
     Trigger manualArm = new Trigger(() -> m_joystick.getRawButton(1));
     resetEncoder.onTrue(Commands.runOnce(() -> m_angler.resetEncoder()));
 
-    // Test buttons for angler PID: button 4 -> set to 1.0,
+    /**
+     * Test buttons for angler PID: button 4 -> go to set angle. Angle could be set in tunablenumber
+     * under Angler/TargetAngleDeg
+     */
     Trigger anglerTestOne = new Trigger(() -> m_buttonBoard.getRawButton(7));
     Trigger anglerTest0 = new Trigger(() -> m_buttonBoard.getRawButton(11));
 
