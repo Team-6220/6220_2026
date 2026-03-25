@@ -20,7 +20,7 @@ public class ShooterTESTER extends Command {
   public ShooterTESTER(ShooterSubsystem shooter, BeltSubsystem m_belt) {
     m_shooter = shooter;
     this.m_belt = m_belt;
-    addRequirements(m_shooter);
+    addRequirements(m_shooter, m_belt);
   }
 
   @Override
