@@ -28,11 +28,20 @@ public class ShooterSubsystem extends SubsystemBase {
   private static final int MOTOR_35_ID = 35;
 
   // Motors
-  private final TalonFX m_motor41; // bottom group
-  private final TalonFX m_motor34; // bottom group
-  private final TalonFX m_motor9; // top group
-  private final TalonFX m_motor31; // top group
-  private final TalonFX m_motor35; // top group
+  /** Shooter motor (CAN ID 41) */
+  private final TalonFX m_motor41;
+
+  /** Shooter motor (CAN ID 34) */
+  private final TalonFX m_motor34;
+
+  /** Shooter motor (CAN ID 9) */
+  private final TalonFX m_motor9;
+
+  /** Shooter motor (CAN ID 31) */
+  private final TalonFX m_motor31;
+
+  /** Shooter motor (CAN ID 35) */
+  private final TalonFX m_motor35;
 
   // Velocity control request
   private final VelocityVoltage m_velocityRequest;
@@ -218,7 +227,7 @@ public class ShooterSubsystem extends SubsystemBase {
     return m_motor35.getVelocity().getValueAsDouble() * 60.0;
   }
 
-  /** Checks if all shooter motors are within tolerance of their target velocity. */
+  /** Checks if all flywheel motors are within tolerance of their target velocity. */
   public boolean isAtSpeedFly(double top) {
     double topRPS = top;
     if (topRPS == 0.0) {
