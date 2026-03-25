@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -16,10 +15,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
+import frc.robot.commands.ArmToPositionCommand;
+import frc.robot.commands.Autos.BasicAutoBlue;
+import frc.robot.commands.Autos.BasicAutoRed;
 import frc.robot.commands.HashShoot;
 import frc.robot.commands.ManualArm;
+import frc.robot.commands.PassToAlliance;
+import frc.robot.commands.ShooterTESTER;
 import frc.robot.commands.SwerveCom;
-import frc.robot.commands.TestBeltCommand;
 import frc.robot.commands.TestRollerCommand;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Intake.ArmSubsystem;
@@ -55,8 +58,6 @@ public class RobotContainer {
 
   private static final double ANGLER_MAX_SPEED = 0.15;
   private static final double ANGLER_DEADBAND = 0.1;
-  private static final double PRESET_TOP_RPM = 1000.0; // for bottom, bad naming
-  private static final double PRESET_BOTTOM_RPM = 4000.0; // for top, bad naming
 
   public RobotContainer() {
     // Initialize climber subsystem based on robot mode
@@ -68,19 +69,19 @@ public class RobotContainer {
     s_Swerve.setDefaultCommand(
         new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
-    m_angler.setDefaultCommand(
-        Commands.run(
-            () -> {
-              double input = -m_driverController.getLeftY(); // negative so up = up
-              if (Math.abs(input) < ANGLER_DEADBAND) {
-                m_angler.stop();
-              } else {
-                m_angler.setSpeed(input * ANGLER_MAX_SPEED);
-              }
-            },
-            m_angler));
+    // m_angler.setDefaultCommand(
+    //     Commands.run(
+    //         () -> {
+    //           double input = -m_driverController.getLeftY(); // negative so up = up
+    //           if (Math.abs(input) < ANGLER_DEADBAND) {
+    //             m_angler.stop();
+    //           } else {
+    //             m_angler.setSpeed(input * ANGLER_MAX_SPEED);
+    //           }
+    //         },
+    //         m_angler));
 
-    belt.setDefaultCommand(new TestBeltCommand());
+    // belt.setDefaultCommand(new TestBeltCommand());
 
     arm.setDefaultCommand(new ManualArm(m_joystick));
 
@@ -91,8 +92,8 @@ public class RobotContainer {
     // NamedCommands.registerCommand("AutoClimber", new AutoClimberCommand(climberSubsystem));
 
     // NamedCommands.registerCommand(null, null);
-    autoChooser.addOption("auto1", new PathPlannerAuto("Auto1"));
-    autoChooser.addOption("default", new PathPlannerAuto("default"));
+    autoChooser.addOption("Red", new BasicAutoRed(s_Swerve, m_angler, m_shooter, belt));
+    autoChooser.addOption("Blue", new BasicAutoBlue(s_Swerve, m_angler, m_shooter, belt));
     SmartDashboard.putData(autoChooser);
     configureBindings();
   }
@@ -110,17 +111,17 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     Trigger angleUp = new Trigger(() -> m_buttonBoard.getRawButton(5));
     Trigger angleDown = new Trigger(() -> m_buttonBoard.getRawButton(6));
-    Trigger shoot = m_driverController.a();
-    Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(1));
-    Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(2));
-    Trigger belt = new Trigger(() -> m_buttonBoard.getRawButton(7));
-
+    Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(2));
+    Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(1));
+    Trigger pass = new Trigger(() -> m_buttonBoard.getRawButton(4));
     Trigger resetEncoder = new Trigger(() -> m_buttonBoard.getRawButton(3));
+    Trigger manualArm = new Trigger(() -> m_joystick.getRawButton(1));
     resetEncoder.onTrue(Commands.runOnce(() -> m_angler.resetEncoder()));
 
     // Test buttons for angler PID: button 4 -> set to 1.0,
     Trigger anglerTestOne = new Trigger(() -> m_buttonBoard.getRawButton(4));
     Trigger anglerTest0 = new Trigger(() -> m_buttonBoard.getRawButton(11));
+
     anglerTestOne.onTrue(
         Commands.run(() -> m_angler.setAngle(m_angler.getAnglerAngle()), m_angler)
             .until(() -> m_angler.isAtAngle(m_angler.getAnglerAngle())));
@@ -136,26 +137,31 @@ public class RobotContainer {
         .rightBumper()
         .onTrue(new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
-    angleDown.whileTrue(
-        Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));
+    angleDown.onTrue(new ArmToPositionCommand(arm, 11));
+    angleUp.onTrue(new ArmToPositionCommand(arm, 0));
+    manualArm.onTrue(new ManualArm(m_joystick));
 
-    angleUp.whileTrue(
-        Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
+    m_driverController
+        .a()
+        .onTrue(
+            Commands.run(() -> m_angler.setAngle(0), m_angler).until(() -> m_angler.isAtAngle(0)));
 
-    belt.whileTrue(new TestBeltCommand());
+    m_driverController
+        .b()
+        .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
+
+    m_driverController.x().whileTrue(new ShooterTESTER(m_shooter, belt));
+
+    pass.whileTrue(new PassToAlliance(m_angler, m_shooter, belt));
 
     intakeIn.whileTrue(new TestRollerCommand(true));
 
     intakeOut.whileTrue(new TestRollerCommand(false));
 
-    // this is the command for autonomous shooting, will need to be changed according to bot
-    // position
-    // m_driverController.b().whileTrue(new ShooterTESTER(m_shooter));
-
-    m_driverController.a().whileTrue(new HashShoot(m_angler, m_shooter));
+    m_driverController.rightTrigger().whileTrue(new HashShoot(m_angler, m_shooter, belt));
 
     m_driverController
-        .leftBumper()
+        .leftTrigger()
         .whileTrue(
             new AlignAndMove(s_Swerve, m_driverController, m_driverController.rightBumper()));
   }
