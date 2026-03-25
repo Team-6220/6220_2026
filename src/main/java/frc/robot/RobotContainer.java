@@ -119,7 +119,7 @@ public class RobotContainer {
     resetEncoder.onTrue(Commands.runOnce(() -> m_angler.resetEncoder()));
 
     // Test buttons for angler PID: button 4 -> set to 1.0,
-    Trigger anglerTestOne = new Trigger(() -> m_buttonBoard.getRawButton(4));
+    Trigger anglerTestOne = new Trigger(() -> m_buttonBoard.getRawButton(7));
     Trigger anglerTest0 = new Trigger(() -> m_buttonBoard.getRawButton(11));
 
     anglerTestOne.onTrue(
