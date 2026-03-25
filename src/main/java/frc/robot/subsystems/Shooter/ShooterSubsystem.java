@@ -28,19 +28,19 @@ public class ShooterSubsystem extends SubsystemBase {
   private static final int MOTOR_35_ID = 35;
 
   // Motors
-  /** Bottom/kicker group */
+  /** Shooter motor (CAN ID 41) */
   private final TalonFX m_motor41;
 
-  /** Bottom/kicker group */
+  /** Shooter motor (CAN ID 34) */
   private final TalonFX m_motor34;
 
-  /** Top/flywheel group */
+  /** Shooter motor (CAN ID 9) */
   private final TalonFX m_motor9;
 
-  /** Top/flywheel group */
+  /** Shooter motor (CAN ID 31) */
   private final TalonFX m_motor31;
 
-  /** Top/flywheel group */
+  /** Shooter motor (CAN ID 35) */
   private final TalonFX m_motor35;
 
   // Velocity control request
