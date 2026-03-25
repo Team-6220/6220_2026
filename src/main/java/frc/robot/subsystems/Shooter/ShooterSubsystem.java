@@ -227,7 +227,7 @@ public class ShooterSubsystem extends SubsystemBase {
     return m_motor35.getVelocity().getValueAsDouble() * 60.0;
   }
 
-  /** Checks if all shooter motors are within tolerance of their target velocity. */
+  /** Checks if all flywheel motors are within tolerance of their target velocity. */
   public boolean isAtSpeedFly(double top) {
     double topRPS = top;
     if (topRPS == 0.0) {
