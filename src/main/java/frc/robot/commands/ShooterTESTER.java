@@ -35,6 +35,7 @@ public class ShooterTESTER extends Command {
   @Override
   public void end(boolean interrupted) {
     m_shooter.stop();
+    m_belt.stop();
   }
 
   @Override
