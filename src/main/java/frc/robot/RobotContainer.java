@@ -133,10 +133,6 @@ public class RobotContainer {
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
 
-    m_driverController
-        .rightBumper()
-        .onTrue(new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
-
     angleDown.onTrue(new ArmToPositionCommand(arm, 11));
     angleUp.onTrue(new ArmToPositionCommand(arm, 0));
     manualArm.onTrue(new ManualArm(m_joystick));
