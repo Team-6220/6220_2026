@@ -19,6 +19,7 @@ public class AlignAndMove extends Command {
   private CommandXboxController driver;
   private static String name = "limelight-front";
   private int ticks;
+  private double epsilon = 0.001;
 
   public AlignAndMove(
       Swerve s_Swerve, CommandXboxController driver, BooleanSupplier robotCentricSup) {
@@ -32,7 +33,7 @@ public class AlignAndMove extends Command {
   @Override
   public void initialize() {
     s_Swerve.setIsAuto(DriverStation.isAutonomous());
-    // Initilize so that the swerve doesn't become grumpy
+    // Initialize so that the swerve doesn't become grumpy
     s_Swerve.resetModulesToAbsolute();
     Limelight.setPipeline();
     s_Swerve.resetTurnController();
@@ -42,7 +43,9 @@ public class AlignAndMove extends Command {
 
   @Override
   public void execute() {
-    if (LimelightHelpers.getTX(name) == 0.0 && LimelightHelpers.getTY(name) == 0.0 && ticks >= 50) {
+    if (Math.abs(LimelightHelpers.getTX(name)) < epsilon
+        && Math.abs(LimelightHelpers.getTY(name)) < epsilon
+        && ticks >= 50) {
       Limelight.setPipeline();
       ticks = 0;
     }
@@ -74,6 +77,7 @@ public class AlignAndMove extends Command {
 
   @Override
   public void end(boolean interrupted) {
+    s_Swerve.stopDriving();
     LimelightHelpers.setPipelineIndex(name, 0);
     System.out.println("DONE ALIGNINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
   }
