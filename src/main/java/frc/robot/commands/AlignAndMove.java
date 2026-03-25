@@ -19,6 +19,7 @@ public class AlignAndMove extends Command {
   private CommandXboxController driver;
   private static String name = "limelight-front";
   private int ticks;
+  private double epsilon = 0.001;
 
   public AlignAndMove(
       Swerve s_Swerve, CommandXboxController driver, BooleanSupplier robotCentricSup) {
@@ -42,7 +43,6 @@ public class AlignAndMove extends Command {
 
   @Override
   public void execute() {
-    double epsilon = 0.001;
     if (Math.abs(LimelightHelpers.getTX(name)) < epsilon
         && Math.abs(LimelightHelpers.getTY(name)) < epsilon
         && ticks >= 50) {
