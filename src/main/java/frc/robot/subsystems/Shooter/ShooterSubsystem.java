@@ -4,16 +4,22 @@
 
 package frc.robot.subsystems.Shooter;
 
+import static edu.wpi.first.units.Units.Volts;
+
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.util.TunableNumber;
 import frc.robot.LimelightHelpers;
 import frc.robot.LimelightHelpers.*;
@@ -28,31 +34,26 @@ public class ShooterSubsystem extends SubsystemBase {
   private static final int MOTOR_35_ID = 35;
 
   // Motors
-  /** Kicker motor (CAN ID 41) bottom */
-  private final TalonFX m_motor41;
-
-  /** Kicker motor (CAN ID 34) bottom */
-  private final TalonFX m_motor34;
-
-  /** Shooter motor (CAN ID 9) top */
-  private final TalonFX m_motor9;
-
-  /** Shooter motor (CAN ID 31) top */
-  private final TalonFX m_motor31;
-
-  /** Shooter motor (CAN ID 35) top */
-  private final TalonFX m_motor35;
+  private final TalonFX m_motor41; // bottom group
+  private final TalonFX m_motor34; // bottom group
+  private final TalonFX m_motor9; // top group
+  private final TalonFX m_motor31; // top group
+  private final TalonFX m_motor35; // top group
 
   // Velocity control request
   private final VelocityVoltage m_velocityRequest;
 
+  // SysId
+  private final VoltageOut m_sysIdVoltage = new VoltageOut(0);
+  private final SysIdRoutine m_sysIdRoutine;
+
   // Tunable PID and feedforward values
-  private final TunableNumber m_kp = new TunableNumber("Shooter/kP", 0.12);
+  private final TunableNumber m_kp = new TunableNumber("Shooter/kP", 0.4);
   private final TunableNumber m_ki = new TunableNumber("Shooter/kI", 0.0);
   private final TunableNumber m_kd = new TunableNumber("Shooter/kD", 0.003);
   private final TunableNumber m_kv = new TunableNumber("Shooter/kV", 0.12);
   private final TunableNumber m_ks = new TunableNumber("Shooter/kS", 0.0);
-  private final TunableNumber m_ka = new TunableNumber("Shooter/kA", 0.01);
+  private final TunableNumber m_ka = new TunableNumber("Shooter/kA", 0.4);
 
   // Separate tunable RPM for top and bottom groups
   private final TunableNumber m_topTargetRPM =
@@ -61,7 +62,7 @@ public class ShooterSubsystem extends SubsystemBase {
       new TunableNumber("Shooter/BottomTargetRPM", ShooterConstants.bottomTESTrpm);
 
   // Tolerance for determining if shooter is at speed (in RPS)
-  private static final double VELOCITY_TOLERANCE_RPS = 0.5;
+  private static final double VELOCITY_TOLERANCE_RPS = 0.4;
 
   // Current limit in amps
   private static final double CURRENT_LIMIT = 40.0;
@@ -75,6 +76,20 @@ public class ShooterSubsystem extends SubsystemBase {
     m_velocityRequest = new VelocityVoltage(0).withSlot(0);
 
     configureMotors();
+
+    // SysId routine - characterizes motor 9 (one of the top group flywheel motors)
+    m_sysIdRoutine =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(
+                null, // default ramp rate (1 V/s)
+                Volts.of(4), // dynamic step voltage (4V to prevent brownout)
+                null, // default timeout (10s)
+                (state) -> SignalLogger.writeString("state", state.toString())),
+            new SysIdRoutine.Mechanism(
+                (volts) ->
+                    m_motor9.setControl(m_sysIdVoltage.withOutput(volts.in(Volts))),
+                null, // Phoenix SignalLogger handles logging automatically
+                this));
   }
 
   private void configureMotors() {
@@ -118,10 +133,18 @@ public class ShooterSubsystem extends SubsystemBase {
     m_motor35.getConfigurator().apply(config);
   }
 
+  // ========== SysId Commands ==========
+
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.quasistatic(direction);
+  }
+
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.dynamic(direction);
+  }
+
   /**
-   * Runs top and bottom groups at their respective tunable RPM targets. Top motors (9, 31, 2) run
-   * at the given topRPM. Bottom motors (41, 1) run at BottomTargetRPM once the top group is at
-   * speed.
+   * Runs top and bottom groups at their respective tunable RPM targets.
    *
    * @param topRPM Desired top-group velocity in RPM.
    */
@@ -143,13 +166,13 @@ public class ShooterSubsystem extends SubsystemBase {
     }
   }
 
-  /** Sets bottom group motors (41, 1) to the given velocity in RPS. */
+  /** Sets top group motors (41, 1) to the given velocity in RPS. */
   public void setBottomGroupVelocityRPS(double rps) {
     m_motor41.setControl(m_velocityRequest.withVelocity(rps));
     m_motor34.setControl(m_velocityRequest.withVelocity(rps));
   }
 
-  /** Sets top group motors (9, 31, 2) to the given velocity in RPS. */
+  /** Sets bottom group motors (9, 31, 2) to the given velocity in RPS. */
   public void setTopGroupVelocityRPS(double rps) {
     m_motor9.setControl(m_velocityRequest.withVelocity(rps));
     m_motor31.setControl(m_velocityRequest.withVelocity(rps));
@@ -228,7 +251,7 @@ public class ShooterSubsystem extends SubsystemBase {
     return m_motor35.getVelocity().getValueAsDouble() * 60.0;
   }
 
-  /** Checks if all flywheel motors are within tolerance of their target velocity. */
+  /** Checks if all shooter motors are within tolerance of their target velocity. */
   public boolean isAtSpeedFly(double top) {
     double topRPS = top;
     if (topRPS == 0.0) {
