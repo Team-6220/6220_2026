@@ -24,7 +24,7 @@ public class SwerveCom extends Command {
   @Override
   public void initialize() {
     s_Swerve.setIsAuto(DriverStation.isAutonomous());
-    // Initilize so that the swerve doesn't become grumpy
+    // Initialize so that the swerve doesn't become grumpy
     s_Swerve.resetModulesToAbsolute();
   }
 

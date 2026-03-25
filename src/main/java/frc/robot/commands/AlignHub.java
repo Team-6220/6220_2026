@@ -23,6 +23,7 @@ public class AlignHub extends Command {
     // Use addRequirements() here to declare subsystem dependencies.
     this.s_Swerve = s_Swerve;
     LimelightHelpers.setPipelineIndex(name, 0);
+    addRequirements(s_Swerve);
   }
 
   // Called when the command is initially scheduled.

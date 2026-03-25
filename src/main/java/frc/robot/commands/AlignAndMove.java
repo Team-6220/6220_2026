@@ -32,7 +32,7 @@ public class AlignAndMove extends Command {
   @Override
   public void initialize() {
     s_Swerve.setIsAuto(DriverStation.isAutonomous());
-    // Initilize so that the swerve doesn't become grumpy
+    // Initialize so that the swerve doesn't become grumpy
     s_Swerve.resetModulesToAbsolute();
     Limelight.setPipeline();
     s_Swerve.resetTurnController();
@@ -55,7 +55,7 @@ public class AlignAndMove extends Command {
       /* Get Values, Deadband*/
       double[] driverInputs = IOConstants.getDriverInputs(driver.getHID());
       /* Drive */
-      if (Math.abs(LimelightHelpers.getTX(name)) <= 5) {
+      if (Math.abs(LimelightHelpers.getTX(name)) <= 3) {
         s_Swerve.drive(
             new Translation2d(driverInputs[0], driverInputs[1]),
             0.0,

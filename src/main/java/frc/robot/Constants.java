@@ -14,8 +14,8 @@ import java.util.Optional;
 
 public final class Constants {
 
-  public static final RobotType TYPE = RobotType.PRACTICEBOT;
-  public static boolean TUNING_MODE = (TYPE != RobotType.COMPBOT);
+  public static final RobotType TYPE = RobotType.COMPBOT;
+  public static boolean TUNING_MODE = true;
 
   public static Optional<DriverStation.Alliance> ALLIANCE_COLOR = DriverStation.getAlliance();
 
