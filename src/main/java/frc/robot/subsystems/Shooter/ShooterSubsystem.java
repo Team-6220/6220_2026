@@ -119,7 +119,7 @@ public class ShooterSubsystem extends SubsystemBase {
     double topRPS = topRPM / 60.0;
     double bottomRPS = m_bottomTargetRPM.get() / 60.0;
     setTopGroupVelocityRPS(topRPS);
-    if (isAtSpeedFly()) {
+    if (isAtSpeedFly(topRPS)) {
       setBottomGroupVelocityRPS(bottomRPS);
     }
   }
@@ -128,7 +128,7 @@ public class ShooterSubsystem extends SubsystemBase {
     double topRPS = m_topTargetRPM.get() / 60.0;
     double bottomRPS = m_bottomTargetRPM.get() / 60.0;
     setTopGroupVelocityRPS(topRPS);
-    if (isAtSpeedFlyMAN()) {
+    if (isAtSpeedFly(topRPS)) {
       setBottomGroupVelocityRPS(bottomRPS);
     }
   }
@@ -218,53 +218,16 @@ public class ShooterSubsystem extends SubsystemBase {
     return m_motor35.getVelocity().getValueAsDouble() * 60.0;
   }
 
-  boolean isAtSpeedFlyMAN() {
-    double topTarget = getTopTargetRPM();
-    if (topTarget == 0.0) {
-      return false;
-    }
-    // Convert top target from RPM to RPS to match TalonFX velocity units
-    double topTargetRps = topTarget / 60.0;
-    if (topTargetRps == 0.0) {
-      return false;
-    }
-
-    return Math.abs(m_motor9.getVelocity().getValueAsDouble() - topTargetRps)
-            < VELOCITY_TOLERANCE_RPS
-        && Math.abs(m_motor31.getVelocity().getValueAsDouble() - topTargetRps)
-            < VELOCITY_TOLERANCE_RPS
-        && Math.abs(m_motor35.getVelocity().getValueAsDouble() - topTargetRps)
-            < VELOCITY_TOLERANCE_RPS;
-  }
-
   /** Checks if all shooter motors are within tolerance of their target velocity. */
-  public boolean isAtSpeedFly() {
-    double topTarget;
-    try {
-      topTarget = ShooterConstants.rpmAngle.get(getDist())[0] / 60.0;
-    } catch (Exception e) {
-      // TODO: handle exception
-      topTarget = 0.0;
-      System.out.println("target out of range");
-    }
-    if (topTarget == 0.0) {
+  public boolean isAtSpeedFly(double top) {
+    double topRPS = top;
+    if (topRPS == 0.0) {
       return false;
     }
 
-    if (Math.abs(m_motor9.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
-        && Math.abs(m_motor31.getVelocity().getValueAsDouble() - topTarget) < VELOCITY_TOLERANCE_RPS
-        && Math.abs(m_motor35.getVelocity().getValueAsDouble() - topTarget)
-            < VELOCITY_TOLERANCE_RPS) {
-      try {
-        System.out.println("WAITING rpm = " + m_motor9.getVelocity().getValueAsDouble());
-        System.out.println(
-            "DONE WAYTINGNIGSDLKSJDFKLJSDKFL rpm + " + m_motor9.getVelocity().getValueAsDouble());
-      } catch (Exception e) {
-        // TODO: handle exception
-      }
-      return true;
-    }
-    return false;
+    return (Math.abs(m_motor9.getVelocity().getValueAsDouble() - topRPS) < VELOCITY_TOLERANCE_RPS
+        && Math.abs(m_motor31.getVelocity().getValueAsDouble() - topRPS) < VELOCITY_TOLERANCE_RPS
+        && Math.abs(m_motor35.getVelocity().getValueAsDouble() - topRPS) < VELOCITY_TOLERANCE_RPS);
   }
 
   public double getTopTargetRPM() {
@@ -339,7 +302,6 @@ public class ShooterSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Shooter/Motor2RPM", getMotor2RPM());
     SmartDashboard.putNumber("Shooter/TopTargetRPM", m_topTargetRPM.get());
     SmartDashboard.putNumber("Shooter/BottomTargetRPM", m_bottomTargetRPM.get());
-    SmartDashboard.putBoolean("Shooter/AtSpeed", isAtSpeedFly());
 
     // Voltage Telemetry
     SmartDashboard.putNumber(

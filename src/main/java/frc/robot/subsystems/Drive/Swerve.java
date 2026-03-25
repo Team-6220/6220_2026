@@ -334,6 +334,14 @@ public class Swerve extends SubsystemBase {
     RumbleManager.rumble(driverController, .2);
   }
 
+  public void zeroHeading() {
+    double offset = Constants.isRed.equals("red") ? 0 : Math.PI;
+    poseEstimator.resetPosition(
+        getGyroYaw(),
+        getModulePositions(),
+        new Pose2d(getPose().getTranslation(), new Rotation2d(offset)));
+  }
+
   public Rotation2d getGyroYaw() {
     return gyroInputs.yawPosition;
   }
