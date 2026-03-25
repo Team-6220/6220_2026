@@ -24,6 +24,7 @@ public class AlignHub extends Command {
     this.s_Swerve = s_Swerve;
     LimelightHelpers.setPipelineIndex(name, 0);
     this.s_Swerve = s_Swerve;
+    addRequirements(s_Swerve);
   }
 
   // Called when the command is initially scheduled.
