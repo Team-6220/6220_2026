@@ -20,6 +20,7 @@ public class AlignAndMove extends Command {
   private static String name = "limelight-front";
   private int ticks;
   private double epsilon = 0.001;
+  private static final double ALIGNMENT_TOLERANCE_DEGREES = 3.0;
 
   public AlignAndMove(
       Swerve s_Swerve, CommandXboxController driver, BooleanSupplier robotCentricSup) {
@@ -57,8 +58,12 @@ public class AlignAndMove extends Command {
           Degree.of(LimelightHelpers.getTX(name) + s_Swerve.getHeadingDegrees()));
       /* Get Values, Deadband*/
       double[] driverInputs = IOConstants.getDriverInputs(driver.getHID());
-      /* Drive */
-      if (Math.abs(LimelightHelpers.getTX(name)) <= 3) {
+      boolean isLimelightAligned = Math.abs(LimelightHelpers.getTX(name)) <= ALIGNMENT_TOLERANCE_DEGREES;
+      /* Drive or lock wheels when aligned */
+      if (s_Swerve.isFacingTurnTarget() && isLimelightAligned) {
+        // Aligned — lock wheels in X position so the robot can't be pushed while shooting
+        s_Swerve.lockWheels();
+      } else if (isLimelightAligned) {
         s_Swerve.drive(
             new Translation2d(driverInputs[0], driverInputs[1]),
             0.0,
@@ -80,5 +85,12 @@ public class AlignAndMove extends Command {
     s_Swerve.stopDriving();
     LimelightHelpers.setPipelineIndex(name, 0);
     System.out.println("DONE ALIGNINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
+  }
+
+  @Override
+  public boolean isFinished() {
+    // Finish when the swerve heading is within tolerance and the limelight TX is close to zero
+    return s_Swerve.isFacingTurnTarget()
+        && Math.abs(LimelightHelpers.getTX(name)) <= ALIGNMENT_TOLERANCE_DEGREES;
   }
 }
