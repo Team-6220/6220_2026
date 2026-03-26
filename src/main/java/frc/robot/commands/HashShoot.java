@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Intake.BeltSubsystem;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterConstants;
@@ -18,15 +19,19 @@ public class HashShoot extends Command {
   ShooterSubsystem m_shoot;
 
   BeltSubsystem m_belt;
+
+  Swerve s_swerve;
+
   double degrees;
   double rpm;
   double dist;
 
-  public HashShoot(AnglerSubsystem m_angler, ShooterSubsystem m_shoot, BeltSubsystem m_belt) {
+  public HashShoot(AnglerSubsystem m_angler, ShooterSubsystem m_shoot, BeltSubsystem m_belt, Swerve s_swerve) {
     this.m_angler = m_angler;
     this.m_shoot = m_shoot;
     this.m_belt = m_belt;
-    addRequirements(m_angler, m_shoot, m_belt);
+    this.s_swerve = s_swerve;
+    addRequirements(m_angler, m_shoot, m_belt, s_swerve);
   }
 
   // Called when the command is initially scheduled.
@@ -49,6 +54,7 @@ public class HashShoot extends Command {
     m_angler.setAngle(degrees);
     m_shoot.runAtTargetVelocity(rpm);
     m_belt.simpleDrive(-0.3);
+    s_swerve.lockWheels();
   }
 
   // Called once the command ends or is interrupted.
