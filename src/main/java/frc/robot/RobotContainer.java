@@ -157,7 +157,7 @@ public class RobotContainer {
 
     intakeOut.whileTrue(new TestRollerCommand(false));
 
-    m_driverController.rightTrigger().whileTrue(new HashShoot(m_angler, m_shooter, belt, s_Swerve));
+    m_driverController.rightTrigger().whileTrue(new HashShoot(m_angler, m_shooter, belt));
 
     m_driverController
         .leftTrigger()
