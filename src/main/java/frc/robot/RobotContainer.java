@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlignAndMove;
-import frc.robot.commands.ArmToPositionCommand;
 import frc.robot.commands.Autos.BasicAutoBlue;
 import frc.robot.commands.Autos.BasicAutoRed;
 import frc.robot.commands.HashShoot;
@@ -71,16 +70,16 @@ public class RobotContainer {
         new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
     // Prespin flywheels when limelight sees a tag
-    m_shooter.setDefaultCommand(
-        Commands.run(
-            () -> {
-              if (m_shooter.getDist() > 0) {
-                m_shooter.setTopGroupVelocityRPS(m_shooter.getTopTargetRPM() / 60.0);
-              } else {
-                m_shooter.stop();
-              }
-            },
-            m_shooter));
+    // m_shooter.setDefaultCommand(
+    //     Commands.run(
+    //         () -> {
+    //           if (m_shooter.getDist() > 0) {
+    //             m_shooter.setTopGroupVelocityRPS(m_shooter.getTopTargetRPM() / 60.0);
+    //           } else {
+    //             m_shooter.stop();
+    //           }
+    //         },
+    //         m_shooter));
 
     // m_angler.setDefaultCommand(
     //     Commands.run(
@@ -163,8 +162,7 @@ public class RobotContainer {
 
     m_driverController
         .b()
-        .whileTrue(
-            Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
+        .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
 
     m_driverController.x().whileTrue(new ShooterTESTER(m_shooter, belt));
 
@@ -187,10 +185,14 @@ public class RobotContainer {
     // Button 10: Dynamic Forward (step voltage)
     // Button 11 is already used for anglerTest0, so using button 12 instead
     // Button 12: Dynamic Reverse (step voltage reverse)
-    new Trigger(() -> m_joystick.getRawButton(3)).whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    new Trigger(() -> m_joystick.getRawButton(4)).whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    new Trigger(() -> m_joystick.getRawButton(5)).whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    new Trigger(() -> m_joystick.getRawButton(6)).whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    new Trigger(() -> m_joystick.getRawButton(3))
+        .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    new Trigger(() -> m_joystick.getRawButton(4))
+        .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    new Trigger(() -> m_joystick.getRawButton(5))
+        .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    new Trigger(() -> m_joystick.getRawButton(6))
+        .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**

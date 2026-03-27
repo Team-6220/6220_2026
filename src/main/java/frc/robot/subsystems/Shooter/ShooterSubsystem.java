@@ -86,8 +86,7 @@ public class ShooterSubsystem extends SubsystemBase {
                 null, // default timeout (10s)
                 (state) -> SignalLogger.writeString("state", state.toString())),
             new SysIdRoutine.Mechanism(
-                (volts) ->
-                    m_motor9.setControl(m_sysIdVoltage.withOutput(volts.in(Volts))),
+                (volts) -> m_motor9.setControl(m_sysIdVoltage.withOutput(volts.in(Volts))),
                 null, // Phoenix SignalLogger handles logging automatically
                 this));
   }
