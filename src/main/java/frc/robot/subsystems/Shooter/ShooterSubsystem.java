@@ -60,12 +60,31 @@ public class ShooterSubsystem extends SubsystemBase {
       new TunableNumber("Shooter/TopTargetRPM", ShooterConstants.topTESTrpm);
   private final TunableNumber m_bottomTargetRPM =
       new TunableNumber("Shooter/BottomTargetRPM", ShooterConstants.bottomTESTrpm);
+  // Tunable for the first-shot boost multiplier (do not reuse BottomTargetRPM key)
+  private final TunableNumber m_FirstShotBoost =
+      new TunableNumber("Shooter/FirstShotBoost", ShooterConstants.FIRST_SHOT_BOOST_PERCENT);
 
   // Tolerance for determining if shooter is at speed (in RPS)
   private static final double VELOCITY_TOLERANCE_RPS = 0.4;
 
   // Current limit in amps
   private static final double CURRENT_LIMIT = 40.0;
+
+  // First Shot Boost State Management
+  /** Tracks if we are in the first shot boost phase */
+  private boolean isFirstShot = true;
+
+  /** Stores the normal (non-boosted) RPM target for current shot */
+  private double normalTargetRPM = 0.0;
+
+  /** Stores the boosted RPM target (normal * 1.05) */
+  private double boostedTargetRPM = 0.0;
+
+  /** Tracks if we've recorded the peak RPM during boost phase */
+  private boolean initialRPMRecorded = false;
+
+  /** Records the peak RPM achieved during the boost phase */
+  private double peakRPM = 0.0;
 
   public ShooterSubsystem() {
     m_motor41 = new TalonFX(MOTOR_41_ID);
@@ -145,11 +164,48 @@ public class ShooterSubsystem extends SubsystemBase {
   /**
    * Runs top and bottom groups at their respective tunable RPM targets.
    *
-   * @param topRPM Desired top-group velocity in RPM.
+   * <p>Implements three-phase shooting: 1. First Shot Boost: Runs at 105% of target RPM 2. RPM Dip
+   * Detection: Monitors for 400 RPM dip indicating shot has left 3. Normal Operation: Returns to
+   * normal RPM and operates as standard
+   *
+   * @param topRPM Desired top-group velocity in RPM (normal, non-boosted).
    */
   public void runAtTargetVelocity(double topRPM) {
-    double topRPS = topRPM / 60.0;
+    // Handle new RPM target (first call or RPM changed)
+    if (normalTargetRPM != topRPM) {
+      normalTargetRPM = topRPM;
+      isFirstShot = true;
+      initialRPMRecorded = false;
+      peakRPM = 0.0;
+      boostedTargetRPM = topRPM * ShooterConstants.FIRST_SHOT_BOOST_PERCENT;
+    }
+
+    double topRPS;
     double bottomRPS = m_bottomTargetRPM.get() / 60.0;
+
+    // Phase 1 & 2: Handle first shot with boost and dip detection
+    if (isFirstShot) {
+      double currentRPM = getAverageTopRPM();
+
+      // Check if RPM has dipped enough to transition to normal
+      if (checkForRPMDip(currentRPM)) {
+        isFirstShot = false;
+      }
+
+      // Set RPM based on current phase
+      if (isFirstShot) {
+        // Still in boost phase
+        topRPS = boostedTargetRPM / 60.0;
+      } else {
+        // Transitioned to normal phase
+        topRPS = normalTargetRPM / 60.0;
+      }
+    } else {
+      // Phase 3: Normal operation
+      topRPS = normalTargetRPM / 60.0;
+    }
+
+    // Set motor velocities
     setTopGroupVelocityRPS(topRPS);
     if (isAtSpeedFly(topRPS)) {
       setBottomGroupVelocityRPS(bottomRPS);
@@ -157,8 +213,41 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public void runAtTargetVelocity() {
-    double topRPS = m_topTargetRPM.get() / 60.0;
+    double topRPM = m_topTargetRPM.get();
+    if (normalTargetRPM != topRPM) {
+      normalTargetRPM = topRPM;
+      isFirstShot = true;
+      initialRPMRecorded = false;
+      peakRPM = 0.0;
+      boostedTargetRPM = topRPM * ShooterConstants.FIRST_SHOT_BOOST_PERCENT;
+    }
+
+    double topRPS;
     double bottomRPS = m_bottomTargetRPM.get() / 60.0;
+
+    // Phase 1 & 2: Handle first shot with boost and dip detection
+    if (isFirstShot) {
+      double currentRPM = getAverageTopRPM();
+
+      // Check if RPM has dipped enough to transition to normal
+      if (checkForRPMDip(currentRPM)) {
+        isFirstShot = false;
+      }
+
+      // Set RPM based on current phase
+      if (isFirstShot) {
+        // Still in boost phase
+        topRPS = boostedTargetRPM / 60.0;
+      } else {
+        // Transitioned to normal phase
+        topRPS = normalTargetRPM / 60.0;
+      }
+    } else {
+      // Phase 3: Normal operation
+      topRPS = normalTargetRPM / 60.0;
+    }
+
+    // Set motor velocities
     setTopGroupVelocityRPS(topRPS);
     if (isAtSpeedFly(topRPS)) {
       setBottomGroupVelocityRPS(bottomRPS);
@@ -191,6 +280,48 @@ public class ShooterSubsystem extends SubsystemBase {
     m_motor9.stopMotor();
     m_motor31.stopMotor();
     m_motor35.stopMotor();
+  }
+
+  /** Resets the shooting state for a new shot sequence. */
+  public void resetShootingState() {
+    isFirstShot = true;
+    normalTargetRPM = 0.0;
+    boostedTargetRPM = 0.0;
+    initialRPMRecorded = false;
+    peakRPM = 0.0;
+  }
+
+  /**
+   * Calculates the average RPM of the top three motors (9, 31, 35) for stable dip detection.
+   *
+   * @return Average RPM of top three motors
+   */
+  private double getAverageTopRPM() {
+    double motor9RPM = getMotor9RPM();
+    double motor31RPM = getMotor31RPM();
+    double motor2RPM = getMotor2RPM();
+    return (motor9RPM + motor31RPM + motor2RPM) / 3.0;
+  }
+
+  /**
+   * Checks if the current RPM has dipped enough to trigger transition from boost to normal.
+   *
+   * @param currentRPM Current average RPM of top motors
+   * @return true if RPM has dipped by at least RPM_DIP_THRESHOLD from peak
+   */
+  private boolean checkForRPMDip(double currentRPM) {
+    if (!initialRPMRecorded) {
+      // Update peak RPM while tracking the maximum
+      if (currentRPM > peakRPM) {
+        peakRPM = currentRPM;
+      }
+      // Check if we've started losing RPM (dip detected)
+      if (peakRPM > 0 && (peakRPM - currentRPM) >= ShooterConstants.RPM_DIP_THRESHOLD) {
+        initialRPMRecorded = true;
+        return true;
+      }
+    }
+    return false;
   }
 
   /** Runs all shooters at a percentage of max output (for testing). */
@@ -324,6 +455,10 @@ public class ShooterSubsystem extends SubsystemBase {
         || m_ka.hasChanged()) {
       updatePIDValues();
     }
+    // Update first-shot boost multiplier if it changed via tunable
+    if (m_FirstShotBoost.hasChanged()) {
+      ShooterConstants.FIRST_SHOT_BOOST_PERCENT = m_FirstShotBoost.get();
+    }
     SmartDashboard.putNumber("Shooter/ForwardDistance", getDist());
 
     // RPM Telemetry
@@ -332,8 +467,12 @@ public class ShooterSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Shooter/Motor9RPM", getMotor9RPM());
     SmartDashboard.putNumber("Shooter/Motor31RPM", getMotor31RPM());
     SmartDashboard.putNumber("Shooter/Motor2RPM", getMotor2RPM());
+
     SmartDashboard.putNumber("Shooter/TopTargetRPM", m_topTargetRPM.get());
     SmartDashboard.putNumber("Shooter/BottomTargetRPM", m_bottomTargetRPM.get());
+    SmartDashboard.putNumber("Shooter/FirstShotBoost", ShooterConstants.FIRST_SHOT_BOOST_PERCENT);
+
+    SmartDashboard.putBoolean("Shooter/isFirstShot", isFirstShot);
 
     // Voltage Telemetry
     SmartDashboard.putNumber(
