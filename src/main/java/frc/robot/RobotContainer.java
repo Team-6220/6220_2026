@@ -166,7 +166,7 @@ public class RobotContainer {
 
     m_driverController.x().whileTrue(new ShooterTESTER(m_shooter, belt));
 
-    pass.whileTrue(new PassToAlliance(m_angler, m_shooter, belt));
+    m_driverController.rightBumper().whileTrue(new PassToAlliance(m_angler, m_shooter, belt));
 
     intakeIn.whileTrue(new TestRollerCommand(true));
 
@@ -185,14 +185,14 @@ public class RobotContainer {
     // Button 10: Dynamic Forward (step voltage)
     // Button 11 is already used for anglerTest0, so using button 12 instead
     // Button 12: Dynamic Reverse (step voltage reverse)
-    new Trigger(() -> m_joystick.getRawButton(3))
-        .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    new Trigger(() -> m_joystick.getRawButton(4))
-        .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    new Trigger(() -> m_joystick.getRawButton(5))
-        .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    new Trigger(() -> m_joystick.getRawButton(6))
-        .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // new Trigger(() -> m_joystick.getRawButton(3))
+    //     .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // new Trigger(() -> m_joystick.getRawButton(4))
+    //     .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // new Trigger(() -> m_joystick.getRawButton(5))
+    //     .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // new Trigger(() -> m_joystick.getRawButton(6))
+    //     .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**
