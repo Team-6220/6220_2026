@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import java.util.ArrayList;
@@ -27,6 +29,12 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
 
+  // Shift tracking for 2026 FRC game
+  private double teleOpStartTime = 0.0;
+  private int currentShift = 0;
+  private double shiftCountdownTime = 0.0;
+  private String shiftName = "AUTO";
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -38,6 +46,10 @@ public class Robot extends TimedRobot {
     // CameraServer.startAutomaticCapture();
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
+    
+    // Initialize Elastic telemetry client (integrates with DataLogManager and NetworkTables)
+    ElasticTelemetry.getInstance();
+    System.out.println("[Elastic] Dashboard telemetry client initialized.");
   }
 
   /**
@@ -100,6 +112,17 @@ public class Robot extends TimedRobot {
         Constants.isRed = "N/A";
       }
     }
+
+    // Track shift during auto for dashboard display
+    double matchTime = DriverStation.getMatchTime();
+    currentShift = 0;
+    shiftName = "AUTO";
+    shiftCountdownTime = matchTime; // Counts from 20 seconds down to 0
+
+    // Publish shift info
+    SmartDashboard.putString("Match/ShiftName", shiftName);
+    SmartDashboard.putNumber("Match/CurrentShift", currentShift);
+    SmartDashboard.putNumber("Match/ShiftCountdown", shiftCountdownTime);
   }
 
   @Override
@@ -123,6 +146,13 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    // Initialize shift tracking
+    // Match starts at 2:20 (140s). AUTO 0:20-0:00, TRANSITION 2:20-2:10, SHIFT 1-4, ENDGAME
+    // 0:30-0:00
+    teleOpStartTime = Timer.getFPGATimestamp();
+    currentShift = 0;
+    shiftName = "TRANSITION";
   }
 
   /** This function is called periodically during operator control. */
@@ -141,6 +171,46 @@ public class Robot extends TimedRobot {
         Constants.isRed = "N/A";
       }
     }
+
+    // Update shift tracking based on match time
+    double matchTime = DriverStation.getMatchTime();
+
+    if (matchTime >= 130.0) {
+      // TRANSITION SHIFT (2:20 - 2:10) = 10 seconds
+      currentShift = 0;
+      shiftName = "TRANSITION";
+      shiftCountdownTime = matchTime - 130.0; // Counts from 0 to 10
+    } else if (matchTime >= 105.0) {
+      // SHIFT 1 (2:10 - 1:45) = 25 seconds
+      currentShift = 1;
+      shiftName = "SHIFT 1";
+      shiftCountdownTime = matchTime - 105.0; // Counts from 0 to 25
+    } else if (matchTime >= 80.0) {
+      // SHIFT 2 (1:45 - 1:20) = 25 seconds
+      currentShift = 2;
+      shiftName = "SHIFT 2";
+      shiftCountdownTime = matchTime - 80.0; // Counts from 0 to 25
+    } else if (matchTime >= 55.0) {
+      // SHIFT 3 (1:20 - 0:55) = 25 seconds
+      currentShift = 3;
+      shiftName = "SHIFT 3";
+      shiftCountdownTime = matchTime - 55.0; // Counts from 0 to 25
+    } else if (matchTime >= 30.0) {
+      // SHIFT 4 (0:55 - 0:30) = 25 seconds
+      currentShift = 4;
+      shiftName = "SHIFT 4";
+      shiftCountdownTime = matchTime - 30.0; // Counts from 0 to 25
+    } else {
+      // END GAME (0:30 - 0:00) = 30 seconds
+      currentShift = 5;
+      shiftName = "END GAME";
+      shiftCountdownTime = matchTime; // Counts from 0 to 30
+    }
+
+    // Publish shift info to SmartDashboard
+    SmartDashboard.putString("Match/ShiftName", shiftName);
+    SmartDashboard.putNumber("Match/CurrentShift", currentShift);
+    SmartDashboard.putNumber("Match/ShiftCountdown", shiftCountdownTime);
   }
 
   @Override
