@@ -42,19 +42,19 @@
             "height": 384.0,
             "type": "Camera",
             "properties": {
-              "topic": "",
+              "topic": "http://10.62.20.11:5800/stream.mjpg",
               "period": 0.06
             }
           },
           {
             "title": "Velocity (m/s)",
-            "x": 768.0,
+            "x": 896.0,
             "y": 384.0,
-            "width": 384.0,
+            "width": 256.0,
             "height": 256.0,
             "type": "Gauge",
             "properties": {
-              "topic": "/SmartDashboard/Drive/ChassisVelocity/Vx",
+              "topic": "/SmartDashboard/Drive/ChassisVelocity/Magnitude",
               "period": 0.06,
               "data_type": "double"
             }
@@ -75,7 +75,7 @@
           },
           {
             "title": "Hood Angle At Target",
-            "x": 512.0,
+            "x": 640.0,
             "y": 384.0,
             "width": 256.0,
             "height": 128.0,
@@ -98,7 +98,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/limelight-front/tx",
+              "topic": "/SmartDashboard/Vision_pipeline",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
@@ -124,25 +124,24 @@
             "title": "Current Shift",
             "x": 512.0,
             "y": 640.0,
-            "width": 256.0,
+            "width": 384.0,
             "height": 128.0,
-            "type": "Text Display",
+            "type": "Large Text Display",
             "properties": {
               "topic": "/SmartDashboard/Match/ShiftName",
               "period": 0.06,
-              "data_type": "string",
-              "show_submit_button": false
+              "data_type": "string"
             }
           },
           {
             "title": "Match Time",
             "x": 512.0,
             "y": 512.0,
-            "width": 256.0,
+            "width": 384.0,
             "height": 128.0,
             "type": "Match Time",
             "properties": {
-              "topic": "/FMSInfo/MatchTime",
+              "topic": "/SmartDashboard/Match/Time",
               "period": 0.06,
               "data_type": "double",
               "time_display_mode": "Minutes and Seconds",
@@ -154,7 +153,7 @@
             "title": "Shooter Aligned",
             "x": 256.0,
             "y": 384.0,
-            "width": 256.0,
+            "width": 384.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
@@ -185,27 +184,6 @@
             }
           },
           {
-            "title": "Swerve Drive",
-            "x": 1152.0,
-            "y": 384.0,
-            "width": 384.0,
-            "height": 256.0,
-            "type": "Field",
-            "properties": {
-              "topic": "/Shuffleboard/Field Pose 2d tab (map)/Field",
-              "period": 0.06,
-              "field_game": "Rebuilt",
-              "robot_width": 0.85,
-              "robot_length": 0.85,
-              "show_other_objects": false,
-              "show_trajectories": true,
-              "field_rotation": 0.0,
-              "robot_color": 4294198070,
-              "trajectory_color": 4294967295,
-              "show_robot_outside_widget": true
-            }
-          },
-          {
             "title": "FMSInfo",
             "x": 1152.0,
             "y": 640.0,
@@ -218,13 +196,6 @@
             }
           }
         ]
-      }
-    },
-    {
-      "name": "Tab 2",
-      "grid_layout": {
-        "layouts": [],
-        "containers": []
       }
     }
   ]

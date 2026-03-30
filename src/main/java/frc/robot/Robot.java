@@ -46,10 +46,6 @@ public class Robot extends TimedRobot {
     // CameraServer.startAutomaticCapture();
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
-    
-    // Initialize Elastic telemetry client (integrates with DataLogManager and NetworkTables)
-    ElasticTelemetry.getInstance();
-    System.out.println("[Elastic] Dashboard telemetry client initialized.");
   }
 
   /**
