@@ -175,7 +175,12 @@ public class Robot extends TimedRobot {
     // Update shift tracking based on match time
     double matchTime = DriverStation.getMatchTime();
 
-    if (matchTime >= 130.0) {
+    if (matchTime < 0.0) {
+      // Not connected to FMS; avoid negative countdowns and bogus END GAME
+      currentShift = -1;
+      shiftName = "N/A";
+      shiftCountdownTime = 0.0;
+    } else if (matchTime >= 130.0) {
       // TRANSITION SHIFT (2:20 - 2:10) = 10 seconds
       currentShift = 0;
       shiftName = "TRANSITION";
