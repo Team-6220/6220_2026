@@ -34,7 +34,7 @@ public class TestBeltCommand extends Command {
 
   @Override
   public void execute() {
-    belt.simpleDrive(-0.3);
+    belt.simpleDrive(-0.5);
   }
 
   @Override
