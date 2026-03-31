@@ -28,6 +28,7 @@ import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Intake.ArmSubsystem;
 import frc.robot.subsystems.Intake.BeltSubsystem;
 import frc.robot.subsystems.Intake.RollerSubsystem;
+import frc.robot.subsystems.LEDs.AdressableLEDs;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
 
@@ -44,6 +45,7 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
 
   /* Subsystems */
+  private final AdressableLEDs s_LED = new AdressableLEDs();
   private final Swerve s_Swerve = new Swerve();
   private final ShooterSubsystem m_shooter = new ShooterSubsystem();
   private final AnglerSubsystem m_angler = new AnglerSubsystem();
@@ -163,6 +165,61 @@ public class RobotContainer {
         .leftTrigger()
         .whileTrue(
             new AlignAndMove(s_Swerve, m_driverController, m_driverController.rightBumper()));
+
+    // ==================== State-Based LED Controls ====================
+
+    // Alignment threshold (degrees of horizontal offset from target)
+    final double ALIGN_TOLERANCE_DEG = 0.25;
+
+    // Distance threshold (meters)
+    final double MAX_SHOOT_DISTANCE = 2.0;
+
+    // --- Individual state triggers ---
+    Trigger flywheelsReady =
+        new Trigger(() -> m_shooter.isAtSpeedFly(m_shooter.getTopTargetRPM() / 60.0));
+
+    Trigger aligned =
+        new Trigger(
+            () ->
+                Math.abs(LimelightHelpers.getTX("limelight-front")) < ALIGN_TOLERANCE_DEG
+                    && LimelightHelpers.getTV("limelight-front"));
+
+    Trigger inRange =
+        new Trigger(
+            () -> {
+              double dist = m_shooter.getDist();
+              return dist > 0 && dist <= MAX_SHOOT_DISTANCE;
+            });
+
+    // --- Combined "ready to shoot" trigger ---
+    Trigger readyToShoot = flywheelsReady.and(aligned).and(inRange);
+
+    // --- LED bindings (lowest to highest priority) ---
+
+    // Flywheels spinning but NOT ready -> fast blink red
+    flywheelsReady
+        .negate()
+        .and(new Trigger(() -> m_shooter.getMotor9RPM() > 100))
+        .whileTrue(s_LED.runPattern(s_LED.blink(s_LED.solidRed(), 0.15)));
+
+    // Flywheels at speed but not aligned or out of range -> solid dark orange
+    flywheelsReady.and(readyToShoot.negate()).whileTrue(s_LED.runPattern(s_LED.solidDarkOrange()));
+
+    // Everything good -> solid green
+    readyToShoot.whileTrue(s_LED.runPattern(s_LED.solidGreen()));
+
+    // Haptic feedback (rumble) when the robot is fully ready to shoot
+    readyToShoot.onTrue(
+        Commands.runOnce(
+                () -> {
+                  m_driverController.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+                })
+            .andThen(Commands.waitSeconds(0.25))
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      m_driverController.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 0.0);
+                    })));
   }
 
   /**

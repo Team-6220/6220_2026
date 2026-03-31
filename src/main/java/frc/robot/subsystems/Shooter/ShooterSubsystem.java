@@ -336,5 +336,10 @@ public class ShooterSubsystem extends SubsystemBase {
         "Shooter/Motor31Current", m_motor31.getSupplyCurrent().getValueAsDouble());
     SmartDashboard.putNumber(
         "Shooter/Motor2Current", m_motor35.getSupplyCurrent().getValueAsDouble());
+
+    // LED Telemetry (Shooter Status, Debug Purposes; temporary)
+    SmartDashboard.putBoolean("Shooter/FlywheelsReady", isAtSpeedFly(getTopTargetRPM() / 60.0));
+    SmartDashboard.putBoolean("Shooter/TargetVisible", LimelightHelpers.getTV("limelight-front"));
+    SmartDashboard.putNumber("Shooter/LimelightTX", LimelightHelpers.getTX("limelight-front"));
   }
 }

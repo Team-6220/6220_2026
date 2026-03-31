@@ -26,7 +26,7 @@
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
-            "type": "Gauge",
+            "type": "Text Display",
             "properties": {
               "topic": "/SmartDashboard/Shooter/Motor41RPM",
               "period": 0.06,
@@ -41,21 +41,8 @@
             "height": 384.0,
             "type": "Camera Stream",
             "properties": {
-              "topic": "/CameraPublisher/limelight-front/streams",
+              "topic": "/CameraPublisher/limelight-driver",
               "period": 0.06
-            }
-          },
-          {
-            "title": "Velocity (m/s)",
-            "x": 896.0,
-            "y": 384.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Gauge",
-            "properties": {
-              "topic": "/SmartDashboard/Drive/ChassisVelocity/Magnitude",
-              "period": 0.06,
-              "data_type": "double"
             }
           },
           {

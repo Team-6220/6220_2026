@@ -4,8 +4,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -49,14 +48,17 @@ public class Robot extends TimedRobot {
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
 
-    // Setup Limelight camera stream for Elastic dashboard
-    try {
-      HttpCamera limelightCamera =
-          new HttpCamera("limelight-front", "http://10.62.20.11:5800/stream.mjpg");
-      CameraServer.addCamera(limelightCamera);
-    } catch (Exception e) {
-      System.err.println("Failed to setup Limelight camera stream: " + e.getMessage());
-    }
+    // Setup Limelight camera stream for Elastic dashboard using hardcoded IP (bypasses mDNS issues)
+    NetworkTableInstance.getDefault()
+        .getTable("CameraPublisher")
+        .getSubTable("limelight-driver")
+        .getEntry("streams")
+        .setStringArray(
+            new String[] {
+              "mjpg:http://10.62.20.11:5800/?action=stream",
+              "mjpg:http://10.62.20.11:5800/stream.mjpg",
+              "mjpg:http://10.62.20.11:5800"
+            });
   }
 
   /**
