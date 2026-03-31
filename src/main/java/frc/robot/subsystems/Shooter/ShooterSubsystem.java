@@ -173,9 +173,10 @@ public class ShooterSubsystem extends SubsystemBase {
   /**
    * Runs top and bottom groups at their respective tunable RPM targets.
    *
-   * <p>Implements three-phase shooting: 1. First Shot Boost: Runs at 105% of target RPM 2. RPM Dip
-   * Detection: Monitors for 400 RPM dip indicating shot has left 3. Normal Operation: Returns to
-   * normal RPM and operates as standard
+   * <p>Implements three-phase shooting:
+   * 1. First Shot Boost: Runs at {@link ShooterConstants#FIRST_SHOT_BOOST_PERCENT} of target RPM
+   * 2. RPM Dip Detection: Monitors for 400 RPM dip indicating shot has left
+   * 3. Normal Operation: Returns to normal RPM and operates as standard
    *
    * @param topRPM Desired top-group velocity in RPM (normal, non-boosted).
    */
