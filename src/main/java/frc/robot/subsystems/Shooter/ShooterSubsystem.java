@@ -263,13 +263,13 @@ public class ShooterSubsystem extends SubsystemBase {
     }
   }
 
-  /** Sets top group motors (41, 1) to the given velocity in RPS. */
+  /** Sets kicker motors (41, 1) to the given velocity in RPS. */
   public void setBottomGroupVelocityRPS(double rps) {
     m_motor41.setControl(m_velocityRequest.withVelocity(rps));
     m_motor34.setControl(m_velocityRequest.withVelocity(rps));
   }
 
-  /** Sets bottom group motors (9, 31, 2) to the given velocity in RPS. */
+  /** Sets shooter motors (9, 31, 2) to the given velocity in RPS. */
   public void setTopGroupVelocityRPS(double rps) {
     m_motor9.setControl(m_velocityRequest.withVelocity(rps));
     m_motor31.setControl(m_velocityRequest.withVelocity(rps));
