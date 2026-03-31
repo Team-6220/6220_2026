@@ -144,10 +144,6 @@ public class RobotContainer {
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
 
-    m_driverController
-        .rightBumper()
-        .onTrue(new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
-
     angleDown.whileTrue(
         Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));
     angleUp.whileTrue(
