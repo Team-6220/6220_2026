@@ -41,6 +41,8 @@ public class HashShoot extends Command {
       rpm = ShooterConstants.rpmAngle.get(0.0)[0];
       degrees = ShooterConstants.rpmAngle.get(0.0)[1];
     }
+    // Reset shooter state for new shot sequence (enables first shot boost)
+    m_shoot.resetShootingState();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
