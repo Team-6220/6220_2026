@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
-import frc.robot.commands.ArmToPositionCommand;
 import frc.robot.commands.Autos.BasicAutoBlue;
 import frc.robot.commands.Autos.BasicAutoRed;
 import frc.robot.commands.HashShoot;
@@ -69,6 +68,18 @@ public class RobotContainer {
     s_Swerve.setDefaultCommand(
         new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
+    // Prespin flywheels when limelight sees a tag
+    // m_shooter.setDefaultCommand(
+    //     Commands.run(
+    //         () -> {
+    //           if (m_shooter.getDist() > 0) {
+    //             m_shooter.setTopGroupVelocityRPS(m_shooter.getTopTargetRPM() / 60.0);
+    //           } else {
+    //             m_shooter.stop();
+    //           }
+    //         },
+    //         m_shooter));
+
     // m_angler.setDefaultCommand(
     //     Commands.run(
     //         () -> {
@@ -118,11 +129,8 @@ public class RobotContainer {
     Trigger manualArm = new Trigger(() -> m_joystick.getRawButton(1));
     resetEncoder.onTrue(Commands.runOnce(() -> m_angler.resetEncoder()));
 
-    /**
-     * Test buttons for angler PID: button 4 -> go to set angle. Angle could be set in tunablenumber
-     * under Angler/TargetAngleDeg
-     */
-    Trigger anglerTestOne = new Trigger(() -> m_buttonBoard.getRawButton(7));
+    // Test buttons for angler PID: button 4 -> set to 1.0,
+    Trigger anglerTestOne = new Trigger(() -> m_buttonBoard.getRawButton(4));
     Trigger anglerTest0 = new Trigger(() -> m_buttonBoard.getRawButton(11));
 
     anglerTestOne.onTrue(
@@ -136,8 +144,10 @@ public class RobotContainer {
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
 
-    angleDown.onTrue(new ArmToPositionCommand(arm, 11));
-    angleUp.onTrue(new ArmToPositionCommand(arm, 0));
+    angleDown.whileTrue(
+        Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));
+    angleUp.whileTrue(
+        Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
     manualArm.onTrue(new ManualArm(m_joystick));
 
     m_driverController
@@ -151,7 +161,7 @@ public class RobotContainer {
 
     m_driverController.x().whileTrue(new ShooterTESTER(m_shooter, belt));
 
-    pass.whileTrue(new PassToAlliance(m_angler, m_shooter, belt));
+    m_driverController.rightBumper().whileTrue(new PassToAlliance(m_angler, m_shooter, belt));
 
     intakeIn.whileTrue(new TestRollerCommand(true));
 
@@ -163,6 +173,21 @@ public class RobotContainer {
         .leftTrigger()
         .whileTrue(
             new AlignAndMove(s_Swerve, m_driverController, m_driverController.rightBumper()));
+
+    // ========== SysId Buttons (button board) ==========
+    // Button 8: Quasistatic Forward (slow ramp up)
+    // Button 9: Quasistatic Reverse (slow ramp down)
+    // Button 10: Dynamic Forward (step voltage)
+    // Button 11 is already used for anglerTest0, so using button 12 instead
+    // Button 12: Dynamic Reverse (step voltage reverse)
+    // new Trigger(() -> m_joystick.getRawButton(3))
+    //     .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // new Trigger(() -> m_joystick.getRawButton(4))
+    //     .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // new Trigger(() -> m_joystick.getRawButton(5))
+    //     .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // new Trigger(() -> m_joystick.getRawButton(6))
+    //     .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**
