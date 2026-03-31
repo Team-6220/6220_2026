@@ -276,7 +276,7 @@ public class ShooterSubsystem extends SubsystemBase {
     m_motor35.setControl(m_velocityRequest.withVelocity(rps));
   }
 
-  /** Sets all shooter motors to the given velocity in RPS. */
+  /** Sets all motors to the given velocity in RPS. */
   public void setVelocityRPS(double rps) {
     setTopGroupVelocityRPS(rps);
     setBottomGroupVelocityRPS(rps);
