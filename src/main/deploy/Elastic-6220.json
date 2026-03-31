@@ -13,12 +13,11 @@
             "y": 0.0,
             "width": 640.0,
             "height": 384.0,
-            "type": "Text Display",
+            "type": "Large Text Display",
             "properties": {
               "topic": "/SmartDashboard/Shooter/ForwardDistance",
               "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
+              "data_type": "double"
             }
           },
           {
@@ -40,9 +39,9 @@
             "y": 0.0,
             "width": 640.0,
             "height": 384.0,
-            "type": "Camera",
+            "type": "Camera Stream",
             "properties": {
-              "topic": "http://10.62.20.11:5800/stream.mjpg",
+              "topic": "/CameraPublisher/limelight-front/streams",
               "period": 0.06
             }
           },
@@ -91,14 +90,14 @@
             }
           },
           {
-            "title": "Angle from Vision",
+            "title": "Hood Angle",
             "x": 640.0,
             "y": 256.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/Vision_pipeline",
+              "topic": "/SmartDashboard/Angler/CurrentAngleDeg",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
