@@ -71,7 +71,7 @@ public class ShooterSubsystem extends SubsystemBase {
       new TunableNumber("Shooter/BottomTargetRPM", ShooterConstants.bottomTESTrpm);
   // Tunable for the first-shot boost multiplier (do not reuse BottomTargetRPM key)
   private final TunableNumber m_firstShotBoostTN =
-      new TunableNumber("Shooter/FirstShotBoost", ShooterConstants.FIRST_SHOT_BOOST_PERCENT);
+      new TunableNumber("Shooter/FirstShotBoost", ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER);
 
   // Tolerance for determining if shooter is at speed (in RPS)
   private static final double VELOCITY_TOLERANCE_RPS = 0.4;
@@ -173,10 +173,10 @@ public class ShooterSubsystem extends SubsystemBase {
   /**
    * Runs top and bottom groups at their respective tunable RPM targets.
    *
-   * <p>Implements three-phase shooting:
-   * 1. First Shot Boost: Runs at {@link ShooterConstants#FIRST_SHOT_BOOST_PERCENT} of target RPM
-   * 2. RPM Dip Detection: Monitors for 400 RPM dip indicating shot has left
-   * 3. Normal Operation: Returns to normal RPM and operates as standard
+   * <p>Implements three-phase shooting: 1. First Shot Boost: Runs at {@link
+   * ShooterConstants#FIRST_SHOT_BOOST_MULTIPLIER} of target RPM 2. RPM Dip Detection: Monitors for
+   * 400 RPM dip indicating shot has left 3. Normal Operation: Returns to normal RPM and operates as
+   * standard
    *
    * @param topRPM Desired top-group velocity in RPM (normal, non-boosted).
    */
@@ -187,7 +187,7 @@ public class ShooterSubsystem extends SubsystemBase {
       isFirstShot = true;
       initialRPMRecorded = false;
       peakRPM = 0.0;
-      boostedTargetRPM = topRPM * ShooterConstants.FIRST_SHOT_BOOST_PERCENT;
+      boostedTargetRPM = topRPM * ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER;
     }
 
     double topRPS;
@@ -229,7 +229,7 @@ public class ShooterSubsystem extends SubsystemBase {
       isFirstShot = true;
       initialRPMRecorded = false;
       peakRPM = 0.0;
-      boostedTargetRPM = topRPM * ShooterConstants.FIRST_SHOT_BOOST_PERCENT;
+      boostedTargetRPM = topRPM * ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER;
     }
 
     double topRPS;
@@ -467,7 +467,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
     // Update first-shot boost multiplier if it changed via tunable
     if (m_firstShotBoostTN.hasChanged()) {
-      ShooterConstants.FIRST_SHOT_BOOST_PERCENT = m_firstShotBoostTN.get();
+      ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER = m_firstShotBoostTN.get();
     }
     SmartDashboard.putNumber("Shooter/ForwardDistance", getDist());
 
@@ -480,7 +480,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     SmartDashboard.putNumber("Shooter/TopTargetRPM", m_topTargetRPMTN.get());
     SmartDashboard.putNumber("Shooter/BottomTargetRPM", m_bottomTargetRPMTN.get());
-    SmartDashboard.putNumber("Shooter/FirstShotBoost", ShooterConstants.FIRST_SHOT_BOOST_PERCENT);
+    SmartDashboard.putNumber(
+        "Shooter/FirstShotBoost", ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER);
 
     SmartDashboard.putBoolean("Shooter/isFirstShot", isFirstShot);
 

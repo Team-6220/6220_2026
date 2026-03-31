@@ -35,7 +35,10 @@ public class ShooterConstants {
   // ========== First Shot Boost Configuration ==========
   /** Multiplier for first shot RPM (e.g., 1.15 for a 15% boost). */
   public static double FIRST_SHOT_BOOST_MULTIPLIER = 1.15;
-  /** @deprecated Use {@link #FIRST_SHOT_BOOST_MULTIPLIER} instead. */
+
+  /**
+   * @deprecated Use {@link #FIRST_SHOT_BOOST_MULTIPLIER} instead.
+   */
   @Deprecated public static double FIRST_SHOT_BOOST_PERCENT = FIRST_SHOT_BOOST_MULTIPLIER;
 
   /** RPM dip threshold to detect when shot has left the shooter (in RPM) */
