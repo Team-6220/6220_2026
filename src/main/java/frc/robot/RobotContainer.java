@@ -122,8 +122,8 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     Trigger angleUp = new Trigger(() -> m_buttonBoard.getRawButton(5));
     Trigger angleDown = new Trigger(() -> m_buttonBoard.getRawButton(6));
-    Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(2));
-    Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(1));
+    Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(2));
+    Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(1));
     Trigger pass = m_driverController.rightBumper();
     Trigger resetEncoder = new Trigger(() -> m_buttonBoard.getRawButton(3));
     Trigger manualArm = new Trigger(() -> m_joystick.getRawButton(1));
@@ -156,16 +156,15 @@ public class RobotContainer {
             Commands.run(() -> m_angler.setAngle(0), m_angler).until(() -> m_angler.isAtAngle(0)));
 
     m_driverController
-        .b()
-        .whileTrue(Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
+        .b().whileTrue(new TestRollerCommand(false));
 
     m_driverController.x().whileTrue(new ShooterTESTER(m_shooter, belt));
 
     pass.whileTrue(new PassToAlliance(m_angler, m_shooter, belt));
 
-    intakeIn.whileTrue(new TestRollerCommand(true));
+    intakeOut.whileTrue(new TestRollerCommand(true));
 
-    intakeOut.whileTrue(new TestRollerCommand(false));
+    intakeIn.whileTrue(new TestRollerCommand(false));
 
     m_driverController.rightTrigger().whileTrue(new HashShoot(m_angler, m_shooter, belt));
 
