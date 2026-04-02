@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -16,13 +17,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
 import frc.robot.commands.ArmToPositionCommand;
-import frc.robot.commands.Autos.BasicAutoBlue;
-import frc.robot.commands.Autos.BasicAutoRed;
 import frc.robot.commands.HashShoot;
 import frc.robot.commands.ManualArm;
 import frc.robot.commands.PassToAlliance;
 import frc.robot.commands.SwerveCom;
 import frc.robot.commands.TestRollerCommand;
+import frc.robot.commands.Autos.BasicAutoBlue;
+import frc.robot.commands.Autos.BasicAutoRed;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Intake.ArmSubsystem;
 import frc.robot.subsystems.Intake.BeltSubsystem;
@@ -96,7 +97,7 @@ public class RobotContainer {
    * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
-  private void configureBindings() {
+private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     Trigger angleUp = new Trigger(() -> m_buttonBoard.getRawButton(15));
     Trigger angleDown = new Trigger(() -> m_buttonBoard.getRawButton(16));
@@ -116,6 +117,7 @@ public class RobotContainer {
     anglerTest0.onTrue(
         Commands.run(() -> m_angler.setAngle(0), m_angler).until(() -> m_angler.isAtAngle(0)));
 
+        
     m_driverController
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
@@ -143,6 +145,8 @@ public class RobotContainer {
         .leftTrigger()
         .whileTrue(
             new AlignAndMove(s_Swerve, m_driverController, m_driverController.rightBumper()));
+    
+    arm0.onTrue(new ArmToPositionCommand(arm, -2));
 
     arm0.onTrue(new ArmToPositionCommand(arm, -2));
 
@@ -221,9 +225,9 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
+public Command getAutonomousCommand() {
     System.out.println("auto: " + autoChooser.getSelected());
     return autoChooser.getSelected();
-  }
+}
   // An example command will be run in autonomous
 }
