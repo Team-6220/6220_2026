@@ -30,7 +30,8 @@
             "properties": {
               "topic": "/SmartDashboard/Shooter/Motor41RPM",
               "period": 0.06,
-              "data_type": "double"
+              "data_type": "double",
+              "show_submit_button": false
             }
           },
           {
@@ -38,11 +39,12 @@
             "x": 896.0,
             "y": 0.0,
             "width": 640.0,
-            "height": 384.0,
+            "height": 512.0,
             "type": "Camera Stream",
             "properties": {
               "topic": "/CameraPublisher/limelight-driver",
-              "period": 0.06
+              "period": 0.06,
+              "rotation_turns": 0
             }
           },
           {
@@ -57,23 +59,6 @@
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
-            }
-          },
-          {
-            "title": "Hood Angle At Target",
-            "x": 640.0,
-            "y": 384.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Angler/AtTarget",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
             }
           },
           {
@@ -109,9 +94,9 @@
           {
             "title": "Current Shift",
             "x": 512.0,
-            "y": 640.0,
+            "y": 512.0,
             "width": 384.0,
-            "height": 128.0,
+            "height": 256.0,
             "type": "Large Text Display",
             "properties": {
               "topic": "/SmartDashboard/Match/ShiftName",
@@ -122,7 +107,7 @@
           {
             "title": "Match Time",
             "x": 512.0,
-            "y": 512.0,
+            "y": 384.0,
             "width": 384.0,
             "height": 128.0,
             "type": "Match Time",
@@ -139,7 +124,7 @@
             "title": "Shooter Aligned",
             "x": 256.0,
             "y": 384.0,
-            "width": 384.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
@@ -171,14 +156,27 @@
           },
           {
             "title": "FMSInfo",
-            "x": 1152.0,
-            "y": 640.0,
-            "width": 384.0,
+            "x": 896.0,
+            "y": 512.0,
+            "width": 640.0,
             "height": 128.0,
             "type": "FMSInfo",
             "properties": {
               "topic": "/FMSInfo",
               "period": 0.06
+            }
+          },
+          {
+            "title": "SendableChooser[0]",
+            "x": 896.0,
+            "y": 640.0,
+            "width": 640.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/SendableChooser[0]",
+              "period": 0.06,
+              "sort_options": false
             }
           }
         ]

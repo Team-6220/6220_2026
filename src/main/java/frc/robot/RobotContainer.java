@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndMove;
+import frc.robot.commands.ArmToPositionCommand;
 import frc.robot.commands.Autos.BasicAutoBlue;
 import frc.robot.commands.Autos.BasicAutoRed;
 import frc.robot.commands.HashShoot;
@@ -73,13 +74,6 @@ public class RobotContainer {
     // Prespin flywheels when limelight sees a tag
     // m_shooter.setDefaultCommand(
     //     Commands.run(
-    //         () -> {
-    //           if (m_shooter.getDist() > 0) {
-    //             m_shooter.setTopGroupVelocityRPS(m_shooter.getTopTargetRPM() / 60.0);
-    //           } else {
-    //             m_shooter.stop();
-    //           }
-    //         },
     //         m_shooter));
 
     // m_angler.setDefaultCommand(
@@ -178,12 +172,6 @@ public class RobotContainer {
 
     // ==================== State-Based LED Controls ====================
 
-    // Alignment threshold (degrees of horizontal offset from target)
-    final double ALIGN_TOLERANCE_DEG = 0.25;
-
-    // Distance threshold (meters)
-    final double MAX_SHOOT_DISTANCE = 2.0;
-
     // --- Individual state triggers ---
     Trigger flywheelsReady =
         new Trigger(() -> m_shooter.isAtSpeedFly(m_shooter.getTopTargetRPM() / 60.0));
@@ -198,10 +186,15 @@ public class RobotContainer {
         new Trigger(
             () -> {
               double dist = m_shooter.getDist();
-              return dist > 0 && dist <= MAX_SHOOT_DISTANCE;
+              return dist > 0 && dist <= MAX_SHOOT_DISTANCE_M;
             });
 
+    // Stable lock for driver rumble to avoid flicker/noise
+    Trigger targetLocked = aligned.and(inRange).debounce(0.1);
+
     // --- Combined "ready to shoot" trigger ---
+    // We require everything (speed, alignment, range) for the final triggers so rumble corresponds
+    // to the actual firing window.
     Trigger readyToShoot = flywheelsReady.and(aligned).and(inRange);
 
     // --- LED bindings (lowest to highest priority) ---
@@ -213,13 +206,12 @@ public class RobotContainer {
         .whileTrue(s_LED.runPattern(s_LED.blink(s_LED.solidRed(), 0.15)));
 
     // Flywheels at speed but not aligned or out of range -> solid dark orange
-    flywheelsReady.and(readyToShoot.negate()).whileTrue(s_LED.runPattern(s_LED.solidDarkOrange()));
+    flywheelsReady.and(readyToShoot.negate()).whileTrue(s_LED.runPattern(s_LED.blink(s_LED.solidDarkOrange(), 0.15)));
 
-    // Everything good -> solid green
-    readyToShoot.whileTrue(s_LED.runPattern(s_LED.solidGreen()));
+    aligned.whileTrue(s_LED.runPattern(s_LED.solidGreen()));
 
-    // Haptic feedback (rumble) when the robot is fully ready to shoot
-    readyToShoot.onTrue(
+    // Haptic feedback (rumble): Pulse when target is aligned + in range (before full spin-up).
+    aligned.onTrue(
         Commands.runOnce(
                 () -> {
                   m_driverController.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
@@ -241,9 +233,18 @@ public class RobotContainer {
     // new Trigger(() -> m_joystick.getRawButton(4))
     //     .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     // new Trigger(() -> m_joystick.getRawButton(5))
-    //     .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // new Trigger(() -> m_joystick.getRawButton(6))
-    //     .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+  }
+
+  /** Publish shooter booleans needed by Elastic dashboard widgets. */
+  public void publishDriverDashboardBooleans() {
+    boolean aligned =
+        LimelightHelpers.getTV("limelight-front")
+            && Math.abs(LimelightHelpers.getTX("limelight-front")) < ALIGN_TOLERANCE_DEG;
+    double dist = m_shooter.getDist();
+    boolean shortRange = dist > 0 && dist <= MAX_SHOOT_DISTANCE_M;
+
+    SmartDashboard.putBoolean("Shooter/Aligned", aligned);
+    SmartDashboard.putBoolean("Shooter/ShortRange", shortRange);
   }
 
   /**
@@ -255,6 +256,6 @@ public class RobotContainer {
     System.out.println("auto: " + autoChooser.getSelected());
     return autoChooser.getSelected();
   }
-  // An example command will be run in autonomous
 
+  // An example command will be run in autonomous
 }
