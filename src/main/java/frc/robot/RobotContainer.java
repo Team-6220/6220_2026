@@ -204,7 +204,9 @@ public class RobotContainer {
         .whileTrue(s_LED.runPattern(s_LED.blink(s_LED.solidRed(), 0.15)));
 
     // Flywheels at speed but not aligned or out of range -> solid dark orange
-    flywheelsReady.and(readyToShoot.negate()).whileTrue(s_LED.runPattern(s_LED.blink(s_LED.solidDarkOrange(), 0.15)));
+    flywheelsReady
+        .and(readyToShoot.negate())
+        .whileTrue(s_LED.runPattern(s_LED.blink(s_LED.solidDarkOrange(), 0.15)));
 
     aligned.whileTrue(s_LED.runPattern(s_LED.solidGreen()));
 
