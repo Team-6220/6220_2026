@@ -23,8 +23,8 @@ public class ShooterConstants {
           put(1.6, new Double[] {2040.0, 8.0});
           put(1.8, new Double[] {2000.0, 10.0});
           put(2.0, new Double[] {1980.0, 12.61});
-          put(2.2, new Double[] {2100.0, 9.8});
-          put(2.4, new Double[] {2000.0, 14.10});
+          put(2.2, new Double[] {2000.0, 13.4});
+          put(2.4, new Double[] {2020.0, 14.10});
           put(2.6, new Double[] {2040.0, 15.43});
           put(2.8, new Double[] {2060.0, 16.47});
           put(3.0, new Double[] {2080.0, 17.37});
