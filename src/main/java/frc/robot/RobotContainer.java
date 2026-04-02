@@ -150,7 +150,7 @@ public class RobotContainer {
 
     arm90.onTrue(new ArmToPositionCommand(arm, -29.785476684570312));
 
-    // ==================== State-Based LED Controls ====================   
+    // ==================== State-Based LED Controls ====================
 
     // --- Individual state triggers ---
     Trigger flywheelsReady =
