@@ -4,11 +4,13 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import java.util.ArrayList;
@@ -28,6 +30,12 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
 
+  // Shift tracking for 2026 FRC game
+  private double teleOpStartTime = 0.0;
+  private int currentShift = 0;
+  private double shiftCountdownTime = 0.0;
+  private String shiftName = "AUTO";
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -39,8 +47,18 @@ public class Robot extends TimedRobot {
     // CameraServer.startAutomaticCapture();
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
-    SignalLogger.setPath("/media/sda1/");
-    SignalLogger.start();
+
+    // Setup Limelight camera stream for Elastic dashboard using hardcoded IP (bypasses mDNS issues)
+    NetworkTableInstance.getDefault()
+        .getTable("CameraPublisher")
+        .getSubTable("limelight-driver")
+        .getEntry("streams")
+        .setStringArray(
+            new String[] {
+              "mjpg:http://10.62.20.11:5800/?action=stream",
+              "mjpg:http://10.62.20.11:5800/stream.mjpg",
+              "mjpg:http://10.62.20.11:5800"
+            });
   }
 
   /**
@@ -57,6 +75,7 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    m_robotContainer.publishDriverDashboardBooleans();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -103,6 +122,17 @@ public class Robot extends TimedRobot {
         Constants.isRed = "N/A";
       }
     }
+
+    // Track shift during auto for dashboard display
+    double matchTime = DriverStation.getMatchTime();
+    currentShift = 0;
+    shiftName = "AUTO";
+    shiftCountdownTime = matchTime; // Counts from 20 seconds down to 0
+
+    // Publish shift info
+    SmartDashboard.putString("Match/ShiftName", shiftName);
+    SmartDashboard.putNumber("Match/CurrentShift", currentShift);
+    SmartDashboard.putNumber("Match/ShiftCountdown", shiftCountdownTime);
   }
 
   @Override
@@ -126,6 +156,13 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    // Initialize shift tracking
+    // Match starts at 2:20 (140s). AUTO 0:20-0:00, TRANSITION 2:20-2:10, SHIFT 1-4, ENDGAME
+    // 0:30-0:00
+    teleOpStartTime = Timer.getFPGATimestamp();
+    currentShift = 0;
+    shiftName = "TRANSITION";
   }
 
   /** This function is called periodically during operator control. */
@@ -144,6 +181,59 @@ public class Robot extends TimedRobot {
         Constants.isRed = "N/A";
       }
     }
+
+    // Update shift tracking based on match time
+    double matchTime = DriverStation.getMatchTime();
+
+    // Send raw FMS match time to SmartDashboard for Elastic
+    SmartDashboard.putNumber("Match/Time", matchTime);
+
+    // Use a strict elapsed timer for shift calculation to bypass FMS disabled gaps
+    // Teleop is 140 seconds (2:20) in this structure.
+    double elapsedTeleop = Timer.getFPGATimestamp() - teleOpStartTime;
+    double calculatedMatchTime = 140.0 - elapsedTeleop;
+
+    if (matchTime < 0.0 && !DriverStation.isFMSAttached()) {
+      // Not connected to FMS and time implies no match running
+      currentShift = -1;
+      shiftName = "N/A";
+      shiftCountdownTime = 0.0;
+    } else if (calculatedMatchTime >= 130.0) {
+      // TRANSITION SHIFT (2:20 - 2:10) = 10 seconds
+      currentShift = 0;
+      shiftName = "TRANSITION";
+      shiftCountdownTime = calculatedMatchTime - 130.0; // Counts from 10 down to 0
+    } else if (calculatedMatchTime >= 105.0) {
+      // SHIFT 1 (2:10 - 1:45) = 25 seconds
+      currentShift = 1;
+      shiftName = "SHIFT 1";
+      shiftCountdownTime = calculatedMatchTime - 105.0; // Counts from 25 down to 0
+    } else if (calculatedMatchTime >= 80.0) {
+      // SHIFT 2 (1:45 - 1:20) = 25 seconds
+      currentShift = 2;
+      shiftName = "SHIFT 2";
+      shiftCountdownTime = calculatedMatchTime - 80.0; // Counts from 25 down to 0
+    } else if (calculatedMatchTime >= 55.0) {
+      // SHIFT 3 (1:20 - 0:55) = 25 seconds
+      currentShift = 3;
+      shiftName = "SHIFT 3";
+      shiftCountdownTime = calculatedMatchTime - 55.0; // Counts from 25 down to 0
+    } else if (calculatedMatchTime >= 30.0) {
+      // SHIFT 4 (0:55 - 0:30) = 25 seconds
+      currentShift = 4;
+      shiftName = "SHIFT 4";
+      shiftCountdownTime = calculatedMatchTime - 30.0; // Counts from 25 down to 0
+    } else {
+      // END GAME (0:30 - 0:00) = 30 seconds
+      currentShift = 5;
+      shiftName = "END GAME";
+      shiftCountdownTime = Math.max(0.0, calculatedMatchTime); // Counts from 30 down to 0
+    }
+
+    // Publish shift info to SmartDashboard
+    SmartDashboard.putString("Match/ShiftName", shiftName);
+    SmartDashboard.putNumber("Match/CurrentShift", currentShift);
+    SmartDashboard.putNumber("Match/ShiftCountdown", shiftCountdownTime);
   }
 
   @Override
