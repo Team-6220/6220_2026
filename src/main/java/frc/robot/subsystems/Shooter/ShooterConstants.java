@@ -32,7 +32,7 @@ public class ShooterConstants {
           put(3.4, new Double[] {2120.0, 19.4});
           put(3.6, new Double[] {2140.0, 20.45});
           put(3.8, new Double[] {2160.0, 21.49});
-          put(4.0, new Double[] {2180.0, 22.5});
+          put(4.0, new Double[] {2200.0, 22.5});
         }
       };
 
