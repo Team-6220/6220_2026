@@ -60,6 +60,8 @@ public class RobotContainer {
 
   private static final double ANGLER_MAX_SPEED = 0.15;
   private static final double ANGLER_DEADBAND = 0.1;
+  private static final double ALIGN_TOLERANCE_DEG = 2.0;
+  private static final double MAX_SHOOT_DISTANCE_M = 4.0;
 
   public RobotContainer() {
     // Initialize climber subsystem based on robot mode
@@ -70,11 +72,6 @@ public class RobotContainer {
 
     s_Swerve.setDefaultCommand(
         new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
-
-    // Prespin flywheels when limelight sees a tag
-    // m_shooter.setDefaultCommand(
-    //     Commands.run(
-    //         m_shooter));
 
     // m_angler.setDefaultCommand(
     //     Commands.run(
@@ -120,13 +117,16 @@ public class RobotContainer {
     Trigger angleDown = new Trigger(() -> m_buttonBoard.getRawButton(6));
     Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(2));
     Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(1));
-    Trigger pass = m_driverController.rightBumper();
+    Trigger pass = new Trigger(() -> m_buttonBoard.getRawButton(4));
     Trigger resetEncoder = new Trigger(() -> m_buttonBoard.getRawButton(3));
     Trigger manualArm = new Trigger(() -> m_joystick.getRawButton(1));
     resetEncoder.onTrue(Commands.runOnce(() -> m_angler.resetEncoder()));
 
-    // Test buttons for angler PID: button 4 -> set to 1.0,
-    Trigger anglerTestOne = new Trigger(() -> m_buttonBoard.getRawButton(4));
+    /**
+     * Test buttons for angler PID: button 4 -> go to set angle. Angle could be set in tunablenumber
+     * under Angler/TargetAngleDeg
+     */
+    Trigger anglerTestOne = new Trigger(() -> m_buttonBoard.getRawButton(7));
     Trigger anglerTest0 = new Trigger(() -> m_buttonBoard.getRawButton(11));
 
     anglerTestOne.onTrue(
@@ -140,10 +140,8 @@ public class RobotContainer {
         .y()
         .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
 
-    angleDown.whileTrue(
-        Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));
-    angleUp.whileTrue(
-        Commands.runEnd(() -> m_angler.setSpeed(0.15), () -> m_angler.stop(), m_angler));
+    angleDown.onTrue(new ArmToPositionCommand(arm, 11));
+    angleUp.onTrue(new ArmToPositionCommand(arm, 0));
     manualArm.onTrue(new ManualArm(m_joystick));
 
     m_driverController
@@ -222,17 +220,6 @@ public class RobotContainer {
                     () -> {
                       m_driverController.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 0.0);
                     })));
-    // ========== SysId Buttons (button board) ==========
-    // Button 8: Quasistatic Forward (slow ramp up)
-    // Button 9: Quasistatic Reverse (slow ramp down)
-    // Button 10: Dynamic Forward (step voltage)
-    // Button 11 is already used for anglerTest0, so using button 12 instead
-    // Button 12: Dynamic Reverse (step voltage reverse)
-    // new Trigger(() -> m_joystick.getRawButton(3))
-    //     .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    // new Trigger(() -> m_joystick.getRawButton(4))
-    //     .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // new Trigger(() -> m_joystick.getRawButton(5))
   }
 
   /** Publish shooter booleans needed by Elastic dashboard widgets. */
