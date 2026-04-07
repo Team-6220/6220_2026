@@ -5,7 +5,6 @@
 package frc.robot.commands.Autos;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -31,7 +30,11 @@ public class BasicAutoRed extends SequentialCommandGroup {
 
   /** Creates a new StrightAuto. */
   public BasicAutoRed(
-      Swerve s_swerve, AnglerSubsystem m_angler, ShooterSubsystem m_shooter, BeltSubsystem m_belt, CommandXboxController controller) {
+      Swerve s_swerve,
+      AnglerSubsystem m_angler,
+      ShooterSubsystem m_shooter,
+      BeltSubsystem m_belt,
+      CommandXboxController controller) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     this.s_swerve = s_swerve;

@@ -21,7 +21,6 @@ import frc.robot.commands.Autos.BasicAutoRed;
 import frc.robot.commands.HashShoot;
 import frc.robot.commands.ManualArm;
 import frc.robot.commands.PassToAlliance;
-import frc.robot.commands.ShooterTESTER;
 import frc.robot.commands.SwerveCom;
 import frc.robot.commands.TestRollerCommand;
 import frc.robot.subsystems.Drive.Swerve;
@@ -82,8 +81,10 @@ public class RobotContainer {
     // NamedCommands.registerCommand("AutoClimber", new AutoClimberCommand(climberSubsystem));
 
     // NamedCommands.registerCommand(null, null);
-    autoChooser.addOption("Red", new BasicAutoRed(s_Swerve, m_angler, m_shooter, belt, m_driverController));
-    autoChooser.addOption("Blue", new BasicAutoBlue(s_Swerve, m_angler, m_shooter, belt, m_driverController));
+    autoChooser.addOption(
+        "Red", new BasicAutoRed(s_Swerve, m_angler, m_shooter, belt, m_driverController));
+    autoChooser.addOption(
+        "Blue", new BasicAutoBlue(s_Swerve, m_angler, m_shooter, belt, m_driverController));
     SmartDashboard.putData(autoChooser);
     configureBindings();
   }

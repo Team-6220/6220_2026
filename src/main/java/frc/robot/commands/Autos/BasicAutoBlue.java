@@ -30,7 +30,11 @@ public class BasicAutoBlue extends SequentialCommandGroup {
 
   /** Creates a new StrightAuto. */
   public BasicAutoBlue(
-      Swerve s_swerve, AnglerSubsystem m_angler, ShooterSubsystem m_shooter, BeltSubsystem m_belt, CommandXboxController controller) {
+      Swerve s_swerve,
+      AnglerSubsystem m_angler,
+      ShooterSubsystem m_shooter,
+      BeltSubsystem m_belt,
+      CommandXboxController controller) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     this.s_swerve = s_swerve;
