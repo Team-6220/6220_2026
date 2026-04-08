@@ -250,6 +250,10 @@ public class ArmSubsystem extends SubsystemBase {
     armEncoder.setPosition(0);
   }
 
+  public void stopDriving() {
+    armMotor.stopMotor();
+  }
+
   public static synchronized ArmSubsystem getInstance() {
     if (INSTANCE == null) INSTANCE = new ArmSubsystem();
     return INSTANCE;

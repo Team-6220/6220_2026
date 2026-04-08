@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlignAndFlywheels;
 import frc.robot.commands.ArmToPositionCommand;
+import frc.robot.commands.ArmUpAndDown;
 import frc.robot.commands.Autos.BasicAutoBlue;
 import frc.robot.commands.Autos.BasicAutoRed;
 import frc.robot.commands.ManualArm;
@@ -104,7 +105,7 @@ public class RobotContainer {
     Trigger pass = m_driverController.rightBumper();
     Trigger resetEncoder = new Trigger(() -> m_buttonBoard.getRawButton(13));
     Trigger manualArm = new Trigger(() -> m_joystick.getRawButton(1));
-    Trigger anglerTest0 = new Trigger(() -> m_buttonBoard.getRawButton(3));
+    Trigger armUpAndDown = new Trigger(() -> m_buttonBoard.getRawButton(3));
     Trigger arm0 = new Trigger(() -> m_buttonBoard.getRawButton(5));
     Trigger arm90 = new Trigger(() -> m_buttonBoard.getRawButton(6));
     Trigger armReset = new Trigger(() -> m_buttonBoard.getRawButton(14));
@@ -112,8 +113,7 @@ public class RobotContainer {
     resetEncoder.onTrue(Commands.runOnce(() -> m_angler.resetEncoder()));
     armReset.onTrue(Commands.runOnce(() -> arm.resetEncoder()));
 
-    anglerTest0.onTrue(
-        Commands.run(() -> m_angler.setAngle(0), m_angler).until(() -> m_angler.isAtAngle(0)));
+    armUpAndDown.whileTrue(new ArmUpAndDown(arm, m_driverController));
 
     m_driverController
         .y()
@@ -140,7 +140,9 @@ public class RobotContainer {
 
     m_driverController
         .leftTrigger()
-        .whileTrue(new AlignAndFlywheels(s_Swerve, m_driverController, m_angler, m_shooter, belt));
+        .whileTrue(
+            new AlignAndFlywheels(
+                s_Swerve, m_driverController, m_angler, m_shooter, belt));
 
     arm0.onTrue(new ArmToPositionCommand(arm, -2));
 
