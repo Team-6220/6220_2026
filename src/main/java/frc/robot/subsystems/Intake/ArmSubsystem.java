@@ -5,7 +5,6 @@
 package frc.robot.subsystems.Intake;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -17,7 +16,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.TunableNumber;
-@SuppressWarnings("unused")
 
 public class ArmSubsystem extends SubsystemBase {
 
