@@ -138,14 +138,14 @@
             }
           },
           {
-            "title": "Distance < 2m",
+            "title": "Flywheels at Speed",
             "x": 0.0,
             "y": 640.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Shooter/ShortRange",
+              "topic": "/SmartDashboard/Shooter/FlywheelsAtTarget",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,

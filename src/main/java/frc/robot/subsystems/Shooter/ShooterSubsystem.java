@@ -74,7 +74,7 @@ public class ShooterSubsystem extends SubsystemBase {
       new TunableNumber("Shooter/FirstShotBoost", ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER);
 
   // Tolerance for determining if shooter is at speed (in RPS)
-  private static final double VELOCITY_TOLERANCE_RPS = 0.4;
+  private static final double VELOCITY_TOLERANCE_RPS = 1.5;
 
   // Current limit in amps
   private static final double CURRENT_LIMIT = 40.0;
@@ -448,6 +448,14 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public double getTopTargetRPM() {
     return m_topTargetRPMTN.get();
+  }
+
+  /**
+   * Returns whether the shooter is at its current target speed.
+   */
+  public boolean isAtTargetSpeed() {
+    double targetRPS = (isFirstShot ? boostedTargetRPM : normalTargetRPM) / 60.0;
+    return isAtSpeedFly(targetRPS);
   }
 
   public double getBottomTargetRPM() {
