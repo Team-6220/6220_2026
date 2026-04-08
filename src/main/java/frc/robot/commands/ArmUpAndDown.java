@@ -5,13 +5,13 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Intake.ArmSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ArmUpAndDown extends Command {
   /** Creates a new ArmUpAndDown. */
   private ArmSubsystem arm;
+
   private final double up = -10.0;
   private final double down = -29.785476684570312;
   private boolean upPosition;

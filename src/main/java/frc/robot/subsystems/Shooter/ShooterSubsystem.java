@@ -455,9 +455,7 @@ public class ShooterSubsystem extends SubsystemBase {
     return m_topTargetRPMTN.get();
   }
 
-  /**
-   * Returns whether the shooter is at its current target speed.
-   */
+  /** Returns whether the shooter is at its current target speed. */
   public boolean isAtTargetSpeed() {
     double targetRPS = (isFirstShot ? boostedTargetRPM : normalTargetRPM) / 60.0;
     return isAtSpeedFly(targetRPS);
