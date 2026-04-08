@@ -33,9 +33,9 @@ public class PassToAlliance extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_angler.setAngle(35);
+    m_angler.setAngle(32);
     m_shoot.runAtTargetVelocity(2200);
-    m_belt.simpleDrive(-0.3);
+    m_belt.simpleDrive(-0.5);
   }
 
   // Called once the command ends or is interrupted.
