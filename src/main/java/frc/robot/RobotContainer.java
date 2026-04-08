@@ -81,8 +81,10 @@ public class RobotContainer {
     // NamedCommands.registerCommand("AutoClimber", new AutoClimberCommand(climberSubsystem));
 
     // NamedCommands.registerCommand(null, null);
-    autoChooser.addOption("Red", new BasicAutoRed(s_Swerve, m_angler, m_shooter, belt));
-    autoChooser.addOption("Blue", new BasicAutoBlue(s_Swerve, m_angler, m_shooter, belt));
+    autoChooser.addOption(
+        "Red", new BasicAutoRed(s_Swerve, m_angler, m_shooter, belt, m_driverController));
+    autoChooser.addOption(
+        "Blue", new BasicAutoBlue(s_Swerve, m_angler, m_shooter, belt, m_driverController));
     SmartDashboard.putData(autoChooser);
     configureBindings();
   }
