@@ -114,7 +114,7 @@ public class RobotContainer {
     resetEncoder.onTrue(Commands.runOnce(() -> m_angler.resetEncoder()));
     armReset.onTrue(Commands.runOnce(() -> arm.resetEncoder()));
 
-    armUpAndDown.whileTrue(new ArmUpAndDown(arm, m_driverController));
+    armUpAndDown.whileTrue(new ArmUpAndDown(arm));
 
     m_driverController
         .y()
