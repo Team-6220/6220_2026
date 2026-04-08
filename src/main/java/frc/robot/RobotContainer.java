@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.AlignAndFlywheels;
 import frc.robot.commands.AlignAndMove;
 import frc.robot.commands.ArmToPositionCommand;
 import frc.robot.commands.Autos.BasicAutoBlue;
@@ -140,13 +141,9 @@ public class RobotContainer {
     intakeIn.whileTrue(new TestRollerCommand(false));
 
     m_driverController
-        .rightTrigger()
-        .whileTrue(new HashShoot(m_angler, m_shooter, belt, m_driverController));
-
-    m_driverController
         .leftTrigger()
         .whileTrue(
-            new AlignAndMove(s_Swerve, m_driverController, m_driverController.rightBumper()));
+            new AlignAndFlywheels(s_Swerve, m_driverController, m_angler, m_shooter, belt));
 
     arm0.onTrue(new ArmToPositionCommand(arm, -2));
 
