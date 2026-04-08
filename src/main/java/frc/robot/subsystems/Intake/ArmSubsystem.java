@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.TunableNumber;
+@SuppressWarnings("unused")
 
 public class ArmSubsystem extends SubsystemBase {
 
@@ -89,8 +90,8 @@ public class ArmSubsystem extends SubsystemBase {
     armMotorConfig.idleMode(ArmConstants.armIdleMode);
     armMotor.configure(
         armMotorConfig,
-        SparkBase.ResetMode.kResetSafeParameters,
-        SparkBase.PersistMode.kPersistParameters);
+        com.revrobotics.ResetMode.kResetSafeParameters,
+        com.revrobotics.PersistMode.kPersistParameters);
 
     armEncoder = armMotor.getEncoder();
 
@@ -211,7 +212,7 @@ public class ArmSubsystem extends SubsystemBase {
     armMotor.setVoltage(PIDOutput + feedForwardOutput);
   }
 
-  public void resetArmEncoder() {
+  public void resetEncoder() {
     armEncoder.setPosition(0);
   }
 
@@ -244,10 +245,6 @@ public class ArmSubsystem extends SubsystemBase {
   public void setMaxAccel(double maxAccel) {
     ArmMaxAccel.setDefault(maxAccel);
     SmartDashboard.putNumber(tableKey + "max accel", maxAccel);
-  }
-
-  public void resetEncoder() {
-    armEncoder.setPosition(0);
   }
 
   public static synchronized ArmSubsystem getInstance() {
