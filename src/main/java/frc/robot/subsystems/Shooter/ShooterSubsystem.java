@@ -187,7 +187,7 @@ public class ShooterSubsystem extends SubsystemBase {
       isFirstShot = true;
       initialRPMRecorded = false;
       peakRPM = 0.0;
-      boostedTargetRPM = topRPM * ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER;
+      boostedTargetRPM = topRPM * ShooterConstants.rpmAngle.get(getDist())[2];
     }
 
     double topRPS;

@@ -50,7 +50,7 @@ public class HashShoot extends Command {
   public void execute() {
     m_angler.setAngle(degrees);
     m_shoot.runAtTargetVelocity(rpm);
-    m_belt.simpleDrive(-0.3);
+    m_belt.simpleDrive(-0.5);
   }
 
   // Called once the command ends or is interrupted.
