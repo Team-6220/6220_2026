@@ -1,7 +1,7 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2026.2.1"
-    id "com.diffplug.spotless" version "8.3.0"
+    id "com.diffplug.spotless" version "8.4.0"
 }
 
 java {
@@ -12,8 +12,15 @@ java {
 repositories {
     mavenCentral()
     maven { url = uri("https://repo.maven.apache.org/maven2") }
-}
 
+    maven {
+        url = uri("https://maven.pkg.github.com/wpilibsuite/*")
+        credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+        }
+    }
+}
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)

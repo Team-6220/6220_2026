@@ -325,21 +325,17 @@ public class Swerve extends SubsystemBase {
         getGyroYaw(), getModulePositions(), new Pose2d(getPose().getTranslation(), heading));
   }
 
-  public void zeroHeading(XboxController driverController) {
-    double offset = Constants.isRed.equals("red") ? 0 : Math.PI;
-    poseEstimator.resetPosition(
-        getGyroYaw(),
-        getModulePositions(),
-        new Pose2d(getPose().getTranslation(), new Rotation2d(offset)));
-    RumbleManager.rumble(driverController, .2);
-  }
-
   public void zeroHeading() {
     double offset = Constants.isRed.equals("red") ? 0 : Math.PI;
     poseEstimator.resetPosition(
         getGyroYaw(),
         getModulePositions(),
         new Pose2d(getPose().getTranslation(), new Rotation2d(offset)));
+  }
+
+  public void zeroHeading(XboxController driverController) {
+    zeroHeading();
+    RumbleManager.rumble(driverController, .2);
   }
 
   public Rotation2d getGyroYaw() {
