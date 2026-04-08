@@ -220,10 +220,10 @@ public class Swerve extends SubsystemBase {
   public void lockWheels() {
     // Module order: 0=BR, 1=BL, 2=FR, 3=FL
     SwerveModuleState[] xStates = {
-      new SwerveModuleState(0, Rotation2d.fromDegrees(45)),  // BR
+      new SwerveModuleState(0, Rotation2d.fromDegrees(45)), // BR
       new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), // BL
       new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), // FR
-      new SwerveModuleState(0, Rotation2d.fromDegrees(45)),  // FL
+      new SwerveModuleState(0, Rotation2d.fromDegrees(45)), // FL
     };
     for (SwerveModule mod : mSwerveMods) {
       mod.setDesiredState(xStates[mod.getModuleNumber()], true);

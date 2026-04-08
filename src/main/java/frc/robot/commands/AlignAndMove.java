@@ -58,7 +58,8 @@ public class AlignAndMove extends Command {
           Degree.of(LimelightHelpers.getTX(name) + s_Swerve.getHeadingDegrees()));
       /* Get Values, Deadband*/
       double[] driverInputs = IOConstants.getDriverInputs(driver.getHID());
-      boolean isLimelightAligned = Math.abs(LimelightHelpers.getTX(name)) <= ALIGNMENT_TOLERANCE_DEGREES;
+      boolean isLimelightAligned =
+          Math.abs(LimelightHelpers.getTX(name)) <= ALIGNMENT_TOLERANCE_DEGREES;
       /* Drive or lock wheels when aligned */
       if (s_Swerve.isFacingTurnTarget() && isLimelightAligned) {
         // Aligned — lock wheels in X position so the robot can't be pushed while shooting
