@@ -124,7 +124,7 @@ public class Robot extends TimedRobot {
     }
 
     // Track shift during auto for dashboard display
-    double matchTime = DriverStation.getMatchTime();
+    double matchTime = DriverStation.getMatchTime() + 1;
     currentShift = 0;
     shiftName = "AUTO";
     shiftCountdownTime = matchTime; // Counts from 20 seconds down to 0
@@ -160,7 +160,7 @@ public class Robot extends TimedRobot {
     // Initialize shift tracking
     // Match starts at 2:20 (140s). AUTO 0:20-0:00, TRANSITION 2:20-2:10, SHIFT 1-4, ENDGAME
     // 0:30-0:00
-    teleOpStartTime = Timer.getFPGATimestamp();
+    teleOpStartTime = Timer.getFPGATimestamp() + 1;
     currentShift = 0;
     shiftName = "TRANSITION";
   }
@@ -190,7 +190,7 @@ public class Robot extends TimedRobot {
 
     // Use a strict elapsed timer for shift calculation to bypass FMS disabled gaps
     // Teleop is 140 seconds (2:20) in this structure.
-    double elapsedTeleop = Timer.getFPGATimestamp() - teleOpStartTime;
+    double elapsedTeleop = Timer.getFPGATimestamp() - teleOpStartTime - 1;
     double calculatedMatchTime = 140.0 - elapsedTeleop;
 
     if (matchTime < 0.0 && !DriverStation.isFMSAttached()) {

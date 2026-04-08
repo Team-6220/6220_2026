@@ -78,7 +78,13 @@ public class AlignAndMove extends Command {
   @Override
   public void end(boolean interrupted) {
     s_Swerve.stopDriving();
+    s_Swerve.lockWheels();
     LimelightHelpers.setPipelineIndex(name, 0);
     System.out.println("DONE ALIGNINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
+  }
+
+  @Override
+  public boolean isFinished() {
+    return Math.abs(LimelightHelpers.getTX(name)) <= 2;
   }
 }

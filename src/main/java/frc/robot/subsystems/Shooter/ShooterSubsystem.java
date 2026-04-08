@@ -19,10 +19,10 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.util.TunableNumber;
 import frc.robot.LimelightHelpers;
-import frc.robot.LimelightHelpers.*;
 
 public class ShooterSubsystem extends SubsystemBase {
 
@@ -74,7 +74,7 @@ public class ShooterSubsystem extends SubsystemBase {
       new TunableNumber("Shooter/FirstShotBoost", ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER);
 
   // Tolerance for determining if shooter is at speed (in RPS)
-  private static final double VELOCITY_TOLERANCE_RPS = 0.4;
+  private static final double VELOCITY_TOLERANCE_RPS = 1.5;
 
   // Current limit in amps
   private static final double CURRENT_LIMIT = 40.0;
@@ -179,8 +179,56 @@ public class ShooterSubsystem extends SubsystemBase {
    * standard
    *
    * @param topRPM Desired top-group velocity in RPM (normal, non-boosted).
+   * @param controller The Xbox controller instance.
    */
-  public void runAtTargetVelocity(double topRPM) {
+  public void runAtTargetVelocity(double topRPM, CommandXboxController controller) {
+    // Handle new RPM target (first call or RPM changed)
+    if (normalTargetRPM != topRPM) {
+      normalTargetRPM = topRPM;
+      isFirstShot = true;
+      initialRPMRecorded = false;
+      peakRPM = 0.0;
+      boostedTargetRPM = topRPM * ShooterConstants.rpmAngle.get(getDist())[2];
+    }
+
+    double topRPS;
+    double bottomRPS = m_bottomTargetRPMTN.get() / 60.0;
+
+    // Phase 1 & 2: Handle first shot with boost and dip detection
+    if (isFirstShot) {
+      double currentRPM = getAverageTopRPM();
+
+      // Check if RPM has dipped enough to transition to normal
+      if (checkForRPMDip(currentRPM)) {
+        isFirstShot = false;
+      }
+
+      // Set RPM based on current phase
+      if (isFirstShot) {
+        // Still in boost phase
+        topRPS = boostedTargetRPM / 60.0;
+      } else {
+        // Transitioned to normal phase
+        topRPS = normalTargetRPM / 60.0;
+      }
+    } else {
+      // Phase 3: Normal operation
+      topRPS = normalTargetRPM / 60.0;
+    }
+
+    // Set motor velocities
+    setTopGroupVelocityRPS(topRPS);
+    if (controller.getRightTriggerAxis() > 0.5) { // isAtSpeedFly(topRPS) &&
+      setBottomGroupVelocityRPS(bottomRPS);
+    }
+
+    if (controller.getRightTriggerAxis() < 0.5) {
+      m_motor41.stopMotor();
+      m_motor34.stopMotor();
+    }
+  }
+
+  public void runAtTargetVelocityAuto(double topRPM) {
     // Handle new RPM target (first call or RPM changed)
     if (normalTargetRPM != topRPM) {
       normalTargetRPM = topRPM;
@@ -405,6 +453,12 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public double getTopTargetRPM() {
     return m_topTargetRPMTN.get();
+  }
+
+  /** Returns whether the shooter is at its current target speed. */
+  public boolean isAtTargetSpeed() {
+    double targetRPS = (isFirstShot ? boostedTargetRPM : normalTargetRPM) / 60.0;
+    return isAtSpeedFly(targetRPS);
   }
 
   public double getBottomTargetRPM() {

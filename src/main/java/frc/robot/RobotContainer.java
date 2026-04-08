@@ -14,11 +14,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.AlignAndMove;
+import frc.robot.commands.AlignAndFlywheels;
 import frc.robot.commands.ArmToPositionCommand;
+import frc.robot.commands.ArmUpAndDown;
 import frc.robot.commands.Autos.BasicAutoBlue;
 import frc.robot.commands.Autos.BasicAutoRed;
-import frc.robot.commands.HashShoot;
 import frc.robot.commands.ManualArm;
 import frc.robot.commands.PassToAlliance;
 import frc.robot.commands.SwerveCom;
@@ -57,8 +57,6 @@ public class RobotContainer {
 
   private final GenericHID m_buttonBoard = new GenericHID(2);
 
-  private static final double ANGLER_MAX_SPEED = 0.15;
-  private static final double ANGLER_DEADBAND = 0.1;
   private static final double ALIGN_TOLERANCE_DEG = 2.0;
   private static final double MAX_SHOOT_DISTANCE_M = 4.0;
 
@@ -107,7 +105,7 @@ public class RobotContainer {
     Trigger pass = m_driverController.rightBumper();
     Trigger resetEncoder = new Trigger(() -> m_buttonBoard.getRawButton(13));
     Trigger manualArm = new Trigger(() -> m_joystick.getRawButton(1));
-    Trigger anglerTest0 = new Trigger(() -> m_buttonBoard.getRawButton(3));
+    Trigger armUpAndDown = new Trigger(() -> m_buttonBoard.getRawButton(3));
     Trigger arm0 = new Trigger(() -> m_buttonBoard.getRawButton(5));
     Trigger arm90 = new Trigger(() -> m_buttonBoard.getRawButton(6));
     Trigger armReset = new Trigger(() -> m_buttonBoard.getRawButton(14));
@@ -115,8 +113,7 @@ public class RobotContainer {
     resetEncoder.onTrue(Commands.runOnce(() -> m_angler.resetEncoder()));
     armReset.onTrue(Commands.runOnce(() -> arm.resetEncoder()));
 
-    anglerTest0.onTrue(
-        Commands.run(() -> m_angler.setAngle(0), m_angler).until(() -> m_angler.isAtAngle(0)));
+    armUpAndDown.whileTrue(new ArmUpAndDown(arm));
 
     m_driverController
         .y()
@@ -135,18 +132,15 @@ public class RobotContainer {
 
     // m_driverController.x().whileTrue(new ShooterTESTER(m_shooter, belt));
 
-    pass.whileTrue(new PassToAlliance(m_angler, m_shooter, belt));
+    pass.whileTrue(new PassToAlliance(m_angler, m_shooter, belt, m_driverController));
 
     intakeOut.whileTrue(new TestRollerCommand(true));
 
     intakeIn.whileTrue(new TestRollerCommand(false));
 
-    m_driverController.rightTrigger().whileTrue(new HashShoot(m_angler, m_shooter, belt));
-
     m_driverController
         .leftTrigger()
-        .whileTrue(
-            new AlignAndMove(s_Swerve, m_driverController, m_driverController.rightBumper()));
+        .whileTrue(new AlignAndFlywheels(s_Swerve, m_driverController, m_angler, m_shooter, belt));
 
     arm0.onTrue(new ArmToPositionCommand(arm, -2));
 
@@ -155,8 +149,7 @@ public class RobotContainer {
     // ==================== State-Based LED Controls ====================
 
     // --- Individual state triggers ---
-    Trigger flywheelsReady =
-        new Trigger(() -> m_shooter.isAtSpeedFly(m_shooter.getTopTargetRPM() / 60.0));
+    Trigger flywheelsReady = new Trigger(() -> m_shooter.isAtTargetSpeed());
 
     Trigger aligned =
         new Trigger(
@@ -177,25 +170,32 @@ public class RobotContainer {
     // --- Combined "ready to shoot" trigger ---
     // We require everything (speed, alignment, range) for the final triggers so rumble corresponds
     // to the actual firing window.
-    Trigger readyToShoot = flywheelsReady.and(aligned).and(inRange);
+    Trigger readyToShoot = flywheelsReady.and(aligned);
 
-    // --- LED bindings (lowest to highest priority) ---
+    Trigger isShooting = m_driverController.rightTrigger();
 
-    // Flywheels spinning but NOT ready -> fast blink red
+    // --- LED bindings (lowest to highest priority) made mutually exclusive ---
+
+    // Aligned but not at speed -> Flashing Green
+    aligned
+        .and(flywheelsReady.negate())
+        .and(isShooting.negate())
+        .whileTrue(s_LED.runPattern(s_LED.blink(s_LED.solidGreen(), 0.15)));
+
+    // At speed but not aligned OR actively shooting while not aligned -> Flashing Orange
     flywheelsReady
-        .negate()
-        .and(new Trigger(() -> m_shooter.getMotor9RPM() > 100))
-        .whileTrue(s_LED.runPattern(s_LED.blink(s_LED.solidRed(), 0.15)));
-
-    // Flywheels at speed but not aligned or out of range -> solid dark orange
-    flywheelsReady
-        .and(readyToShoot.negate())
+        .or(isShooting)
+        .and(aligned.negate())
         .whileTrue(s_LED.runPattern(s_LED.blink(s_LED.solidDarkOrange(), 0.15)));
 
-    aligned.whileTrue(s_LED.runPattern(s_LED.solidGreen()));
+    // Aligned and at speed (but not shooting) -> Solid Green
+    readyToShoot.and(isShooting.negate()).whileTrue(s_LED.runPattern(s_LED.solidGreen()));
+
+    // Actively shooting AND aligned -> Flashing Red
+    isShooting.and(aligned).whileTrue(s_LED.runPattern(s_LED.blink(s_LED.solidRed(), 0.15)));
 
     // Haptic feedback (rumble): Pulse when target is aligned + in range (before full spin-up).
-    aligned.onTrue(
+    readyToShoot.onTrue(
         Commands.runOnce(
                 () -> {
                   m_driverController.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
@@ -217,6 +217,7 @@ public class RobotContainer {
     boolean shortRange = dist > 0 && dist <= MAX_SHOOT_DISTANCE_M;
 
     SmartDashboard.putBoolean("Shooter/Aligned", aligned);
+    SmartDashboard.putBoolean("Shooter/FlywheelsAtTarget", m_shooter.isAtTargetSpeed());
     SmartDashboard.putBoolean("Shooter/ShortRange", shortRange);
   }
 

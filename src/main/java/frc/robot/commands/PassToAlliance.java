@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Intake.BeltSubsystem;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
@@ -18,11 +19,18 @@ public class PassToAlliance extends Command {
 
   BeltSubsystem m_belt;
 
-  public PassToAlliance(AnglerSubsystem m_angler, ShooterSubsystem m_shoot, BeltSubsystem m_belt) {
+  CommandXboxController controller;
+
+  public PassToAlliance(
+      AnglerSubsystem m_angler,
+      ShooterSubsystem m_shoot,
+      BeltSubsystem m_belt,
+      CommandXboxController controller) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.m_angler = m_angler;
     this.m_shoot = m_shoot;
     this.m_belt = m_belt;
+    this.controller = controller;
     addRequirements(m_angler, m_shoot, m_belt);
   }
 
@@ -33,9 +41,9 @@ public class PassToAlliance extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_angler.setAngle(35);
-    m_shoot.runAtTargetVelocity(2200);
-    m_belt.simpleDrive(-0.3);
+    m_angler.setAngle(32);
+    m_shoot.runAtTargetVelocity(2200, controller);
+    m_belt.simpleDrive(-0.5);
   }
 
   // Called once the command ends or is interrupted.

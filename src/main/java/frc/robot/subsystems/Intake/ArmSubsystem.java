@@ -228,7 +228,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void simpleDriveArm(double motorOutput) {
-    armMotor.setVoltage(motorOutput * 6);
+    armMotor.setVoltage(motorOutput * 8);
   }
 
   public void maintain() {
@@ -248,6 +248,10 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void resetEncoder() {
     armEncoder.setPosition(0);
+  }
+
+  public void stopDriving() {
+    armMotor.stopMotor();
   }
 
   public static synchronized ArmSubsystem getInstance() {
