@@ -57,8 +57,6 @@ public class RobotContainer {
 
   private final GenericHID m_buttonBoard = new GenericHID(2);
 
-  private static final double ANGLER_MAX_SPEED = 0.15;
-  private static final double ANGLER_DEADBAND = 0.1;
   private static final double ALIGN_TOLERANCE_DEG = 2.0;
   private static final double MAX_SHOOT_DISTANCE_M = 4.0;
 

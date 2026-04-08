@@ -228,7 +228,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void simpleDriveArm(double motorOutput) {
-    armMotor.setVoltage(motorOutput * 6);
+    armMotor.setVoltage(motorOutput * 8);
   }
 
   public void maintain() {
