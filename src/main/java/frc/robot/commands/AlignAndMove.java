@@ -2,6 +2,8 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degree;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -10,7 +12,6 @@ import frc.robot.IOConstants;
 import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Vision.Limelight;
-import java.util.function.BooleanSupplier;
 
 /** Swerve drive command used for teleop period. */
 public class AlignAndMove extends Command {
@@ -78,7 +79,13 @@ public class AlignAndMove extends Command {
   @Override
   public void end(boolean interrupted) {
     s_Swerve.stopDriving();
+    s_Swerve.lockWheels();
     LimelightHelpers.setPipelineIndex(name, 0);
     System.out.println("DONE ALIGNINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
+  }
+
+  @Override
+  public boolean isFinished() {
+    return Math.abs(LimelightHelpers.getTX(name)) <= 2;
   }
 }
