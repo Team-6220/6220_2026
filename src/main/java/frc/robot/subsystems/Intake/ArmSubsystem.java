@@ -246,6 +246,10 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber(tableKey + "max accel", maxAccel);
   }
 
+  public void resetEncoder() {
+    armEncoder.setPosition(0);
+  }
+
   public static synchronized ArmSubsystem getInstance() {
     if (INSTANCE == null) INSTANCE = new ArmSubsystem();
     return INSTANCE;
