@@ -135,13 +135,15 @@ public class RobotContainer {
 
     // m_driverController.x().whileTrue(new ShooterTESTER(m_shooter, belt));
 
-    pass.whileTrue(new PassToAlliance(m_angler, m_shooter, belt));
+    pass.whileTrue(new PassToAlliance(m_angler, m_shooter, belt, m_driverController));
 
     intakeOut.whileTrue(new TestRollerCommand(true));
 
     intakeIn.whileTrue(new TestRollerCommand(false));
 
-    m_driverController.rightTrigger().whileTrue(new HashShoot(m_angler, m_shooter, belt));
+    m_driverController
+        .rightTrigger()
+        .whileTrue(new HashShoot(m_angler, m_shooter, belt, m_driverController));
 
     m_driverController
         .leftTrigger()
