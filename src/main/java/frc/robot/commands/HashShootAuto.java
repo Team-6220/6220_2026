@@ -60,7 +60,6 @@ public class HashShootAuto extends Command {
     m_angler.stop();
     m_shoot.stop();
     m_belt.stop();
-    new InstantCommand(() -> m_angler.setAngle(0), m_angler).until(() -> m_angler.isAtAngle(0));
   }
 
   // Returns true when the command should end.

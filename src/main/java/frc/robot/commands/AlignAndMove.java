@@ -32,7 +32,6 @@ public class AlignAndMove extends Command {
 
   @Override
   public void initialize() {
-    s_Swerve.setIsAuto(DriverStation.isAutonomous());
     // Initialize so that the swerve doesn't become grumpy
     s_Swerve.resetModulesToAbsolute();
     Limelight.setPipeline();
@@ -52,7 +51,6 @@ public class AlignAndMove extends Command {
     if (LimelightHelpers.getCurrentPipelineIndex(name) == 0.0) {
       Limelight.setPipeline();
     }
-    if (!DriverStation.isAutonomous()) {
       s_Swerve.setTurnControllerGoal(
           Degree.of(LimelightHelpers.getTX(name) + s_Swerve.getHeadingDegrees()));
       /* Get Values, Deadband*/
@@ -71,6 +69,9 @@ public class AlignAndMove extends Command {
             !robotCentricSup.getAsBoolean(),
             false);
       }
+    
+    if (Math.abs(LimelightHelpers.getTX(name)) <= 2 && (Math.abs(driverInputs[0]) <=  0.1 || Math.abs(driverInputs[1]) <= 0.1)) {
+      s_Swerve.lockWheels();
     }
     ticks++;
   }
@@ -78,13 +79,12 @@ public class AlignAndMove extends Command {
   @Override
   public void end(boolean interrupted) {
     s_Swerve.stopDriving();
-    s_Swerve.lockWheels();
     LimelightHelpers.setPipelineIndex(name, 0);
     System.out.println("DONE ALIGNINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
   }
 
   @Override
   public boolean isFinished() {
-    return Math.abs(LimelightHelpers.getTX(name)) <= 2;
+    return false;
   }
 }
