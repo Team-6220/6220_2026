@@ -16,6 +16,8 @@ public class ShooterConstants {
         {
           put(-1.0, new Double[] {0.0, 0.0, 0.0}); // Testing purposes
           put(0.0, new Double[] {1900.0, 0.0, 1.15}); // Testing purposes
+          put(0.4, new Double[] {1900.0, 0.0, 1.15});
+          put(0.6, new Double[] {1900.0, 0.0, 1.15});
           put(0.8, new Double[] {1900.0, 0.0, 1.19});
           put(1.0, new Double[] {2050.0, 2.6, 1.2});
           put(1.2, new Double[] {2040.0, 5.85, 1.21});
@@ -33,12 +35,14 @@ public class ShooterConstants {
           put(3.6, new Double[] {2140.0, 20.45, 1.33});
           put(3.8, new Double[] {2160.0, 21.49, 1.34});
           put(4.0, new Double[] {2200.0, 22.5, 1.30});
+          put(4.2, new Double[] {2220.0, 23.5, 1.31});
+          put(4.4, new Double[] {2240.0, 24.5, 1.32});
         }
       };
 
   public static final double topTESTrpm = 1600.0;
 
-  public static final double bottomTESTrpm = 800;
+  public static final double bottomTESTrpm = 1200;
 
   // ========== First Shot Boost Configuration ==========
   /** Multiplier for first shot RPM (e.g., 1.15 for a 15% boost). */
