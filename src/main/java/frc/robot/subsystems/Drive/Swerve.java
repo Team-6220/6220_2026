@@ -321,6 +321,10 @@ public class Swerve extends SubsystemBase {
     return poseEstimator.getEstimatedPosition();
   }
 
+  public void addVisionMeasurement(Pose2d visionPose, double timestamp) {
+    poseEstimator.addVisionMeasurement(visionPose, timestamp);
+  }
+
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(getGyroYaw(), getModulePositions(), pose);
   }

@@ -27,7 +27,8 @@ public class PassToAlliance extends Command {
       AnglerSubsystem m_angler,
       ShooterSubsystem m_shoot,
       BeltSubsystem m_belt,
-      CommandXboxController controller, double rpm) {
+      CommandXboxController controller,
+      double rpm) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.m_angler = m_angler;
     this.m_shoot = m_shoot;
