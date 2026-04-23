@@ -17,15 +17,42 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Clone WPILib vendor JSON repo
-        run: |
-          git clone https://github.com/wpilibsuite/vendor-json-repo.git vendorrepo
-
       - name: Update vendordeps
         run: |
-          python vendorrepo/add_vendordep.py --all --output vendordeps/
+          mkdir -p updated
+          changed=false
+
+          for file in vendordeps/*.json; do
+            echo "Checking $file"
+
+            # Extract jsonUrl from the vendordep file
+            url=$(jq -r '.jsonUrl' "$file")
+
+            if [[ "$url" == "null" || -z "$url" ]]; then
+              echo "  No jsonUrl found, skipping"
+              continue
+            fi
+
+            echo "  Downloading latest from $url"
+            curl -sSL "$url" -o "updated/$(basename "$file")"
+
+            # Compare with existing vendordep
+            if ! diff -q "$file" "updated/$(basename "$file")" > /dev/null; then
+              echo "  Update found for $(basename "$file")"
+              cp "updated/$(basename "$file")" "$file"
+              changed=true
+            else
+              echo "  No changes"
+            fi
+          done
+
+          if [[ "$changed" == "false" ]]; then
+            echo "No vendordep updates found"
+            exit 0
+          fi
 
       - name: Commit changes
+        if: success()
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
             git config user.name "github-actions"
@@ -37,9 +64,10 @@ jobs:
           fi
 
       - name: Open PR
+        if: success()
         uses: peter-evans/create-pull-request@v6
         with:
           branch: auto/update-vendordeps
-          title: "Update vendordeps"
+          title: "deps: update vendordeps"
           body: "Automated vendordep update"
           labels: dependencies
