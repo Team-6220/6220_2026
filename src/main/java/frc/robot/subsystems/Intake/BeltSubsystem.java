@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.Intake;
 
-import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -38,8 +37,8 @@ public class BeltSubsystem extends SubsystemBase {
     beltMotorConfig.idleMode(BeltConstants.beltIdleMode);
     beltMotor.configure(
         beltMotorConfig,
-        SparkBase.ResetMode.kResetSafeParameters,
-        SparkBase.PersistMode.kPersistParameters);
+        com.revrobotics.ResetMode.kResetSafeParameters,
+        com.revrobotics.PersistMode.kPersistParameters);
   }
 
   @Override
