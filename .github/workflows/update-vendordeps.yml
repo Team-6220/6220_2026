@@ -23,6 +23,7 @@ jobs:
           changes=""
 
           for file in vendordeps/*.json; do
+            base=$(basename "$file")
             name=$(jq -r '.name' "$file")
             oldVersion=$(jq -r '.version' "$file")
             url=$(jq -r '.jsonUrl' "$file")
@@ -31,15 +32,28 @@ jobs:
               continue
             fi
 
-            curl -sSL "$url" -o "updated/$(basename "$file")"
-            newVersion=$(jq -r '.version' "updated/$(basename "$file")")
+            curl -sSL "$url" -o "updated/$base"
+            newVersion=$(jq -r '.version' "updated/$base")
 
-            if ! diff -q "$file" "updated/$(basename "$file")" > /dev/null; then
-              cp "updated/$(basename "$file")" "$file"
+            # Only count real version bumps
+            if [[ "$oldVersion" != "$newVersion" ]]; then
               changed=true
               changes+="$name: $oldVersion → $newVersion"$'\n'
+
+              # Update file contents
+              cp "updated/$base" "$file"
+
+              # Rename file if filename contains version
+              if [[ "$base" =~ (.*)-([v0-9].*)\.json ]]; then
+                prefix="${BASH_REMATCH[1]}"
+                newFile="vendordeps/${prefix}-${newVersion}.json"
+                mv "$file" "$newFile"
+              fi
             fi
           done
+
+          # Clean up
+          rm -rf updated
 
           echo "changed=$changed" >> $GITHUB_OUTPUT
           echo "changes<<EOF" >> $GITHUB_OUTPUT
@@ -58,7 +72,7 @@ jobs:
             new=$(echo "${{ steps.update.outputs.changes }}" | awk '{print $4}')
             title="Bump $dep from $old → $new"
             commit="Bump $dep from $old → $new"
-            body=""   # no body for single update
+            body=""
           else
             title="Bump dependencies"
             commit="Bump dependencies"
