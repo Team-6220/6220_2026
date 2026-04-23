@@ -94,3 +94,4 @@ jobs:
           commit-message: ${{ steps.meta.outputs.commit }}
           body: ${{ steps.meta.outputs.body }}
           delete-branch: true
+          team-reviewers: Team-6220/2025-reviewers
