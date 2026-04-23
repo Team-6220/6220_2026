@@ -12,62 +12,71 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Update vendordeps
+        id: update
         run: |
           mkdir -p updated
           changed=false
+          changes=""
 
           for file in vendordeps/*.json; do
-            echo "Checking $file"
-
-            # Extract jsonUrl from the vendordep file
+            name=$(jq -r '.name' "$file")
+            oldVersion=$(jq -r '.version' "$file")
             url=$(jq -r '.jsonUrl' "$file")
 
             if [[ "$url" == "null" || -z "$url" ]]; then
-              echo "  No jsonUrl found, skipping"
               continue
             fi
 
-            echo "  Downloading latest from $url"
             curl -sSL "$url" -o "updated/$(basename "$file")"
+            newVersion=$(jq -r '.version' "updated/$(basename "$file")")
 
-            # Compare with existing vendordep
             if ! diff -q "$file" "updated/$(basename "$file")" > /dev/null; then
-              echo "  Update found for $(basename "$file")"
               cp "updated/$(basename "$file")" "$file"
               changed=true
-            else
-              echo "  No changes"
+              changes+="$name: $oldVersion → $newVersion"$'\n'
             fi
           done
 
-          if [[ "$changed" == "false" ]]; then
-            echo "No vendordep updates found"
-            exit 0
-          fi
+          echo "changed=$changed" >> $GITHUB_OUTPUT
+          echo "changes<<EOF" >> $GITHUB_OUTPUT
+          echo "$changes" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Commit changes
-        if: success()
+      - name: Build PR metadata
+        id: meta
+        if: steps.update.outputs.changed == 'true'
         run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
-            git config user.name "github-actions"
-            git config user.email "github-actions@github.com"
-            git checkout -b auto/update-vendordeps
-            git add vendordeps/
-            git commit -m "Update vendordeps"
-            git push --force --set-upstream origin auto/update-vendordeps
+          count=$(echo "${{ steps.update.outputs.changes }}" | grep -c "→" || true)
+
+          if [[ "$count" -eq 1 ]]; then
+            dep=$(echo "${{ steps.update.outputs.changes }}" | cut -d':' -f1)
+            old=$(echo "${{ steps.update.outputs.changes }}" | awk '{print $2}')
+            new=$(echo "${{ steps.update.outputs.changes }}" | awk '{print $4}')
+            title="Bump $dep from $old → $new"
+            commit="Bump $dep from $old → $new"
+            body=""   # no body for single update
+          else
+            title="Bump dependencies"
+            commit="Bump dependencies"
+            body="Updated vendordeps:\n\n${{ steps.update.outputs.changes }}\n\n_This PR was generated automatically._"
           fi
 
-      - name: Open PR
-        if: success()
+          echo "title=$title" >> $GITHUB_OUTPUT
+          echo "commit=$commit" >> $GITHUB_OUTPUT
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$body" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        if: steps.update.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           branch: auto/update-vendordeps
-          title: "deps: update vendordeps"
-          body: "Automated vendordep update"
-          labels: dependencies
+          title: ${{ steps.meta.outputs.title }}
+          commit-message: ${{ steps.meta.outputs.commit }}
+          body: ${{ steps.meta.outputs.body }}
+          delete-branch: true
