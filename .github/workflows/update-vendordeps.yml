@@ -2,7 +2,7 @@ name: Auto Update Vendordeps
 
 on:
   schedule:
-    - cron: "0 9 * * *"   # daily
+    - cron: "0 19 * * 3"   # Every Wednesday at 19:00 UTC
   workflow_dispatch:
 
 jobs:
