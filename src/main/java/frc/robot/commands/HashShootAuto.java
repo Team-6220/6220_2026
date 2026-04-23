@@ -6,34 +6,27 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Intake.BeltSubsystem;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class HashShoot extends Command {
-  /** Creates a new HashShoot. */
+public class HashShootAuto extends Command {
+  /** Creates a new AngleSet. */
   AnglerSubsystem m_angler;
 
   ShooterSubsystem m_shoot;
 
   BeltSubsystem m_belt;
-  CommandXboxController controller;
   double degrees;
   double rpm;
   double dist;
 
-  public HashShoot(
-      AnglerSubsystem m_angler,
-      ShooterSubsystem m_shoot,
-      BeltSubsystem m_belt,
-      CommandXboxController controller) {
+  public HashShootAuto(AnglerSubsystem m_angler, ShooterSubsystem m_shoot, BeltSubsystem m_belt) {
     this.m_angler = m_angler;
     this.m_shoot = m_shoot;
     this.m_belt = m_belt;
-    this.controller = controller;
     addRequirements(m_angler, m_shoot, m_belt);
   }
 
@@ -57,7 +50,7 @@ public class HashShoot extends Command {
   @Override
   public void execute() {
     m_angler.setAngle(degrees);
-    m_shoot.runAtTargetVelocity(rpm, controller);
+    m_shoot.runAtTargetVelocityAuto(rpm);
     m_belt.simpleDrive(-0.5);
   }
 

@@ -72,7 +72,8 @@ public class AdressableLEDs extends SubsystemBase {
 
   public LEDPattern solidDarkOrange() {
     // Swapped R and G for GRB format
-    return LEDPattern.solid(new Color(140.0 / 255.0, 255.0 / 255.0, 0.0));
+    return LEDPattern.solid(new Color(105.0 / 255.0, 160.0 / 255.0, 10.0 / 255.0));
+    // rgb(160, 105, 10)
   }
 
   // Rainbow
