@@ -1,0 +1,45 @@
+name: Auto Update Vendordeps
+
+on:
+  schedule:
+    - cron: "0 19 * * 3"   # Every Wednesday at 19:00 UTC
+  workflow_dispatch:
+
+jobs:
+  update-vendordeps:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Clone WPILib vendor JSON repo
+        run: |
+          git clone https://github.com/wpilibsuite/vendor-json-repo.git vendorrepo
+
+      - name: Update vendordeps
+        run: |
+          python vendorrepo/add_vendordep.py --all --output vendordeps/
+
+      - name: Commit changes
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name "github-actions"
+            git config user.email "github-actions@github.com"
+            git checkout -b auto/update-vendordeps
+            git add vendordeps/
+            git commit -m "Update vendordeps"
+            git push --force --set-upstream origin auto/update-vendordeps
+          fi
+
+      - name: Open PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: auto/update-vendordeps
+          title: "Update vendordeps"
+          body: "Automated vendordep update"
+          labels: dependencies
