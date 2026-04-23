@@ -70,9 +70,11 @@ jobs:
           count=$(echo "${{ steps.update.outputs.changes }}" | grep -c "→" || true)
 
           if [[ "$count" -eq 1 ]]; then
-            dep=$(echo "${{ steps.update.outputs.changes }}" | cut -d':' -f1)
-            old=$(echo "${{ steps.update.outputs.changes }}" | awk '{print $2}')
-            new=$(echo "${{ steps.update.outputs.changes }}" | awk '{print $4}')
+            change_line=$(echo "${{ steps.update.outputs.changes }}" | grep "→" | head -n 1)
+            dep="${change_line%%: *}"
+            versions="${change_line#*: }"
+            old="${versions%% → *}"
+            new="${versions#* → }"
             title="Bump $dep from $old → $new"
             commit="Bump $dep from $old → $new"
             body=""
