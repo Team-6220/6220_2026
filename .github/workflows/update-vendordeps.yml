@@ -94,12 +94,9 @@ jobs:
         if: steps.update.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ secrets.MY_PAT }}
           branch: auto/update-vendordeps
           title: ${{ steps.meta.outputs.title }}
           commit-message: ${{ steps.meta.outputs.commit }}
           body: ${{ steps.meta.outputs.body }}
           delete-branch: true
-
-  build-and-test:
-    needs: update-vendordeps
-    uses: ./.github/workflows/build.yml
