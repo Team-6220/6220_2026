@@ -99,3 +99,7 @@ jobs:
           commit-message: ${{ steps.meta.outputs.commit }}
           body: ${{ steps.meta.outputs.body }}
           delete-branch: true
+
+  build-and-test:
+    needs: update-vendordeps
+    uses: ./.github/workflows/build.yml
