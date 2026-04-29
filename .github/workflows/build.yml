@@ -2,14 +2,10 @@ name: build-and-test
 
 on:
   workflow_call:
-    outputs:
-      status:
-        description: "Dummy output to register check"
-        value: "ok"
   pull_request: 
-    branches: [ main, dev ]
+    branches: [ main, dev, auto/**]
   push:
-    branches: [ main, dev ]
+    branches: [ main, dev, auto/**]
   workflow_dispatch:
 
 jobs: 
