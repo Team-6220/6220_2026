@@ -2,7 +2,7 @@ name: Auto Update Vendordeps
 
 on:
   schedule:
-    - cron: "0 19 * * 3"   # Every Wednesday at 19:00 UTC
+    - cron: "0 03 * * 4"   # Every Wednesday at 03:00 UTC, 19:00 PST on Tuesday
   workflow_dispatch:
 
 jobs:
@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.1.7
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -92,11 +92,10 @@ jobs:
 
       - name: Create Pull Request
         if: steps.update.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           branch: auto/update-vendordeps
           title: ${{ steps.meta.outputs.title }}
           commit-message: ${{ steps.meta.outputs.commit }}
           body: ${{ steps.meta.outputs.body }}
           delete-branch: true
-          team-reviewers: Team-6220/2025-reviewers
