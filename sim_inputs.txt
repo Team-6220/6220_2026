@@ -1,4 +1,0 @@
-# sim_inputs.txt
-# Format: forward_m_s strafe_m_s omega_rad_s alliance recordVision replayVision
-# Example: drive forward at 1 m/s, no strafe, no rotation, blue alliance
-1.0 0.0 0.0 blue false false

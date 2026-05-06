@@ -7,10 +7,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.FieldConstants;
 import frc.robot.aiming.AimPredictor;
 import frc.robot.aiming.AimSolution;
-import frc.robot.subsystems.tracking.TargetEstimator;
-import frc.robot.subsystems.turret.TurretSubsystemSim;
+import frc.robot.subsystems.turret.TurretIOSim;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.time.Instant;
@@ -37,9 +38,7 @@ public final class RobotTurretSimRunner {
   private static final String LATEST_FILE = "sim_latest_pose3d.txt";
   private static final String VISION_RECORD_FILE = "sim_vision_recording.csv";
 
-  private final TurretSubsystemSim turret;
-  private final TargetEstimator targetEstimator;
-  private final SimPoseEstimator poseEstimator;
+  private final TurretIOSim turret;
   private final SimRangeEstimator rangeEstimator;
   private final VisionTelemetryRecorder visionRecorder;
   private final NetworkTable simTable;
@@ -115,8 +114,8 @@ public final class RobotTurretSimRunner {
       // Determine which hub to aim at
       Pose2d hubPose =
           alliance.equals("blue")
-              ? SimGeometryConstants.BLUE_HUB_POSE
-              : SimGeometryConstants.RED_HUB_POSE;
+              ? FieldConstants.BLUE_HUB_POSE
+              : FieldConstants.RED_HUB_POSE;
 
       // Update pose estimator with simulated ground truth
       poseEstimator.update(new Pose2d(x, y, new Rotation2d(yaw)));
@@ -142,7 +141,7 @@ public final class RobotTurretSimRunner {
       }
 
       // Compute shooter pose (turret center) using robot pose and turret offset
-      Translation2d offset = SimGeometryConstants.TURRET_OFFSET_XY;
+      Translation2d offset = FieldConstants.TURRET_OFFSET_XY;
       double offX = offset.getX() * Math.cos(yaw) - offset.getY() * Math.sin(yaw);
       double offY = offset.getX() * Math.sin(yaw) + offset.getY() * Math.cos(yaw);
       Pose2d shooterPose = new Pose2d(x + offX, y + offY, new Rotation2d(yaw));
@@ -151,7 +150,7 @@ public final class RobotTurretSimRunner {
       Translation2d targetVel = targetEstimator.estimateVelocity();
       AimSolution sol =
           AimPredictor.predictIntercept(
-              hubPose, targetVel, shooterPose, SimGeometryConstants.PROJECTILE_SPEED_MPS);
+              hubPose, targetVel, shooterPose, FieldConstants.PROJECTILE_SPEED_MPS);
       double turretAngleRobotFrame = sol.requiredTurretAngleRad;
       turret.setTargetAngle(new Rotation2d(turretAngleRobotFrame));
 
@@ -168,7 +167,7 @@ public final class RobotTurretSimRunner {
       edu.wpi.first.math.geometry.Rotation3d turretRot3 =
           new edu.wpi.first.math.geometry.Rotation3d(0.0, 0.0, turretYawField);
       Pose3d turretPose3d =
-          new Pose3d(x + offX, y + offY, SimGeometryConstants.TURRET_HEIGHT_M, turretRot3);
+          new Pose3d(x + offX, y + offY, FieldConstants.TURRET_HEIGHT_M, turretRot3);
 
       // compute relative vector to hub (field frame)
       double relX = hubPose.getX() - x;
