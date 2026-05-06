@@ -1,11 +1,11 @@
-package frc.robot.turret;
+package frc.robot.subsystems.turret;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Minimal turret subsystem with a PID controller for angle. Meant as a compile-ready stub. */
-public class TurretSubsystem extends SubsystemBase {
+public class TurretSubsystem extends SubsystemBase implements TurretSubsystemIO {
   private final PIDController pid = new PIDController(4.0, 0, 0.1);
   private double currentAngle = 0.0; // radians
 

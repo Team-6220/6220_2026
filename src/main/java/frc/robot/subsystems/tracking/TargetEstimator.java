@@ -1,4 +1,4 @@
-package frc.robot.tracking;
+package frc.robot.subsystems.tracking;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;

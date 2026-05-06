@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.aiming.AimPredictor;
 import frc.robot.aiming.AimSolution;
-import frc.robot.turret.TurretSubsystem;
+import frc.robot.subsystems.turret.TurretSubsystem;
 
 /** Small coordinator that requests aim solutions and commands the turret. */
 public class SuperstructureCoordinator {

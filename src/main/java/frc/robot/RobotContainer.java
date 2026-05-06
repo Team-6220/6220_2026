@@ -30,6 +30,9 @@ import frc.robot.subsystems.Intake.RollerSubsystem;
 import frc.robot.subsystems.LEDs.AdressableLEDs;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
+import frc.robot.subsystems.turret.TurretSubsystem;
+import frc.robot.subsystems.turret.TurretSubsystemIO;
+import frc.robot.subsystems.turret.TurretSubsystemSim;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -47,6 +50,11 @@ public class RobotContainer {
   private final AdressableLEDs s_LED = new AdressableLEDs();
   private final Swerve s_Swerve = new Swerve();
   private final ShooterSubsystem m_shooter = new ShooterSubsystem();
+  // Turret simulation integration (sim uses TurretSubsystemSim, real uses TurretSubsystem)
+  private final TurretSubsystemIO turret =
+      edu.wpi.first.wpilibj.RobotBase.isSimulation()
+          ? new TurretSubsystemSim()
+          : new TurretSubsystem();
   private final AnglerSubsystem m_angler = new AnglerSubsystem();
   private final ArmSubsystem arm = ArmSubsystem.getInstance();
   private final BeltSubsystem belt = BeltSubsystem.getInstance();

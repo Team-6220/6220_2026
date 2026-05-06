@@ -14,6 +14,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -94,6 +95,11 @@ public class Swerve extends SubsystemBase {
   };
 
   private SwervePoseEstimator poseEstimator;
+
+  // Simulation state (used only in simulation)
+  private Pose2d simPose = new Pose2d();
+  private ChassisSpeeds simChassisSpeeds = new ChassisSpeeds();
+  private ChassisSpeeds simActualSpeeds = new ChassisSpeeds();
 
   RobotConfig config;
 
@@ -187,13 +193,16 @@ public class Swerve extends SubsystemBase {
    */
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+    ChassisSpeeds desiredSpeeds =
+        fieldRelative
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                translation.getX(), translation.getY(), rotation, getHeading())
+            : new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
+    if (RobotBase.isSimulation()) {
+      simChassisSpeeds = desiredSpeeds;
+    }
     SwerveModuleState[] swerveModuleStates =
-        SwerveConstants.kinematics()
-            .toSwerveModuleStates(
-                fieldRelative
-                    ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                        translation.getX(), translation.getY(), rotation, getHeading())
-                    : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
+        SwerveConstants.kinematics().toSwerveModuleStates(desiredSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.maxSpeed());
 
     // set all the modules
@@ -261,6 +270,9 @@ public class Swerve extends SubsystemBase {
    */
   public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
     System.out.println("relative");
+    if (RobotBase.isSimulation()) {
+      simChassisSpeeds = robotRelativeSpeeds;
+    }
     ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
 
     SwerveModuleState[] targetStates =
@@ -316,12 +328,18 @@ public class Swerve extends SubsystemBase {
   }
 
   public Pose2d getPose() {
-
+    if (RobotBase.isSimulation()) {
+      return simPose;
+    }
     return poseEstimator.getEstimatedPosition();
   }
 
   public void setPose(Pose2d pose) {
-    poseEstimator.resetPosition(getGyroYaw(), getModulePositions(), pose);
+    if (RobotBase.isSimulation()) {
+      simPose = pose;
+    } else {
+      poseEstimator.resetPosition(getGyroYaw(), getModulePositions(), pose);
+    }
   }
 
   public Rotation2d getHeading() {
@@ -505,6 +523,56 @@ public class Swerve extends SubsystemBase {
               AutoConstants.angularMaxVelRadPerSec(), AutoConstants.angularMaxAccelRadPerSecSq()));
       turnPidController.reset(getHeadingRads());
     }
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    if (!RobotBase.isSimulation()) {
+      return;
+    }
+    double dt = 0.02;
+    // Clamp desired speeds to AutoConstants and drivetrain max
+    double maxLinVel = Math.min(SwerveConstants.maxSpeed(), AutoConstants.translationMaxVel());
+    double maxAngVel =
+        Math.min(SwerveConstants.maxAngularVelocity(), AutoConstants.angularMaxVelRadPerSec());
+
+    double desiredVx = simChassisSpeeds.vxMetersPerSecond;
+    double desiredVy = simChassisSpeeds.vyMetersPerSecond;
+    double desiredOmega = simChassisSpeeds.omegaRadiansPerSecond;
+
+    double linMag = Math.hypot(desiredVx, desiredVy);
+    if (linMag > maxLinVel && linMag > 1e-6) {
+      double scale = maxLinVel / linMag;
+      desiredVx *= scale;
+      desiredVy *= scale;
+    }
+    if (Math.abs(desiredOmega) > maxAngVel) {
+      desiredOmega = Math.copySign(maxAngVel, desiredOmega);
+    }
+
+    double maxLinAccel = AutoConstants.translationMaxAccel();
+    double maxAngAccel = AutoConstants.angularMaxAccelRadPerSecSq();
+
+    double vx = applyAccelLimit(simActualSpeeds.vxMetersPerSecond, desiredVx, maxLinAccel, dt);
+    double vy = applyAccelLimit(simActualSpeeds.vyMetersPerSecond, desiredVy, maxLinAccel, dt);
+    double omega =
+        applyAccelLimit(simActualSpeeds.omegaRadiansPerSecond, desiredOmega, maxAngAccel, dt);
+
+    simActualSpeeds = new ChassisSpeeds(vx, vy, omega);
+    Twist2d twist = new Twist2d(vx * dt, vy * dt, omega * dt);
+    simPose = simPose.exp(twist);
+  }
+
+  private double applyAccelLimit(double current, double target, double maxAccel, double dt) {
+    double delta = target - current;
+    double maxDelta = maxAccel * dt;
+    if (delta > maxDelta) {
+      return current + maxDelta;
+    }
+    if (delta < -maxDelta) {
+      return current - maxDelta;
+    }
+    return target;
   }
 
   private void createShuffleOutputs() {
