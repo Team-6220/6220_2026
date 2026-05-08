@@ -5,6 +5,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 /** Shared turret interface for real and simulated implementations. */
 public interface TurretIO {
@@ -21,6 +22,7 @@ public interface TurretIO {
     public Voltage appliedVoltage;
   }
 
+  @AutoLogOutput
   void driveToGoal(Rotation2d angle);
 
   void setVoltageOut(Voltage voltsOut);

@@ -1,9 +1,9 @@
 package frc.robot.subsystems.turret;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.units.Units.Celsius;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -61,7 +61,7 @@ public class TurretIOTalonFX implements TurretIO {
       inputs.motorCurrent = Amps.of(0.0);
     }
 
-  inputs.motorTemperature = Celsius.of(30.0);
+    inputs.motorTemperature = Celsius.of(30.0);
   }
 
   @Override

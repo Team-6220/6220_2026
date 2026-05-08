@@ -1,8 +1,8 @@
 package frc.robot.subsystems.turret;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -75,7 +75,7 @@ public class TurretIOSparkMax implements TurretIO {
     inputs.builtinEncoderAngle = new Rotation2d(rotations * 2.0 * Math.PI);
     inputs.appliedVoltage = Volts.of(lastAppliedVolts);
     inputs.motorCurrent = Amps.of(motor.getOutputCurrent());
-  inputs.motorTemperature = Celsius.of(30.0);
+    inputs.motorTemperature = Celsius.of(30.0);
   }
 
   @Override

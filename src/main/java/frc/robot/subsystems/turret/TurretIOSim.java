@@ -1,8 +1,8 @@
 package frc.robot.subsystems.turret;
 
-import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,6 +12,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class TurretIOSim implements TurretIO {
   private LinearSystemSim<N2, N1, N2> sim;
@@ -50,6 +51,7 @@ public class TurretIOSim implements TurretIO {
   public void driveToGoal(Rotation2d angle) {
     // store goal for profiled PID
     goalAngle = angle.getRadians();
+    SmartDashboard.putNumber("turret goal degrees", angle.getDegrees());
   }
 
   @Override
@@ -74,8 +76,8 @@ public class TurretIOSim implements TurretIO {
 
     inputs.builtinEncoderAngle = new Rotation2d(simAngle);
     inputs.appliedVoltage = Volts.of(appliedVolts);
-  inputs.motorCurrent = Amps.of(Math.abs(appliedVolts) * 2.0);
-  inputs.motorTemperature = Celsius.of(30.0 + Math.abs(appliedVolts) * 2.0);
+    inputs.motorCurrent = Amps.of(Math.abs(appliedVolts) * 2.0);
+    inputs.motorTemperature = Celsius.of(30.0 + Math.abs(appliedVolts) * 2.0);
   }
 
   @Override

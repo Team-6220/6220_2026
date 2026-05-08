@@ -47,10 +47,13 @@ public class TurretCoordinator {
 
   /** Automatically switch modes based on robot location */
   private void updateMode(Pose2d robotPose) {
-    if (robotPose.getX() < MIDLINE_X) {
-      mode = AimMode.AIM_AT_HUB;
+    // Use Constants.isRed to determine alliance-side behavior. If isRed == "red" we treat the
+    // right side (X > midline) as the hub side; otherwise (blue/unknown) we treat the left side
+    // (X < midline) as the hub side.
+    if (Constants.isRed != null && Constants.isRed.equals("red")) {
+      mode = robotPose.getX() > MIDLINE_X ? AimMode.AIM_AT_HUB : AimMode.FIELD_RELATIVE_ANGLE;
     } else {
-      mode = AimMode.FIELD_RELATIVE_ANGLE;
+      mode = robotPose.getX() < MIDLINE_X ? AimMode.AIM_AT_HUB : AimMode.FIELD_RELATIVE_ANGLE;
     }
   }
 
@@ -61,6 +64,10 @@ public class TurretCoordinator {
         return computeHubAngle(robotPose);
 
       case FIELD_RELATIVE_ANGLE:
+        // Flip the fixed field angle based on Constants.isRed so "other-side" angle is correct.
+        if (Constants.isRed != null && !Constants.isRed.equals("red")) {
+          return fixedFieldAngle.rotateBy(Rotation2d.fromDegrees(180));
+        }
         return fixedFieldAngle;
 
       default:

@@ -11,6 +11,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -94,7 +95,7 @@ public class Swerve extends SubsystemBase {
     new SwerveModulePosition()
   };
 
-  private SwervePoseEstimator poseEstimator;
+  private final SwerveDrivePoseEstimator poseEstimator;
 
   // Simulation state (used only in simulation)
   private Pose2d simPose = new Pose2d();
@@ -140,7 +141,7 @@ public class Swerve extends SubsystemBase {
         };
 
     poseEstimator =
-        new SwervePoseEstimator(
+        new SwerveDrivePoseEstimator(
             SwerveConstants.kinematics(),
             new Rotation2d(),
             positions,

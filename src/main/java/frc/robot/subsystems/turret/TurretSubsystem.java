@@ -1,6 +1,7 @@
 package frc.robot.subsystems.turret;
 
 import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Voltage;
@@ -43,8 +44,8 @@ public class TurretSubsystem extends SubsystemBase {
     // Compute feedforward (units: volts)
     double ffVolts = feedforward.calculate(targetVelocityRadPerSec);
     // Delegate position set via IO and apply feedforward voltage
-  io.driveToGoal(angle);
-  io.setVoltageOut(Volts.of(ffVolts));
+    io.driveToGoal(angle);
+    io.setVoltageOut(Volts.of(ffVolts));
   }
 
   @Override

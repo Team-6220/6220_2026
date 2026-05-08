@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.AimingTurret;
 import frc.robot.commands.AlignAndFlywheels;
 import frc.robot.commands.ArmToPositionCommand;
 import frc.robot.commands.ArmUpAndDown;
@@ -83,6 +84,8 @@ public class RobotContainer {
         new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
     arm.setDefaultCommand(new ManualArm(m_joystick));
+
+    s_turret.setDefaultCommand(new AimingTurret(s_turret, s_Swerve));
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);

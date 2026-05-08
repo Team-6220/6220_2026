@@ -52,6 +52,9 @@ Make quick, actionable recommendations for code changes in this repository. Focu
 - All units themselves should be using "edu.wpi.first.units.*"
 - Import "edu.wpi.first.units.[specific measureable units]" once, then just use [specific measureable units] later in the code
 
+## Checking for alliance color
+- Use 'Constants.isRed.equals("red) ?' to check for red
+
 ## If something is unclear
 - Ask for which subsystem or workflow you want the agent to change (e.g., "modify turret aiming logic" or "add a new auto path"). Provide the target file(s) or test to update. I can then make focused edits and run the build/tests.
 
