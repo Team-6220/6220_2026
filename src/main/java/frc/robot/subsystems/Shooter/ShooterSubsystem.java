@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.Shooter;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -16,6 +17,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -494,18 +496,18 @@ public class ShooterSubsystem extends SubsystemBase {
     m_motor35.getConfigurator().apply(output);
   }
 
-  public double getDist() {
+  public Distance getDist() {
     try {
       int a =
           ((int) (LimelightHelpers.getTargetPose3d_CameraSpace("limelight-front").getZ() * 100));
       double b = (double) a;
       b = b / 20.0;
       b = Math.round(b) * 2.0;
-      return b / 10.0;
+      return Meters.of(b / 10.0);
     } catch (Exception e) {
       System.out.println("distance doens't work");
     }
-    return -1.0;
+    return Meters.of(-1.0);
   }
 
   @Override
@@ -523,7 +525,7 @@ public class ShooterSubsystem extends SubsystemBase {
     if (m_firstShotBoostTN.hasChanged()) {
       ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER = m_firstShotBoostTN.get();
     }
-    SmartDashboard.putNumber("Shooter/ForwardDistance", getDist());
+    SmartDashboard.putNumber("Shooter/ForwardDistance", getDist().in(Meters));
 
     // RPM Telemetry
     SmartDashboard.putNumber("Shooter/Motor41RPM", getMotor41RPM());

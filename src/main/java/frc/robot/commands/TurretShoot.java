@@ -9,27 +9,40 @@ import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Intake.BeltSubsystem;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
+import frc.robot.subsystems.turret.TurretSubsystem;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class HashShootAuto extends Command {
-  /** Creates a new AngleSet. */
+/**
+ * TurretShoot: like HashShoot but waits until turret, angler, and flywheels are at setpoint before
+ * actuating the belt to feed balls.
+ */
+public class TurretShoot extends Command {
   AnglerSubsystem m_angler;
 
   ShooterSubsystem m_shoot;
 
   BeltSubsystem m_belt;
+  TurretSubsystem m_turret;
+  CommandXboxController controller;
   double degrees;
   double rpm;
   Distance dist;
 
-  public HashShootAuto(AnglerSubsystem m_angler, ShooterSubsystem m_shoot, BeltSubsystem m_belt) {
+  public TurretShoot(
+      AnglerSubsystem m_angler,
+      ShooterSubsystem m_shoot,
+      BeltSubsystem m_belt,
+      TurretSubsystem m_turret,
+      CommandXboxController controller) {
     this.m_angler = m_angler;
     this.m_shoot = m_shoot;
     this.m_belt = m_belt;
+    this.m_turret = m_turret;
+    this.controller = controller;
     addRequirements(m_angler, m_shoot, m_belt);
   }
 
@@ -42,7 +55,7 @@ public class HashShootAuto extends Command {
       rpm = vals[0];
       degrees = vals[1];
     } catch (Exception e) {
-      System.out.println("Error occurred while initializing HashShoot command.");
+      System.err.println("Error occurred while initializing TurretShoot command.");
       Double[] vals = ShooterConstants.rpmAngle.get(Meters.of(0.0));
       rpm = vals[0];
       degrees = vals[1];
@@ -54,9 +67,22 @@ public class HashShootAuto extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    // Always drive angler and request shooter velocity
     m_angler.setAngle(degrees);
-    m_shoot.runAtTargetVelocityAuto(rpm);
-    m_belt.simpleDrive(-0.5);
+    m_shoot.runAtTargetVelocity(rpm, controller);
+
+    // Only feed balls when turret, angler and flywheels are at their setpoints
+    boolean turretReady = m_turret.atSetpoint();
+    boolean anglerReady = m_angler.isAtAngle(degrees);
+    boolean flyReady = m_shoot.isAtSpeedFly(rpm / 60.0);
+
+    if (turretReady && anglerReady && flyReady) {
+      // Feed slowly when ready
+      m_belt.simpleDrive(-0.5);
+    } else {
+      // Stop feeding until everything is ready
+      m_belt.stop();
+    }
   }
 
   // Called once the command ends or is interrupted.

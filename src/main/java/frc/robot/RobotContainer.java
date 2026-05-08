@@ -4,7 +4,10 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -23,6 +26,7 @@ import frc.robot.commands.ManualArm;
 import frc.robot.commands.PassToAlliance;
 import frc.robot.commands.SwerveCom;
 import frc.robot.commands.TestRollerCommand;
+import frc.robot.commands.TurretShoot;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Intake.ArmSubsystem;
 import frc.robot.subsystems.Intake.BeltSubsystem;
@@ -30,9 +34,10 @@ import frc.robot.subsystems.Intake.RollerSubsystem;
 import frc.robot.subsystems.LEDs.AdressableLEDs;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
-import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.subsystems.turret.TurretIO;
 import frc.robot.subsystems.turret.TurretIOSim;
+import frc.robot.subsystems.turret.TurretIOSparkMax;
+import frc.robot.subsystems.turret.TurretSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -52,9 +57,8 @@ public class RobotContainer {
   private final ShooterSubsystem m_shooter = new ShooterSubsystem();
   // Turret simulation integration (sim uses TurretSubsystemSim, real uses TurretSubsystem)
   private final TurretIO turret =
-      edu.wpi.first.wpilibj.RobotBase.isSimulation()
-          ? new TurretIOSim()
-          : new TurretIO();
+      edu.wpi.first.wpilibj.RobotBase.isSimulation() ? new TurretIOSim() : new TurretIOSparkMax(0);
+  private final TurretSubsystem s_turret = new TurretSubsystem(turret);
   private final AnglerSubsystem m_angler = new AnglerSubsystem();
   private final ArmSubsystem arm = ArmSubsystem.getInstance();
   private final BeltSubsystem belt = BeltSubsystem.getInstance();
@@ -66,7 +70,7 @@ public class RobotContainer {
   private final GenericHID m_buttonBoard = new GenericHID(2);
 
   private static final double ALIGN_TOLERANCE_DEG = 2.0;
-  private static final double MAX_SHOOT_DISTANCE_M = 4.0;
+  private static final Distance MAX_SHOOT_DISTANCE = Meters.of(4.0);
 
   public RobotContainer() {
     // Initialize climber subsystem based on robot mode
@@ -150,6 +154,11 @@ public class RobotContainer {
         .leftTrigger()
         .whileTrue(new AlignAndFlywheels(s_Swerve, m_driverController, m_angler, m_shooter, belt));
 
+    // Left bumper: aim/prepare and feed only when turret, angler, and flywheels are at setpoint
+    m_driverController
+        .leftBumper()
+        .whileTrue(new TurretShoot(m_angler, m_shooter, belt, s_turret, m_driverController));
+
     arm0.onTrue(new ArmToPositionCommand(arm, -2));
 
     arm90.onTrue(new ArmToPositionCommand(arm, -29.785476684570312));
@@ -168,8 +177,8 @@ public class RobotContainer {
     Trigger inRange =
         new Trigger(
             () -> {
-              double dist = m_shooter.getDist();
-              return dist > 0 && dist <= MAX_SHOOT_DISTANCE_M;
+              Distance dist = m_shooter.getDist();
+              return dist.in(Meters) > 0 && dist.in(Meters) <= MAX_SHOOT_DISTANCE.in(Meters);
             });
 
     // Stable lock for driver rumble to avoid flicker/noise
@@ -221,8 +230,8 @@ public class RobotContainer {
     boolean aligned =
         LimelightHelpers.getTV("limelight-front")
             && Math.abs(LimelightHelpers.getTX("limelight-front")) < ALIGN_TOLERANCE_DEG;
-    double dist = m_shooter.getDist();
-    boolean shortRange = dist > 0 && dist <= MAX_SHOOT_DISTANCE_M;
+    Distance dist = m_shooter.getDist();
+    boolean shortRange = dist.in(Meters) > 0 && dist.in(Meters) <= MAX_SHOOT_DISTANCE.in(Meters);
 
     SmartDashboard.putBoolean("Shooter/Aligned", aligned);
     SmartDashboard.putBoolean("Shooter/FlywheelsAtTarget", m_shooter.isAtTargetSpeed());

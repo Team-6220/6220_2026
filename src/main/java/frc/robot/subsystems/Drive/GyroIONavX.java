@@ -18,7 +18,6 @@ public class GyroIONavX implements GyroIO {
   public void updateInputs(GyroIOInputs inputs) {
     // Read raw rotation from NavX
     Rotation2d raw = navx.getRotation2d();
-
     if (Constants.GYRO_UPSIDEDOWN) {
       // If the NavX is mounted upside-down on the robot, its reported yaw will be
       // effectively rotated and inverted. Apply a simple correction here so users

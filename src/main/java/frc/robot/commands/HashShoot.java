@@ -4,6 +4,9 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Meters;
+
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -23,7 +26,7 @@ public class HashShoot extends Command {
   CommandXboxController controller;
   double degrees;
   double rpm;
-  double dist;
+  Distance dist;
 
   public HashShoot(
       AnglerSubsystem m_angler,
@@ -42,12 +45,14 @@ public class HashShoot extends Command {
   public void initialize() {
     try {
       dist = m_shoot.getDist();
-      rpm = ShooterConstants.rpmAngle.get(dist)[0];
-      degrees = ShooterConstants.rpmAngle.get(dist)[1];
+      Double[] vals = ShooterConstants.rpmAngle.get(dist);
+      rpm = vals[0];
+      degrees = vals[1];
     } catch (Exception e) {
       System.out.println("Error occurred while initializing HashShoot command.");
-      rpm = ShooterConstants.rpmAngle.get(0.0)[0];
-      degrees = ShooterConstants.rpmAngle.get(0.0)[1];
+      Double[] vals = ShooterConstants.rpmAngle.get(Meters.of(0.0));
+      rpm = vals[0];
+      degrees = vals[1];
     }
     // Reset shooter state for new shot sequence (enables first shot boost)
     m_shoot.resetShootingState();

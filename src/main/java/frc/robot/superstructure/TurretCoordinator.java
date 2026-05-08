@@ -1,94 +1,95 @@
 package frc.robot.superstructure;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
+import frc.robot.subsystems.turret.TurretSubsystem;
 
 /**
- * TurretCoordinator:
- * High-level brain that decides what the turret should aim at.
- * - AIM_AT_HUB on one side of the field
- * - FIELD_RELATIVE_ANGLE on the other side
- * 
- * Subsystem stays dumb (PID to angle).
- * Commands simply call update() every loop.
+ * TurretCoordinator: High-level brain that decides what the turret should aim at. - AIM_AT_HUB on
+ * one side of the field - FIELD_RELATIVE_ANGLE on the other side
+ *
+ * <p>Subsystem stays dumb (PID to angle). Commands simply call update() every loop.
  */
 public class TurretCoordinator {
 
-    /** Aiming modes */
-    public enum AimMode {
-        AIM_AT_HUB,
-        FIELD_RELATIVE_ANGLE
+  /** Aiming modes */
+  public enum AimMode {
+    AIM_AT_HUB,
+    FIELD_RELATIVE_ANGLE
+  }
+
+  private final TurretSubsystem turret;
+
+  // Current mode
+  private AimMode mode = AimMode.AIM_AT_HUB;
+
+  // Field-relative angle for the "other side"
+  private Rotation2d fixedFieldAngle = Rotation2d.fromDegrees(180);
+
+  // Midline X coordinate (example — adjust to your field)
+  private static final double MIDLINE_X = FieldConstants.FIELD_LENGTH.in(Meters) / 2.0;
+
+  public TurretCoordinator(TurretSubsystem turret) {
+    this.turret = turret;
+  }
+
+  /** Called every loop by a default command */
+  public void update(Pose2d robotPose) {
+    updateMode(robotPose);
+    Rotation2d desired = computeDesiredAngle(robotPose);
+    turret.driveToGoal(desired);
+  }
+
+  /** Automatically switch modes based on robot location */
+  private void updateMode(Pose2d robotPose) {
+    if (robotPose.getX() < MIDLINE_X) {
+      mode = AimMode.AIM_AT_HUB;
+    } else {
+      mode = AimMode.FIELD_RELATIVE_ANGLE;
     }
+  }
 
-    private final TurretSubsystem turret;
+  /** Compute the turret angle based on the current mode */
+  private Rotation2d computeDesiredAngle(Pose2d robotPose) {
+    switch (mode) {
+      case AIM_AT_HUB:
+        return computeHubAngle(robotPose);
 
-    // Current mode
-    private AimMode mode = AimMode.AIM_AT_HUB;
+      case FIELD_RELATIVE_ANGLE:
+        return fixedFieldAngle;
 
-    // Field-relative angle for the "other side"
-    private Rotation2d fixedFieldAngle = Rotation2d.fromDegrees(180);
-
-    // Midline X coordinate (example — adjust to your field)
-    private static final double MIDLINE_X = FieldConstants.FIELD_LENGTH_M / 2.0;
-
-    public TurretCoordinator(TurretSubsystem turret) {
-        this.turret = turret;
+      default:
+        return new Rotation2d();
     }
+  }
 
-    /** Called every loop by a default command */
-    public void update(Pose2d robotPose) {
-        updateMode(robotPose);
-        Rotation2d desired = computeDesiredAngle(robotPose);
-        turret.driveToGoal(desired);
-    }
+  /** Compute angle from robot → HUB */
+  private Rotation2d computeHubAngle(Pose2d robotPose) {
+    Translation2d hub =
+        Constants.isRed.equals("red")
+            ? FieldConstants.RED_HUB_POSE.getTranslation()
+            : FieldConstants.BLUE_HUB_POSE.getTranslation();
+    Translation2d diff = hub.minus(robotPose.getTranslation());
+    double angleRad = Math.atan2(diff.getY(), diff.getX());
+    return new Rotation2d(angleRad);
+  }
 
-    /** Automatically switch modes based on robot location */
-    private void updateMode(Pose2d robotPose) {
-        if (robotPose.getX() < MIDLINE_X) {
-            mode = AimMode.AIM_AT_HUB;
-        } else {
-            mode = AimMode.FIELD_RELATIVE_ANGLE;
-        }
-    }
+  /** Optional: allow operator to override the fixed angle */
+  public void setFixedFieldAngle(Rotation2d angle) {
+    this.fixedFieldAngle = angle;
+  }
 
-    /** Compute the turret angle based on the current mode */
-    private Rotation2d computeDesiredAngle(Pose2d robotPose) {
-        switch (mode) {
+  /** Optional: allow operator to force a mode */
+  public void setMode(AimMode newMode) {
+    this.mode = newMode;
+  }
 
-            case AIM_AT_HUB:
-                return computeHubAngle(robotPose);
-
-            case FIELD_RELATIVE_ANGLE:
-                return fixedFieldAngle;
-
-            default:
-                return new Rotation2d();
-        }
-    }
-
-    /** Compute angle from robot → HUB */
-    private Rotation2d computeHubAngle(Pose2d robotPose) {
-        Translation2d hub = Constants.isRed.equals("red") ? FieldConstants.RED_HUB_POSE.getTranslation() : FieldConstants.BLUE_HUB_POSE.getTranslation();
-        Translation2d diff = hub.minus(robotPose.getTranslation());
-        double angleRad = Math.atan2(diff.getY(), diff.getX());
-        return new Rotation2d(angleRad);
-    }
-
-    /** Optional: allow operator to override the fixed angle */
-    public void setFixedFieldAngle(Rotation2d angle) {
-        this.fixedFieldAngle = angle;
-    }
-
-    /** Optional: allow operator to force a mode */
-    public void setMode(AimMode newMode) {
-        this.mode = newMode;
-    }
-
-    public AimMode getMode() {
-        return mode;
-    }
+  public AimMode getMode() {
+    return mode;
+  }
 }
