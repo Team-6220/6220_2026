@@ -297,6 +297,10 @@ public class Swerve extends SubsystemBase {
     return chassisSpeeds;
   }
 
+  public Field2d getField2d() {
+    return field2d;
+  }
+
   /* Used by SwerveControllerCommand in Auto */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, SwerveConstants.maxSpeed());
@@ -580,6 +584,13 @@ public class Swerve extends SubsystemBase {
     String title = "Swerve";
     // Shuffleboard.getTab(title).addString("Robot Pose", () -> getPose().toString());
     Shuffleboard.getTab(title).add(field2d);
+    // Ensure turret visualization objects exist on the field widget
+    try {
+      field2d.getObject("turret").setPose(new Pose2d());
+      field2d.getObject("turretAim").setPoses(java.util.Arrays.asList(new Pose2d(), new Pose2d()));
+    } catch (Exception e) {
+      // ignore if widget not available in this environment
+    }
     Shuffleboard.getTab(title)
         .addNumber("where the bot think it is swerve X", () -> getPose().getX());
     Shuffleboard.getTab(title)

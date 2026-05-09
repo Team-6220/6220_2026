@@ -19,7 +19,8 @@ public class AimingTurret extends Command {
     this.turret = turret;
     this.swerve = swerve;
     addRequirements(turret);
-    superstructure = new TurretCoordinator(turret);
+    // Provide Swerve's Field2d so the coordinator can update visualization each loop
+    superstructure = new TurretCoordinator(turret, swerve.getField2d());
   }
 
   // Called when the command is initially scheduled.
