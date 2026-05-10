@@ -37,7 +37,11 @@ public class TurretCoordinator {
   // Field-relative angle for the "other side"
   private Rotation2d fixedFieldAngle = Rotation2d.fromDegrees(0);
 
-  // NOTE: Previously used a midline threshold. This coordinator now uses the alliance hub X
+  private Rotation2d lastDesiredField = new Rotation2d();
+
+  private static final double ANGLE_SMOOTH_ALPHA = 0.25; // 0..1, larger = faster
+
+  // This coordinator uses the alliance hub X
   // coordinate as the threshold; MIDLINE is retained in history but not used.
 
   /** Basic coordinator without visualization. */
@@ -76,8 +80,8 @@ public class TurretCoordinator {
       Translation2d turretTrans = robotPose.getTranslation().plus(offset);
 
       // desiredRobotRel is robot-relative; convert to world rotation for visualization
-      Rotation2d turretWorldRot = robotYaw.rotateBy(desiredRobotRel);
-      Pose2d turretPose = new Pose2d(turretTrans, turretWorldRot);
+      Rotation2d turretWorldRot = computeDesiredFieldRelativeAngle(robotPose);
+      Pose2d turretPose = new Pose2d(turretTrans, desiredRobotRel);
       try {
         turretObject.setPose(turretPose);
       } catch (Exception e) {
@@ -89,7 +93,11 @@ public class TurretCoordinator {
         double len = Meters.of(1.0).in(Meters); // 1 meter long aim line
         double dx = Math.cos(turretWorldRot.getRadians()) * len;
         double dy = Math.sin(turretWorldRot.getRadians()) * len;
-        Pose2d end = new Pose2d(turretTrans.plus(new Translation2d(dx, dy)), turretWorldRot);
+        Pose2d end =
+            new Pose2d(
+                turretTrans.plus(new Translation2d(dx, dy)).getX(),
+                turretTrans.plus(new Translation2d(dx, dy)).getY(),
+                turretWorldRot);
         try {
           turretAimObject.setPoses(Arrays.asList(turretPose, end));
         } catch (Exception e) {
@@ -154,11 +162,32 @@ public class TurretCoordinator {
   /** Compute angle from robot → HUB */
   private Rotation2d computeHubAngle(Pose2d robotPose) {
     Translation2d hub =
-        Constants.isRed.equals("red")
+        (Constants.isRed != null && Constants.isRed.equals("red"))
             ? FieldConstants.RED_HUB_POSE.getTranslation()
             : FieldConstants.BLUE_HUB_POSE.getTranslation();
+
     Translation2d diff = hub.minus(robotPose.getTranslation());
-    double angleRad = Math.atan2(diff.getY(), diff.getX());
+
+    // Raw angle from robot -> hub in field frame. Use signed atan2 so we know the true
+    // direction, then "unwrap" relative to the previous desired angle to avoid jumps
+    // across the ±PI discontinuity when the sign of Y changes.
+    double raw = Math.atan2(diff.getY(), diff.getX());
+
+    double prev = lastDesiredField.getRadians();
+    double delta = raw - prev;
+    // Normalize delta to [-PI, PI]
+    while (delta > Math.PI) {
+      delta -= 2.0 * Math.PI;
+    }
+    while (delta < -Math.PI) {
+      delta += 2.0 * Math.PI;
+    }
+
+    // Choose the angle closest to previous (continuous), and apply light smoothing.
+    double angleRad = prev + delta;
+    angleRad = prev * (1.0 - ANGLE_SMOOTH_ALPHA) + angleRad * ANGLE_SMOOTH_ALPHA;
+
+    lastDesiredField = new Rotation2d(angleRad);
     return new Rotation2d(angleRad);
   }
 

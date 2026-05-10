@@ -39,8 +39,7 @@ public class TurretIOSparkMax implements TurretIO {
     // Set closed-loop position setpoint in encoder rotations converted from radians.
     // Many code paths in this repo convert between encoder/native units elsewhere; this is a
     // straightforward set using the closed-loop controller API.
-    double rotations = angle.getRadians() / (2.0 * Math.PI);
-    closedLoopController.setSetpoint(rotations, ControlType.kPosition);
+    closedLoopController.setSetpoint(angle.getRotations(), ControlType.kPosition);
   }
 
   @Override

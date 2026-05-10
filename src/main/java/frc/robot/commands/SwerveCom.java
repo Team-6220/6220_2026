@@ -36,7 +36,7 @@ public class SwerveCom extends Command {
       /* Drive */
       s_Swerve.drive(
           new Translation2d(driverInputs[0], driverInputs[1]),
-          driverInputs[2],
+          driverInputs[2] * 0.1,
           !robotCentricSup.getAsBoolean(),
           true);
     }

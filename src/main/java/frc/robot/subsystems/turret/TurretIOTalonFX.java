@@ -3,6 +3,7 @@ package frc.robot.subsystems.turret;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -25,7 +26,7 @@ public class TurretIOTalonFX implements TurretIO {
     // Best-effort: set the onboard position to target angle so closed-loop controllers
     // that read position can use it. This mirrors patterns elsewhere in the repo where
     // getConfigurator().setPosition(...) is used.
-    motor.getConfigurator().setPosition(Degree.of(Math.toDegrees(angle.getRadians())));
+    motor.getConfigurator().setPosition(angle.getRotations());
   }
 
   @Override

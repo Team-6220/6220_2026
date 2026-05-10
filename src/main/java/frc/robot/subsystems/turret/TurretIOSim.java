@@ -39,7 +39,7 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public boolean atSetpoint() {
-    return false; // subsystem handles this
+    return profiledPID.atGoal(); // subsystem handles this
   }
 
   @Override

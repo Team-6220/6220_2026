@@ -52,4 +52,13 @@ public class TurretSubsystem extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
   }
+
+  /**
+   * Returns the most recently-updated robot-relative turret angle reported by the IO layer. This is
+   * the "outside"/relative encoder reading that tracks turret rotation relative to the robot frame.
+   * If no reading is available yet, returns zero.
+   */
+  public Rotation2d getMeasuredRobotRelativeAngle() {
+    return inputs.outsideEncoderAngle == null ? new Rotation2d() : inputs.outsideEncoderAngle;
+  }
 }
