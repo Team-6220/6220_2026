@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.Vision;
 
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -13,7 +12,6 @@ import frc.robot.LimelightHelpers;
 public class Limelight extends SubsystemBase {
   /** Creates a new Limelight. */
   private static String tableName = "limelight-front";
-
 
   private VisionMeasurements latestMeasurement = new VisionMeasurements(new Pose2d(), 0);
 
@@ -26,21 +24,20 @@ public class Limelight extends SubsystemBase {
     SmartDashboard.putNumber("Vision_tagID", LimelightHelpers.getFiducialID(tableName));
     SmartDashboard.putNumber(
         "Vision_pipeline", LimelightHelpers.getCurrentPipelineIndex(tableName));
-        // In your periodic function:
-    LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(tableName);
-    LimelightHelpers.PoseEstimate limelightMeasurementMT2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(tableName);
-      
-     // add logic for filtering out bad measurements if necessary
-    if (limelightMeasurement.tagCount >= 2) {  // Only trust measurement if we see multiple tags
-      latestMeasurement = new VisionMeasurements(
-          limelightMeasurement.pose,
-          limelightMeasurement.timestampSeconds
-      );
+    // In your periodic function:
+    LimelightHelpers.PoseEstimate limelightMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue(tableName);
+    LimelightHelpers.PoseEstimate limelightMeasurementMT2 =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(tableName);
+
+    // add logic for filtering out bad measurements if necessary
+    if (limelightMeasurement.tagCount >= 2) { // Only trust measurement if we see multiple tags
+      latestMeasurement =
+          new VisionMeasurements(limelightMeasurement.pose, limelightMeasurement.timestampSeconds);
     } else if (limelightMeasurementMT2.tagCount >= 2) {
-      latestMeasurement = new VisionMeasurements(
-        limelightMeasurementMT2.pose,
-        limelightMeasurementMT2.timestampSeconds
-      );
+      latestMeasurement =
+          new VisionMeasurements(
+              limelightMeasurementMT2.pose, limelightMeasurementMT2.timestampSeconds);
     }
   }
 
@@ -66,5 +63,6 @@ public class Limelight extends SubsystemBase {
       LimelightHelpers.setPipelineIndex(tableName, 0);
     }
   }
+
   public record VisionMeasurements(Pose2d visionMeasurement, double timestamp) {}
 }
