@@ -70,7 +70,7 @@ public class AlignAndMove extends Command {
     }
 
     if (Math.abs(LimelightHelpers.getTX(name)) <= 2
-        && (Math.abs(driverInputs[0]) <= 0.1 || Math.abs(driverInputs[1]) <= 0.1)) {
+        && (Math.abs(driverInputs[0]) <= 0.1 && Math.abs(driverInputs[1]) <= 0.1)) {
       s_Swerve.lockWheels();
     }
     ticks++;
