@@ -102,7 +102,8 @@ public class RobotContainer {
     Trigger angleDown = new Trigger(() -> m_buttonBoard.getRawButton(16));
     Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(2));
     Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(1));
-    Trigger pass = m_driverController.rightBumper();
+    Trigger passMid = m_driverController.rightBumper();
+    Trigger passFar = m_driverController.b();
     Trigger resetEncoder = new Trigger(() -> m_buttonBoard.getRawButton(13));
     Trigger manualArm = new Trigger(() -> m_joystick.getRawButton(1));
     Trigger armUpAndDown = new Trigger(() -> m_buttonBoard.getRawButton(3));
@@ -132,7 +133,9 @@ public class RobotContainer {
 
     // m_driverController.x().whileTrue(new ShooterTESTER(m_shooter, belt));
 
-    pass.whileTrue(new PassToAlliance(m_angler, m_shooter, belt, m_driverController));
+    passMid.whileTrue(new PassToAlliance(m_angler, m_shooter, belt, m_driverController, 2200));
+
+    passFar.whileTrue(new PassToAlliance(m_angler, m_shooter, belt, m_driverController, 3100));
 
     intakeOut.whileTrue(new TestRollerCommand(true));
 
