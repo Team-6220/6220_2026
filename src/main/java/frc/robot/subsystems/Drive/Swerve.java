@@ -213,6 +213,23 @@ public class Swerve extends SubsystemBase {
     }
   }
 
+  /**
+   * Locks the swerve wheels in an "X" position to resist being pushed. Each module is angled
+   * diagonally (45°/-45° alternating) with zero drive speed, preventing lateral movement.
+   */
+  public void lockWheels() {
+    // Module order: 0=BR, 1=BL, 2=FR, 3=FL
+    SwerveModuleState[] xStates = {
+      new SwerveModuleState(0, Rotation2d.fromDegrees(45)), // BR
+      new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), // BL
+      new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), // FR
+      new SwerveModuleState(0, Rotation2d.fromDegrees(45)), // FL
+    };
+    for (SwerveModule mod : mSwerveMods) {
+      mod.setDesiredState(xStates[mod.getModuleNumber()], true);
+    }
+  }
+
   /** swerve auto init */
   public void configureAutoBuilder() {
     AutoBuilder.configure(
@@ -302,6 +319,10 @@ public class Swerve extends SubsystemBase {
   public Pose2d getPose() {
 
     return poseEstimator.getEstimatedPosition();
+  }
+
+  public void addVisionMeasurement(Pose2d visionPose, double timestamp) {
+    poseEstimator.addVisionMeasurement(visionPose, timestamp);
   }
 
   public void setPose(Pose2d pose) {

@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AlignAndMove;
-import frc.robot.commands.HashShoot;
+import frc.robot.commands.HashShootAuto;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Intake.BeltSubsystem;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
@@ -54,7 +54,7 @@ public class BasicAutoBlue extends SequentialCommandGroup {
         new RunCommand(() -> s_swerve.drive(new Translation2d(0, 0), 0, true, false))
             .withTimeout(0.2),
         new AlignAndMove(s_swerve, controller, controller.rightBumper()).withTimeout(2),
-        new HashShoot(m_angler, m_shooter, m_belt).withTimeout(4),
+        new HashShootAuto(m_angler, m_shooter, m_belt).withTimeout(4),
         new PrintCommand("done"));
   }
 }

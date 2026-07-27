@@ -11,7 +11,7 @@
             "title": "Shooter Distance",
             "x": 0.0,
             "y": 0.0,
-            "width": 640.0,
+            "width": 768.0,
             "height": 384.0,
             "type": "Large Text Display",
             "properties": {
@@ -22,7 +22,7 @@
           },
           {
             "title": "Shooter Flywheel RPM",
-            "x": 640.0,
+            "x": 768.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
@@ -36,7 +36,7 @@
           },
           {
             "title": "Driver Camera",
-            "x": 896.0,
+            "x": 1024.0,
             "y": 0.0,
             "width": 640.0,
             "height": 512.0,
@@ -49,7 +49,7 @@
           },
           {
             "title": "Flywheel RPM Target",
-            "x": 640.0,
+            "x": 768.0,
             "y": 128.0,
             "width": 256.0,
             "height": 128.0,
@@ -63,7 +63,7 @@
           },
           {
             "title": "Hood Angle",
-            "x": 640.0,
+            "x": 768.0,
             "y": 256.0,
             "width": 256.0,
             "height": 128.0,
@@ -78,7 +78,7 @@
           {
             "title": "Shift Countdown",
             "x": 0.0,
-            "y": 512.0,
+            "y": 384.0,
             "width": 512.0,
             "height": 256.0,
             "type": "Match Time",
@@ -94,8 +94,8 @@
           {
             "title": "Current Shift",
             "x": 512.0,
-            "y": 512.0,
-            "width": 384.0,
+            "y": 384.0,
+            "width": 512.0,
             "height": 256.0,
             "type": "Large Text Display",
             "properties": {
@@ -106,9 +106,9 @@
           },
           {
             "title": "Match Time",
-            "x": 512.0,
-            "y": 384.0,
-            "width": 384.0,
+            "x": 256.0,
+            "y": 640.0,
+            "width": 512.0,
             "height": 128.0,
             "type": "Match Time",
             "properties": {
@@ -122,8 +122,8 @@
           },
           {
             "title": "Shooter Aligned",
-            "x": 256.0,
-            "y": 384.0,
+            "x": 768.0,
+            "y": 640.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -138,14 +138,14 @@
             }
           },
           {
-            "title": "Distance < 2m",
+            "title": "Flywheels at Speed",
             "x": 0.0,
-            "y": 384.0,
+            "y": 640.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Shooter/ShortRange",
+              "topic": "/SmartDashboard/Shooter/FlywheelsAtTarget",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -156,8 +156,8 @@
           },
           {
             "title": "FMSInfo",
-            "x": 896.0,
-            "y": 512.0,
+            "x": 1024.0,
+            "y": 640.0,
             "width": 640.0,
             "height": 128.0,
             "type": "FMSInfo",
@@ -168,8 +168,8 @@
           },
           {
             "title": "SendableChooser[0]",
-            "x": 896.0,
-            "y": 640.0,
+            "x": 1024.0,
+            "y": 512.0,
             "width": 640.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
@@ -177,6 +177,200 @@
               "topic": "/SmartDashboard/SendableChooser[0]",
               "period": 0.06,
               "sort_options": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tab 2",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "kP",
+            "x": 640.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/TunableNumbers/Shooter/kP",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kI",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/TunableNumbers/Shooter/kI",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kD",
+            "x": 896.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/TunableNumbers/Shooter/kD",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kA",
+            "x": 640.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/TunableNumbers/Shooter/kA",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "kV",
+            "x": 768.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/TunableNumbers/Shooter/kV",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "kS",
+            "x": 896.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/TunableNumbers/Shooter/kS",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Motor31RPM",
+            "x": 1024.0,
+            "y": 256.0,
+            "width": 640.0,
+            "height": 512.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/Motor31RPM",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Motor9RPM",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/Motor9RPM",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "TopTargetRPM",
+            "x": 1024.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/TopTargetRPM",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "TopTargetRPM",
+            "x": 768.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/TunableNumbers/Shooter/TopTargetRPM",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "FlywheelsReady",
+            "x": 1152.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/FlywheelsReady",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "ForwardDistance",
+            "x": 640.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/ForwardDistance",
+              "period": 0.06,
+              "data_type": "double"
+            }
+          },
+          {
+            "title": "FirstShotBoost",
+            "x": 640.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/TunableNumbers/Shooter/FirstShotBoost",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
             }
           }
         ]

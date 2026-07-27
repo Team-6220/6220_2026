@@ -5,7 +5,6 @@
 package frc.robot.subsystems.Intake;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -89,8 +88,8 @@ public class ArmSubsystem extends SubsystemBase {
     armMotorConfig.idleMode(ArmConstants.armIdleMode);
     armMotor.configure(
         armMotorConfig,
-        SparkBase.ResetMode.kResetSafeParameters,
-        SparkBase.PersistMode.kPersistParameters);
+        com.revrobotics.ResetMode.kResetSafeParameters,
+        com.revrobotics.PersistMode.kPersistParameters);
 
     armEncoder = armMotor.getEncoder();
 
@@ -211,7 +210,7 @@ public class ArmSubsystem extends SubsystemBase {
     armMotor.setVoltage(PIDOutput + feedForwardOutput);
   }
 
-  public void resetArmEncoder() {
+  public void resetEncoder() {
     armEncoder.setPosition(0);
   }
 
@@ -228,7 +227,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void simpleDriveArm(double motorOutput) {
-    armMotor.setVoltage(motorOutput * 6);
+    armMotor.setVoltage(motorOutput * 8);
   }
 
   public void maintain() {
@@ -246,8 +245,8 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber(tableKey + "max accel", maxAccel);
   }
 
-  public void resetEncoder() {
-    armEncoder.setPosition(0);
+  public void stopDriving() {
+    armMotor.stopMotor();
   }
 
   public static synchronized ArmSubsystem getInstance() {

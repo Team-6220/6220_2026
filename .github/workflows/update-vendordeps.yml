@@ -1,0 +1,102 @@
+name: Auto Update Vendordeps
+
+on:
+  schedule:
+    - cron: "0 03 * * 4"   # Every Wednesday at 03:00 UTC, 19:00 PST on Tuesday
+  workflow_dispatch:
+
+jobs:
+  update-vendordeps:
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7.0.0
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Update vendordeps
+        id: update
+        run: |
+          mkdir -p updated
+          changed=false
+          changes=""
+
+          for file in vendordeps/*.json; do
+            base=$(basename "$file")
+            name=$(jq -r '.name' "$file")
+            oldVersion=$(jq -r '.version' "$file")
+            url=$(jq -r '.jsonUrl' "$file")
+
+            if [[ "$url" == "null" || -z "$url" ]]; then
+              continue
+            fi
+
+            curl -sSL "$url" -o "updated/$base"
+            newVersion=$(jq -r '.version' "updated/$base")
+
+            # Only count real version bumps
+            if [[ "$oldVersion" != "$newVersion" ]]; then
+              changed=true
+              changes+="$name: $oldVersion → $newVersion"$'\n'
+
+              # Update file contents
+              cp "updated/$base" "$file"
+
+              # Rename file if filename contains version
+              if [[ "$base" =~ (.*)-([v0-9].*)\.json ]]; then
+                prefix="${BASH_REMATCH[1]}"
+                newFile="vendordeps/${prefix}-${newVersion}.json"
+                mv "$file" "$newFile"
+              fi
+            fi
+          done
+
+          # Clean up
+          rm -rf updated
+
+          echo "changed=$changed" >> $GITHUB_OUTPUT
+          echo "changes<<EOF" >> $GITHUB_OUTPUT
+          echo "$changes" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Build PR metadata
+        id: meta
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          count=$(echo "${{ steps.update.outputs.changes }}" | grep -c "→" || true)
+
+          if [[ "$count" -eq 1 ]]; then
+            change_line=$(echo "${{ steps.update.outputs.changes }}" | grep "→" | head -n 1)
+            dep="${change_line%%: *}"
+            versions="${change_line#*: }"
+            old="${versions%% → *}"
+            new="${versions#* → }"
+            title="Bump $dep from $old → $new"
+            commit="Bump $dep from $old → $new"
+            body=""
+          else
+            title="Bump dependencies"
+            commit="Bump dependencies"
+            body="Updated vendordeps:\n\n${{ steps.update.outputs.changes }}\n\n_This PR was generated automatically._"
+          fi
+
+          echo "title=$title" >> $GITHUB_OUTPUT
+          echo "commit=$commit" >> $GITHUB_OUTPUT
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$body" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        if: steps.update.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.SAM_PAT }}
+          branch: auto/update-vendordeps
+          title: ${{ steps.meta.outputs.title }}
+          commit-message: ${{ steps.meta.outputs.commit }}
+          body: ${{ steps.meta.outputs.body }}
+          delete-branch: true
