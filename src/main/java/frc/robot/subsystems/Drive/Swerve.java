@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.RumbleManager;
 import frc.robot.AutoConstants;
 import frc.robot.Constants;
+import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.Drive.GyroIO.GyroIOInputs;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -58,7 +59,7 @@ public class Swerve extends SubsystemBase {
    * and radians.
    */
   private static final Vector<N3> visionMeasurementStdDevs =
-      VecBuilder.fill(1.5, 1.5, Double.MAX_VALUE);
+      VecBuilder.fill(0.7, 0.7, Double.MAX_VALUE);
 
   public SwerveModule[] mSwerveMods = new SwerveModule[4]; // BR, BL, FR, FL
   private final GyroIO gyro;
@@ -490,6 +491,20 @@ public class Swerve extends SubsystemBase {
     }
 
     poseEstimator.update(getGyroYaw(), getModulePositions());
+
+    // vision stuff begin
+    double robotYaw = getGyroYaw().getDegrees();
+    LimelightHelpers.SetRobotOrientation("", robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
+
+    // Get the pose estimate
+    LimelightHelpers.PoseEstimate limelightMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("");
+
+    // Add it to your pose estimator
+    poseEstimator.setVisionMeasurementStdDevs(visionMeasurementStdDevs);
+    poseEstimator.addVisionMeasurement(
+        limelightMeasurement.pose, limelightMeasurement.timestampSeconds);
+    // vision stuff ends
 
     field2d.setRobotPose(getPose());
 
