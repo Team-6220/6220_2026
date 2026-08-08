@@ -6,19 +6,21 @@
 
 package frc.robot.commands.Autos.SamAuto;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
+import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants;
 import frc.robot.subsystems.Drive.Swerve;
+import frc.robot.subsystems.Drive.SwerveConstants;
+import java.io.IOException;
+import org.json.simple.parser.ParseException;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -26,17 +28,49 @@ import frc.robot.subsystems.Drive.Swerve;
 public class SamAutoV1 extends SequentialCommandGroup {
   /** Creates a new SamAutoV1. */
   public SamAutoV1(Swerve swerve) {
-    // Add your commands in the addCommands() call, e.g.
-    // addCommands(new FooCommand(), new BarCommand());
+    addRequirements(swerve);
+
+    PathPlannerPath path;
+    try {
+      path = PathPlannerPath.fromPathFile("toptostation");
+    } catch (IOException | ParseException | FileVersionException e) {
+      throw new RuntimeException("Failed to load toptostation.path", e);
+    }
+
+    Pose2d startPose = path.getStartingHolonomicPose().orElse(new Pose2d(2.27, 7.0, new Rotation2d()));
+
+    // Debug: compute the trajectory ourselves right now (boot time) and dump its total
+    // time / state list, so we can see directly whether PathPlannerLib is generating a
+    // sane multi-second trajectory or collapsing to ~0s for this path.
+    RobotConfig debugConfig =
+        new RobotConfig(
+            Constants.robotMass,
+            Constants.robotMOI,
+            SwerveConstants.swerveModuleConfig(),
+            SwerveConstants.kinematics().getModules());
+    PathPlannerTrajectory debugTrajectory =
+        path.generateTrajectory(new ChassisSpeeds(), startPose.getRotation(), debugConfig);
+    System.out.println(
+        "[TrajectoryDebug] totalTimeSeconds="
+            + debugTrajectory.getTotalTimeSeconds()
+            + " states.size()="
+            + debugTrajectory.getStates().size());
+    for (int i = 0; i < debugTrajectory.getStates().size(); i += Math.max(1, debugTrajectory.getStates().size() / 10)) {
+      var s = debugTrajectory.getStates().get(i);
+      System.out.println(
+          "[TrajectoryDebug]   state["
+              + i
+              + "] t="
+              + s.timeSeconds
+              + " pose="
+              + s.pose
+              + " linVel="
+              + s.linearVelocity);
+    }
+
     addCommands(
-        new InstantCommand(() -> swerve.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))))),
-        AutoBuilder.pathfindToPose(
-            new Pose2d(1, 1, new Rotation2d(0)),
-            new PathConstraints(
-                MetersPerSecond.of(1),
-                MetersPerSecondPerSecond.of(5),
-                DegreesPerSecond.of(180),
-                DegreesPerSecondPerSecond.of(360))),
+        new InstantCommand(() -> swerve.setPose(startPose)),
+        AutoBuilder.followPath(path),
         new InstantCommand(() -> System.out.println("Done with auto!")));
   }
 }

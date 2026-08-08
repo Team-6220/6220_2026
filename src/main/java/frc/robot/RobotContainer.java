@@ -4,12 +4,23 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -19,6 +30,7 @@ import frc.robot.commands.ArmToPositionCommand;
 import frc.robot.commands.ArmUpAndDown;
 import frc.robot.commands.Autos.BasicAutoBlue;
 import frc.robot.commands.Autos.BasicAutoRed;
+import frc.robot.commands.Autos.SamAuto.SamAutoV1;
 import frc.robot.commands.ManualArm;
 import frc.robot.commands.PassToAlliance;
 import frc.robot.commands.SwerveCom;
@@ -67,23 +79,58 @@ public class RobotContainer {
     s_Swerve.configureAutoBuilder();
     s_Swerve.zeroHeading(m_driverController.getHID());
 
+    // Debug: log why/when commands end, to distinguish "finished" (isFinished() returned true)
+    // from "interrupted" (something else took a required subsystem, e.g. a default command).
+    CommandScheduler.getInstance()
+        .onCommandInitialize(
+            cmd ->
+                System.out.println(
+                    "[CMD INIT] "
+                        + cmd.getName()
+                        + " t="
+                        + Timer.getFPGATimestamp()
+                        + " pose="
+                        + s_Swerve.getPose()));
+    CommandScheduler.getInstance()
+        .onCommandFinish(
+            cmd ->
+                System.out.println(
+                    "[CMD FINISH] "
+                        + cmd.getName()
+                        + " t="
+                        + Timer.getFPGATimestamp()
+                        + " pose="
+                        + s_Swerve.getPose()));
+    CommandScheduler.getInstance()
+        .onCommandInterrupt(
+            cmd ->
+                System.out.println(
+                    "[CMD INTERRUPT] "
+                        + cmd.getName()
+                        + " t="
+                        + Timer.getFPGATimestamp()
+                        + " pose="
+                        + s_Swerve.getPose()));
+
     s_Swerve.setDefaultCommand(
         new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
 
     arm.setDefaultCommand(new ManualArm(m_joystick));
 
     autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
-
+    
     // TODO: Register named commands as needed for auto
     // NamedCommands.registerCommand("AutoClimber", new AutoClimberCommand(climberSubsystem));
-
+    
     // NamedCommands.registerCommand(null, null);
     autoChooser.addOption(
         "Red", new BasicAutoRed(s_Swerve, m_angler, m_shooter, belt, m_driverController));
-    autoChooser.addOption(
-        "Blue", new BasicAutoBlue(s_Swerve, m_angler, m_shooter, belt, m_driverController));
-    SmartDashboard.putData(autoChooser);
+        autoChooser.addOption(
+            "Blue", new BasicAutoBlue(s_Swerve, m_angler, m_shooter, belt, m_driverController));
+            SmartDashboard.putData(autoChooser);
+            autoChooser.addOption(
+                "samautov1", new SamAutoV1(s_Swerve));
+    SmartDashboard.putData("Auto Chooser", autoChooser);
     configureBindings();
   }
 
@@ -118,7 +165,14 @@ public class RobotContainer {
 
     m_driverController
         .y()
-        .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
+        .whileTrue(AutoBuilder.pathfindToPose(
+            new Pose2d(2.380,5.682, new Rotation2d(0)),
+            new PathConstraints(
+                MetersPerSecond.of(1),
+                MetersPerSecondPerSecond.of(3.5),
+                DegreesPerSecond.of(180),
+                DegreesPerSecondPerSecond.of(360))));
+        // .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
 
     angleDown.whileTrue(
         Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));

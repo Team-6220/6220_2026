@@ -273,6 +273,12 @@ public final class SwerveConstants {
 
   public static ModuleConfig swerveModuleConfig() {
     return new ModuleConfig(
-        wheelRadius(), maxSpeed(), 1.0, DC_MOTOR, SwerveConstants.driveCurrentLimit, 1);
+        wheelRadius(),
+        maxSpeed(),
+        1.0,
+        DC_MOTOR,
+        DRIVE_GEAR_RATIO,
+        100,
+        1);
   }
 }

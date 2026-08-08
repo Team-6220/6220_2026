@@ -7,6 +7,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -81,6 +82,8 @@ public class Swerve extends SubsystemBase {
   private final int swerveAlignUpdateSecond = 20;
 
   private boolean autoIsOverShoot = false, isAuto = false;
+
+  private int pathfindDebugCount = 0;
 
   // private double targetX;
   // private double targetY;
@@ -157,9 +160,58 @@ public class Swerve extends SubsystemBase {
 
     turnPidController.enableContinuousInput(-(Math.PI), (Math.PI));
 
-    // Set up custom logging to add the current path to a field 2d widget
+    // Set up custom logging to add the current path to a field 2d widget. Also print the
+    // point count and endpoints so we can see exactly what Pathfinding.getCurrentPath()
+    // generated (e.g. is the first point actually where the robot is?).
     PathPlannerLogging.setLogActivePathCallback(
-        (poses) -> field2d.getObject("path").setPoses(poses));
+        (poses) -> {
+          field2d.getObject("path").setPoses(poses);
+          if (!poses.isEmpty()) {
+            System.out.println(
+                "[ActivePath] t="
+                    + Timer.getFPGATimestamp()
+                    + " points="
+                    + poses.size()
+                    + " first="
+                    + poses.get(0)
+                    + " last="
+                    + poses.get(poses.size() - 1)
+                    + " robotPose="
+                    + getPose());
+          }
+        });
+
+    // Log the pathfinding/following target pose so it can be compared against the estimated
+    // pose (field2d "target" object + Shuffleboard) to see if the controller thinks it's
+    // already at the goal when the real robot isn't. This callback only fires from
+    // PathfindingCommand.execute() while a trajectory is actively being sampled, so the
+    // counter tells us how many control loops the path following actually ran for.
+    PathPlannerLogging.setLogTargetPoseCallback(
+        (pose) -> {
+          pathfindDebugCount++;
+          Pose2d current = getPose();
+          System.out.println(
+              "[PathfindDebug] #"
+                  + pathfindDebugCount
+                  + " t="
+                  + Timer.getFPGATimestamp()
+                  + " target="
+                  + pose
+                  + " current="
+                  + current
+                  + " dist="
+                  + current.getTranslation().getDistance(pose.getTranslation()));
+          field2d.getObject("target").setPose(pose);
+          SmartDashboard.putNumberArray(
+              "PathPlanner/TargetPose",
+              new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()});
+        });
+
+    PathPlannerLogging.setLogCurrentPoseCallback(
+        (pose) ->
+            SmartDashboard.putNumberArray(
+                "PathPlanner/CurrentPose",
+                new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()}));
 
     // try{
     // config = RobotConfig.fromGUISettings();
@@ -175,6 +227,33 @@ public class Swerve extends SubsystemBase {
     // Also https://pathplanner.dev/api/java/com/pathplanner/lib/config/RobotConfig.html for API
     // e.printStackTrace();
     // }
+    System.out.println(
+        "[RobotConfigDebug] massKG="
+            + config.massKG
+            + " MOI="
+            + config.MOI
+            + " numModules="
+            + config.numModules
+            + " wheelFrictionForce="
+            + config.wheelFrictionForce
+            + " maxTorqueFriction="
+            + config.maxTorqueFriction
+            + " moduleConfig.maxDriveVelocityMPS="
+            + config.moduleConfig.maxDriveVelocityMPS
+            + " moduleConfig.wheelRadiusMeters="
+            + config.moduleConfig.wheelRadiusMeters
+            + " moduleConfig.wheelCOF="
+            + config.moduleConfig.wheelCOF
+            + " moduleConfig.driveCurrentLimit="
+            + config.moduleConfig.driveCurrentLimit
+            + " driveMotor.freeSpeedRadPerSec="
+            + config.moduleConfig.driveMotor.freeSpeedRadPerSec
+            + " driveMotor.stallTorqueNewtonMeters="
+            + config.moduleConfig.driveMotor.stallTorqueNewtonMeters
+            + " driveMotor.stallCurrentAmps="
+            + config.moduleConfig.driveMotor.stallCurrentAmps
+            + " driveMotor.KtNMPerAmp="
+            + config.moduleConfig.driveMotor.KtNMPerAmp);
     createShuffleOutputs();
   }
 
@@ -232,11 +311,14 @@ public class Swerve extends SubsystemBase {
 
   /** swerve auto init */
   public void configureAutoBuilder() {
+    System.out.println(AutoConstants.translation_kP);
+    System.out.println(AutoConstants.translation_kI);
+    System.out.println(AutoConstants.translation_kD);
     AutoBuilder.configure(
         this::getPose,
         this::resetOdometry,
         this::getRobotRelativeSpeeds,
-        (speeds, feedforwards) -> driveRobotRelative(speeds),
+        (speeds, feedforwards) -> driveRobotRelative(speeds,feedforwards),
         new PPHolonomicDriveController(
             new PIDConstants(
                 AutoConstants.translationKPTN.get(),
@@ -255,18 +337,28 @@ public class Swerve extends SubsystemBase {
           return false;
         },
         this);
+        System.out.println("configured!!!!!");
   }
 
   /**
    * @param robotRelativeSpeeds the speed in m/s
    */
-  public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
+  public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds, DriveFeedforwards feedforward) {
     System.out.println("relative");
     ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
 
     SwerveModuleState[] targetStates =
         SwerveConstants.kinematics().toSwerveModuleStates(targetSpeeds);
     setModuleStates(targetStates);
+    System.out.println("relative vx=" + robotRelativeSpeeds.vxMetersPerSecond
+    + " vy=" + robotRelativeSpeeds.vyMetersPerSecond
+    + " omega=" + robotRelativeSpeeds.omegaRadiansPerSecond);
+    System.out.println("ff acceleration MPSSq" + feedforward.accelerationsMPSSq());
+    System.out.println("ff linear force newton" + feedforward.linearForcesNewtons());
+    System.out.println("ff linear torque current" + feedforward.torqueCurrentsAmps());
+    System.out.println("ff linear torque current" + feedforward.torqueCurrentsAmps());
+    System.out.println("ff linear x force " + feedforward.robotRelativeForcesXNewtons());
+    System.out.println("ff linear y force" + feedforward.robotRelativeForcesYNewtons());
   }
 
   /** Resets the odometer value */
@@ -282,6 +374,7 @@ public class Swerve extends SubsystemBase {
   /** Get's the chassis speed of the robot in ROBOT RELATIVE SPEED */
   public ChassisSpeeds getRobotRelativeSpeeds() {
     ChassisSpeeds chassisSpeeds = SwerveConstants.kinematics().toChassisSpeeds(getModuleStates());
+    System.out.println("getting robot relative speed... " + chassisSpeeds.vxMetersPerSecond + " y: " + chassisSpeeds.vyMetersPerSecond);
     return chassisSpeeds;
   }
 
@@ -292,7 +385,7 @@ public class Swerve extends SubsystemBase {
     for (SwerveModule mod : mSwerveMods) {
       mod.setDesiredState(desiredStates[mod.getModuleNumber()], false);
     }
-  }
+  } 
 
   /**
    * @return list of the states of the modules
@@ -326,6 +419,7 @@ public class Swerve extends SubsystemBase {
   }
 
   public void setPose(Pose2d pose) {
+    System.out.println("set pose!! new pose 2d" + pose.getX() + " y: " + pose.getY());
     poseEstimator.resetPosition(getGyroYaw(), getModulePositions(), pose);
   }
 
