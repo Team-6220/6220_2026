@@ -19,6 +19,7 @@ import frc.robot.commands.ArmToPositionCommand;
 import frc.robot.commands.ArmUpAndDown;
 import frc.robot.commands.Autos.BasicAutoBlue;
 import frc.robot.commands.Autos.BasicAutoRed;
+import frc.robot.commands.Autos.SamAuto.SamAutoV1;
 import frc.robot.commands.ManualArm;
 import frc.robot.commands.PassToAlliance;
 import frc.robot.commands.SwerveCom;
@@ -73,7 +74,6 @@ public class RobotContainer {
     arm.setDefaultCommand(new ManualArm(m_joystick));
 
     autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
 
     // TODO: Register named commands as needed for auto
     // NamedCommands.registerCommand("AutoClimber", new AutoClimberCommand(climberSubsystem));
@@ -84,6 +84,8 @@ public class RobotContainer {
     autoChooser.addOption(
         "Blue", new BasicAutoBlue(s_Swerve, m_angler, m_shooter, belt, m_driverController));
     SmartDashboard.putData(autoChooser);
+    autoChooser.addOption("samautov1", new SamAutoV1(s_Swerve));
+    SmartDashboard.putData("Auto Chooser", autoChooser);
     configureBindings();
   }
 

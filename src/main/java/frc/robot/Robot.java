@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.commands.PathfindingCommand;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -59,6 +60,7 @@ public class Robot extends TimedRobot {
               "mjpg:http://10.62.20.11:5800/stream.mjpg",
               "mjpg:http://10.62.20.11:5800"
             });
+    PathfindingCommand.warmupCommand();
   }
 
   /**
