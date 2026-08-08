@@ -7,18 +7,13 @@
 package frc.robot.commands.Autos.SamAuto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants;
 import frc.robot.subsystems.Drive.Swerve;
-import frc.robot.subsystems.Drive.SwerveConstants;
 import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
@@ -37,36 +32,8 @@ public class SamAutoV1 extends SequentialCommandGroup {
       throw new RuntimeException("Failed to load toptostation.path", e);
     }
 
-    Pose2d startPose = path.getStartingHolonomicPose().orElse(new Pose2d(2.27, 7.0, new Rotation2d()));
-
-    // Debug: compute the trajectory ourselves right now (boot time) and dump its total
-    // time / state list, so we can see directly whether PathPlannerLib is generating a
-    // sane multi-second trajectory or collapsing to ~0s for this path.
-    RobotConfig debugConfig =
-        new RobotConfig(
-            Constants.robotMass,
-            Constants.robotMOI,
-            SwerveConstants.swerveModuleConfig(),
-            SwerveConstants.kinematics().getModules());
-    PathPlannerTrajectory debugTrajectory =
-        path.generateTrajectory(new ChassisSpeeds(), startPose.getRotation(), debugConfig);
-    System.out.println(
-        "[TrajectoryDebug] totalTimeSeconds="
-            + debugTrajectory.getTotalTimeSeconds()
-            + " states.size()="
-            + debugTrajectory.getStates().size());
-    for (int i = 0; i < debugTrajectory.getStates().size(); i += Math.max(1, debugTrajectory.getStates().size() / 10)) {
-      var s = debugTrajectory.getStates().get(i);
-      System.out.println(
-          "[TrajectoryDebug]   state["
-              + i
-              + "] t="
-              + s.timeSeconds
-              + " pose="
-              + s.pose
-              + " linVel="
-              + s.linearVelocity);
-    }
+    Pose2d startPose =
+        path.getStartingHolonomicPose().orElse(new Pose2d(2.27, 7.0, new Rotation2d()));
 
     addCommands(
         new InstantCommand(() -> swerve.setPose(startPose)),

@@ -40,6 +40,7 @@ public final class SwerveConstants {
   public static final double driveMaxCurrent = 60;
   public static final double driveMaxCurrentTime = 0.1;
   public static final boolean driveEnableCurrentLimit = true;
+  public static final double driveStatorCurrentLimit = 100;
 
   /* Neutral Modes */
   public static final IdleMode angleNeutralMode = IdleMode.kBrake;
@@ -273,12 +274,6 @@ public final class SwerveConstants {
 
   public static ModuleConfig swerveModuleConfig() {
     return new ModuleConfig(
-        wheelRadius(),
-        maxSpeed(),
-        1.0,
-        DC_MOTOR,
-        DRIVE_GEAR_RATIO,
-        100,
-        1);
+        wheelRadius(), maxSpeed(), 1.0, DC_MOTOR, DRIVE_GEAR_RATIO, driveStatorCurrentLimit, 1);
   }
 }

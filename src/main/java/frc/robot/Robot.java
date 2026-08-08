@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.commands.PathfindingCommand;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -15,8 +16,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import java.util.ArrayList;
 import java.util.Optional;
-
-import com.pathplanner.lib.commands.PathfindingCommand;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -61,7 +60,7 @@ public class Robot extends TimedRobot {
               "mjpg:http://10.62.20.11:5800/stream.mjpg",
               "mjpg:http://10.62.20.11:5800"
             });
-            PathfindingCommand.warmupCommand();
+    PathfindingCommand.warmupCommand();
   }
 
   /**
