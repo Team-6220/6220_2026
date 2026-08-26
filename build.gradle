@@ -76,13 +76,15 @@ dependencies {
     roborioRelease wpi.java.deps.wpilibJniRelease(wpi.platforms.roborio)
     roborioRelease wpi.java.vendor.jniRelease(wpi.platforms.roborio)
 
-    nativeDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.desktop)
-    nativeDebug wpi.java.vendor.jniDebug(wpi.platforms.desktop)
-    simulationDebug wpi.sim.enableDebug()
+    if (includeDesktopSupport) {
+        nativeDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.desktop)
+        nativeDebug wpi.java.vendor.jniDebug(wpi.platforms.desktop)
+        simulationDebug wpi.sim.enableDebug()
 
-    nativeRelease wpi.java.deps.wpilibJniRelease(wpi.platforms.desktop)
-    nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
-    simulationRelease wpi.sim.enableRelease()
+        nativeRelease wpi.java.deps.wpilibJniRelease(wpi.platforms.desktop)
+        nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
+        simulationRelease wpi.sim.enableRelease()
+    }
 
     testImplementation 'org.junit.jupiter:junit-jupiter:6.1.3'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -94,8 +96,10 @@ test {
 }
 
 // Simulation configuration (e.g. environment variables).
-wpi.sim.addGui().defaultEnabled = true
-wpi.sim.addDriverstation()
+if (includeDesktopSupport) {
+    wpi.sim.addGui().defaultEnabled = true
+    wpi.sim.addDriverstation()
+}
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
 // in order to make them all available at runtime. Also adding the manifest so WPILib
