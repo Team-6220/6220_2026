@@ -517,7 +517,6 @@ public class Swerve extends SubsystemBase {
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
 
     megatag2Pose.setRobotPose(limelightMeasurement.pose);
-    SmartDashboard.putData("megatag2", megatag2Pose);
 
     // Reject the update if no tags were seen - MegaTag2 returns a degenerate/garbage
     // pose when tagCount == 0, and blindly fusing it corrupts the odometry.
@@ -527,7 +526,6 @@ public class Swerve extends SubsystemBase {
       poseEstimator.addVisionMeasurement(
           limelightMeasurement.pose, limelightMeasurement.timestampSeconds);
     }
-    logVisionDebug(limelightMeasurement, robotYaw, visionAccepted);
     // vision stuff ends
 
     field2d.setRobotPose(getPose());
@@ -551,66 +549,11 @@ public class Swerve extends SubsystemBase {
     }
   }
 
-  /**
-   * Dumps raw NT arrays, MT1-vs-MT2 comparison, and per-tag fiducial data to SmartDashboard so
-   * bad vision estimates can be diagnosed after the fact (e.g. via a log file / Elastic).
-   */
-  private void logVisionDebug(
-      LimelightHelpers.PoseEstimate mt2, double seededYawDeg, boolean accepted) {
-    final String base = "LimelightDebug/";
-    final String llName = "limelight-front";
-
-    // Raw arrays straight off the wire - reveals array-length/parsing mismatches that
-    // wouldn't show up once they've been decoded into a Pose2d.
-    double[] rawWpiBlue = LimelightHelpers.getLimelightNTDoubleArray(llName, "botpose_wpiblue");
-    double[] rawOrbWpiBlue =
-        LimelightHelpers.getLimelightNTDoubleArray(llName, "botpose_orb_wpiblue");
-    SmartDashboard.putNumber(base + "raw botpose_wpiblue length", rawWpiBlue.length);
-    SmartDashboard.putNumber(base + "raw botpose_orb_wpiblue length", rawOrbWpiBlue.length);
-    SmartDashboard.putNumberArray(base + "raw botpose_wpiblue", rawWpiBlue);
-    SmartDashboard.putNumberArray(base + "raw botpose_orb_wpiblue", rawOrbWpiBlue);
-
-    // MT1 (no orientation seed) vs MT2 (seeded with current gyro yaw) side by side - if MT1
-    // is sane and MT2 isn't, the orientation seed is the suspect; if both are garbage, it's
-    // a tag-detection problem, not a seeding problem.
-    LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(llName);
-    SmartDashboard.putNumber(base + "MT1 X", mt1.pose.getX());
-    SmartDashboard.putNumber(base + "MT1 Y", mt1.pose.getY());
-    SmartDashboard.putNumber(base + "MT1 Yaw deg", mt1.pose.getRotation().getDegrees());
-    SmartDashboard.putNumber(base + "MT1 tagCount", mt1.tagCount);
-
-    SmartDashboard.putNumber(base + "MT2 X", mt2.pose.getX());
-    SmartDashboard.putNumber(base + "MT2 Y", mt2.pose.getY());
-    SmartDashboard.putNumber(base + "MT2 Yaw deg", mt2.pose.getRotation().getDegrees());
-    SmartDashboard.putNumber(base + "MT2 tagCount", mt2.tagCount);
-    SmartDashboard.putNumber(base + "MT2 tagSpan", mt2.tagSpan);
-    SmartDashboard.putNumber(base + "MT2 avgTagDist", mt2.avgTagDist);
-    SmartDashboard.putNumber(base + "MT2 avgTagArea", mt2.avgTagArea);
-    SmartDashboard.putNumber(base + "MT2 latency ms", mt2.latency);
-    SmartDashboard.putNumber(base + "MT2 timestamp", mt2.timestampSeconds);
-    SmartDashboard.putBoolean(base + "MT2 accepted", accepted);
-
-    // Orientation seed fed into MegaTag2 this loop vs what the pose estimator currently holds -
-    // if these two yaws disagree a lot, the seed and the estimate it produced are out of sync.
-    SmartDashboard.putNumber(base + "seeded gyro yaw deg", seededYawDeg);
-    SmartDashboard.putNumber(base + "fused pose yaw deg", getPose().getRotation().getDegrees());
-
-    // Per-tag raw detections - id/ambiguity/distance show whether a specific tag is being
-    // seen reliably, or whether the tag being "seen" doesn't correspond to a real detection.
-    StringBuilder sb = new StringBuilder();
-    for (LimelightHelpers.RawFiducial f : mt2.rawFiducials) {
-      sb.append(
-          String.format(
-              "[id=%d amb=%.3f distToCam=%.2f distToRobot=%.2f ta=%.3f] ",
-              f.id, f.ambiguity, f.distToCamera, f.distToRobot, f.ta));
-    }
-    SmartDashboard.putString(base + "MT2 raw fiducials", sb.toString());
-  }
-
   private void createShuffleOutputs() {
     String title = "Swerve";
     // Shuffleboard.getTab(title).addString("Robot Pose", () -> getPose().toString());
     Shuffleboard.getTab(title).add(field2d);
+    SmartDashboard.putData("megatag2", megatag2Pose);
     Shuffleboard.getTab(title)
         .addNumber("where the bot think it is swerve X", () -> getPose().getX());
     Shuffleboard.getTab(title)

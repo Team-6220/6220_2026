@@ -11,8 +11,25 @@ public class Limelight extends SubsystemBase {
   /** Creates a new Limelight. */
   private static String tableName = "limelight-front";
 
+  // TODO: Measure the physical mount and replace these placeholders. Offsets are from the
+  // robot's origin (center of the drivetrain, floor height) to the camera lens.
+  private static final double CAMERA_FORWARD_METERS = 0.0;
+  private static final double CAMERA_RIGHT_METERS = 0.0;
+  private static final double CAMERA_UP_METERS = 0.0;
+  private static final double CAMERA_ROLL_DEGREES = 0.0;
+  private static final double CAMERA_PITCH_DEGREES = 55;
+  private static final double CAMERA_YAW_DEGREES = 0.0;
+
   public Limelight() {
     LimelightHelpers.setPipelineIndex(tableName, 0);
+    LimelightHelpers.setCameraPose_RobotSpace(
+        tableName,
+        CAMERA_FORWARD_METERS,
+        CAMERA_RIGHT_METERS,
+        CAMERA_UP_METERS,
+        CAMERA_ROLL_DEGREES,
+        CAMERA_PITCH_DEGREES,
+        CAMERA_YAW_DEGREES);
   }
 
   @Override
