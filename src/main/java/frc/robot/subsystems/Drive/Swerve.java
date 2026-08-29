@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.RumbleManager;
 import frc.robot.AutoConstants;
 import frc.robot.Constants;
+import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.Drive.GyroIO.GyroIOInputs;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -58,7 +59,7 @@ public class Swerve extends SubsystemBase {
    * and radians.
    */
   private static final Vector<N3> visionMeasurementStdDevs =
-      VecBuilder.fill(1.5, 1.5, Double.MAX_VALUE);
+      VecBuilder.fill(0.7, 0.7, Double.MAX_VALUE);
 
   public SwerveModule[] mSwerveMods = new SwerveModule[4]; // BR, BL, FR, FL
   private final GyroIO gyro;
@@ -74,9 +75,15 @@ public class Swerve extends SubsystemBase {
   public ShuffleboardTab fieldPoseTab = Shuffleboard.getTab("Field Pose 2d tab (map)");
 
   public Field2d field2d = new Field2d();
+  private final Field2d megatag2Pose = new Field2d();
 
   private double lastTurnUpdate;
   private double autoTurnHeading;
+
+  // Tracked to derive yaw rate for MegaTag2's SetRobotOrientation call, since the navX's raw
+  // getRate() sign convention isn't guaranteed to match the already-verified getGyroYaw().
+  private Rotation2d lastYawForRate = new Rotation2d();
+  private double lastYawRateTimestamp = Timer.getFPGATimestamp();
 
   private final int swerveAlignUpdateSecond = 20;
 
@@ -491,6 +498,36 @@ public class Swerve extends SubsystemBase {
 
     poseEstimator.update(getGyroYaw(), getModulePositions());
 
+    // vision stuff begin
+    double robotYaw = getGyroYaw().getDegrees();
+
+    double yawRateDegPerSec = 0.0;
+    double rateDt = timestamp - lastYawRateTimestamp;
+    if (rateDt > 0) {
+      yawRateDegPerSec = getGyroYaw().minus(lastYawForRate).getDegrees() / rateDt;
+    }
+    lastYawForRate = getGyroYaw();
+    lastYawRateTimestamp = timestamp;
+
+    LimelightHelpers.SetRobotOrientation(
+        "limelight-front", robotYaw, yawRateDegPerSec, 0.0, 0.0, 0.0, 0.0);
+
+    // Get the pose estimate
+    LimelightHelpers.PoseEstimate limelightMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
+
+    megatag2Pose.setRobotPose(limelightMeasurement.pose);
+
+    // Reject the update if no tags were seen - MegaTag2 returns a degenerate/garbage
+    // pose when tagCount == 0, and blindly fusing it corrupts the odometry.
+    boolean visionAccepted = limelightMeasurement.tagCount > 0;
+    if (visionAccepted) {
+      poseEstimator.setVisionMeasurementStdDevs(visionMeasurementStdDevs);
+      poseEstimator.addVisionMeasurement(
+          limelightMeasurement.pose, limelightMeasurement.timestampSeconds);
+    }
+    // vision stuff ends
+
     field2d.setRobotPose(getPose());
 
     if (AutoConstants.angularKPTN.hasChanged()
@@ -516,6 +553,7 @@ public class Swerve extends SubsystemBase {
     String title = "Swerve";
     // Shuffleboard.getTab(title).addString("Robot Pose", () -> getPose().toString());
     Shuffleboard.getTab(title).add(field2d);
+    SmartDashboard.putData("megatag2", megatag2Pose);
     Shuffleboard.getTab(title)
         .addNumber("where the bot think it is swerve X", () -> getPose().getX());
     Shuffleboard.getTab(title)
