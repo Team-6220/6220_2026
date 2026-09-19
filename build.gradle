@@ -2,11 +2,25 @@ plugins {
     id "java"
     id "application"
     id "org.wpilib.GradleRIO" version "2027.0.0-alpha-7"
+    id "com.diffplug.spotless" version "8.10.0"
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_25
     targetCompatibility = JavaVersion.VERSION_25
+}
+
+repositories {
+    mavenCentral()
+    maven { url = uri("https://repo.maven.apache.org/maven2") }
+
+    maven {
+        url = uri("https://maven.pkg.github.com/wpilibsuite/*")
+        credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
@@ -104,4 +118,19 @@ jar {
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
+}
+
+//for github workflow
+spotless {
+    java {
+        googleJavaFormat()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
+tasks.named("build") {
+    dependsOn("spotlessApply")
+    dependsOn("spotlessCheck")
 }
