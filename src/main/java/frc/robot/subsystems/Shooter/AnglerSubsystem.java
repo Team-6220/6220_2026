@@ -16,6 +16,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.SubsystemBase;
+import org.wpilib.hardware.bus.CANPort;
+
 import frc.lib.util.TunableNumber;
 
 public class AnglerSubsystem extends SubsystemBase {
@@ -48,7 +50,8 @@ public class AnglerSubsystem extends SubsystemBase {
   private static final double ANGLE_TOLERANCE_DEG = 2.0;
 
   public AnglerSubsystem() {
-    m_anglerMotor = new SparkMax(ANGLER_MOTOR_ID, MotorType.kBrushless);
+    CANPort shooterCANPort = CANPort.CAN_S2;
+    m_anglerMotor = new SparkMax(shooterCANPort,ANGLER_MOTOR_ID, MotorType.kBrushless);
     configureMotor();
     m_encoder = m_anglerMotor.getEncoder();
     m_closedLoopController = m_anglerMotor.getClosedLoopController();
@@ -59,7 +62,8 @@ public class AnglerSubsystem extends SubsystemBase {
     config.smartCurrentLimit(CURRENT_LIMIT).idleMode(IdleMode.kBrake).inverted(false);
     config.inverted(true);
     // Configure encoder with gear ratio so position reads in degrees
-    config.encoder.positionConversionFactor(GEAR_RATIO).velocityConversionFactor(GEAR_RATIO);
+    // config.encoder.positionConversionFactor(GEAR_RATIO).velocityConversionFactor(GEAR_RATIO);
+    
     // Use the primary (relative) encoder for closed loop
     config
         .closedLoop
@@ -101,11 +105,11 @@ public class AnglerSubsystem extends SubsystemBase {
     //   return;
     // }
     if (currentAngle >= MAX_SHAFT_ROT && speed > 0) {
-      m_anglerMotor.set(0);
+      m_anglerMotor.setVoltage(0);
       return;
     }
 
-    m_anglerMotor.set(speed);
+    m_anglerMotor.setThrottle(speed);
   }
 
   /**
@@ -126,7 +130,7 @@ public class AnglerSubsystem extends SubsystemBase {
 
   /** Stops the angler motor. */
   public void stop() {
-    m_anglerMotor.set(0);
+    m_anglerMotor.setVoltage(0);
   }
 
   /**
@@ -136,7 +140,7 @@ public class AnglerSubsystem extends SubsystemBase {
    * @return Current angle in degrees
    */
   public double getCurrentAngleDeg() {
-    return m_encoder.getPosition();
+    return m_encoder.getPosition().get();
   }
 
   /**

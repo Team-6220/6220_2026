@@ -6,6 +6,7 @@ package frc.robot.subsystems.Shooter;
 
 import static org.wpilib.units.Units.Volts;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -21,6 +22,8 @@ import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.sysid.SysIdRoutine;
+import org.wpilib.hardware.bus.CANPort;
+
 import frc.lib.util.TunableNumber;
 import frc.robot.LimelightHelpers;
 
@@ -96,11 +99,13 @@ public class ShooterSubsystem extends SubsystemBase {
   private double peakRPM = 0.0;
 
   public ShooterSubsystem() {
-    m_motor41 = new TalonFX(MOTOR_41_ID);
-    m_motor34 = new TalonFX(MOTOR_34_ID);
-    m_motor9 = new TalonFX(MOTOR_9_ID);
-    m_motor31 = new TalonFX(MOTOR_31_ID);
-    m_motor35 = new TalonFX(MOTOR_35_ID);
+    CANPort shooterCANPort = CANPort.CAN_S2;
+    CANBus shooterCANBus = new CANBus(shooterCANPort);
+    m_motor41 = new TalonFX(MOTOR_41_ID, shooterCANBus);
+    m_motor34 = new TalonFX(MOTOR_34_ID, shooterCANBus);
+    m_motor9 = new TalonFX(MOTOR_9_ID, shooterCANBus);
+    m_motor31 = new TalonFX(MOTOR_31_ID, shooterCANBus);
+    m_motor35 = new TalonFX(MOTOR_35_ID, shooterCANBus);
     m_velocityRequest = new VelocityVoltage(0).withSlot(0);
 
     configureMotors();
@@ -384,24 +389,24 @@ public class ShooterSubsystem extends SubsystemBase {
 
   /** Runs all shooters at a percentage of max output (for testing). */
   public void setPercentOutput(double percent) {
-    m_motor41.set(percent);
-    m_motor34.set(percent);
-    m_motor9.set(percent);
-    m_motor31.set(percent);
-    m_motor35.set(percent);
+    m_motor41.setThrottle(percent);
+    m_motor34.setThrottle(percent);
+    m_motor9.setThrottle(percent);
+    m_motor31.setThrottle(percent);
+    m_motor35.setThrottle(percent);
   }
 
   /** Runs motors 9, 2, and 31 at percent output. */
   public void setBottomGroupPercent(double percent) {
-    m_motor9.set(percent);
-    m_motor35.set(percent);
-    m_motor31.set(percent);
+    m_motor9.setThrottle(percent);
+    m_motor35.setThrottle(percent);
+    m_motor31.setThrottle(percent);
   }
 
   /** Runs motors 41 and 1 at percent output. */
   public void setTopGroupPercent(double percent) {
-    m_motor41.set(percent);
-    m_motor34.set(percent);
+    m_motor41.setThrottle(percent);
+    m_motor34.setThrottle(percent);
   }
 
   /** Stops motors 9, 2, and 31. */

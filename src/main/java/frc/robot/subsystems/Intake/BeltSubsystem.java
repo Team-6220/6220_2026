@@ -10,6 +10,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.SubsystemBase;
+import org.wpilib.hardware.bus.CANPort;
 
 public class BeltSubsystem extends SubsystemBase {
 
@@ -31,7 +32,8 @@ public class BeltSubsystem extends SubsystemBase {
   }
 
   public BeltSubsystem() {
-    beltMotor = new SparkMax(BeltConstants.beltID, MotorType.kBrushless);
+    CANPort beltCANPort = CANPort.CAN_S2;
+    beltMotor = new SparkMax(beltCANPort, BeltConstants.beltID, MotorType.kBrushless);
     beltMotorConfig.inverted(BeltConstants.beltInvert);
     beltMotorConfig.smartCurrentLimit(BeltConstants.stallLimit, BeltConstants.freeLimit);
     beltMotorConfig.idleMode(BeltConstants.beltIdleMode);

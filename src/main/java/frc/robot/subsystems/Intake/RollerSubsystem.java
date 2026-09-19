@@ -4,12 +4,14 @@
 
 package frc.robot.subsystems.Intake;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.SubsystemBase;
+import org.wpilib.hardware.bus.CANPort;
 
 public class RollerSubsystem extends SubsystemBase {
 
@@ -22,7 +24,6 @@ public class RollerSubsystem extends SubsystemBase {
 
   private static final class RollerConstants {
     public static final int rollerMotorID = 15;
-    public static final String canBus = "rio"; // change to your CANivore bus name if applicable
 
     public static final double stallCurrentLimit = 40.0;
     public static final boolean rollerInvert = false;
@@ -30,7 +31,9 @@ public class RollerSubsystem extends SubsystemBase {
   }
 
   public RollerSubsystem() {
-    rollerMotor = new TalonFX(RollerConstants.rollerMotorID, RollerConstants.canBus);
+    CANPort rollerCANPort = CANPort.CAN_S2;
+    CANBus rollerCANBus = new CANBus(rollerCANPort);
+    rollerMotor = new TalonFX(RollerConstants.rollerMotorID, rollerCANBus);
 
     TalonFXConfiguration config = new TalonFXConfiguration();
     config.MotorOutput.Inverted =

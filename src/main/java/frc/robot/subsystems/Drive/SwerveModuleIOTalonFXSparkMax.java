@@ -14,6 +14,9 @@ import static org.wpilib.units.Units.Rotations;
 import static org.wpilib.units.Units.RotationsPerSecond;
 import static org.wpilib.units.Units.Volts;
 
+import org.wpilib.hardware.bus.CANPort;
+
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -21,7 +24,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -44,11 +46,13 @@ public class SwerveModuleIOTalonFXSparkMax implements SwerveModuleIO {
   private final SparkClosedLoopController angleController;
 
   public SwerveModuleIOTalonFXSparkMax(SwerveModuleConstants swerveConfig) {
-    driveMotor = new TalonFX(swerveConfig.driveMotorID);
+    CANPort swerveCANPort = CANPort.CAN_S0;
+    CANBus swerveCANBus = new CANBus(swerveCANPort);
+    driveMotor = new TalonFX(swerveConfig.driveMotorID, swerveCANBus);
     driveMotor.getConfigurator().apply(Robot.ctreConfigs.swerveDriveFXConfig);
     driveMotor.getConfigurator().setPosition(Degree.of(0));
 
-    angleMotor = new SparkMax(swerveConfig.angleMotorID, MotorType.kBrushless);
+    angleMotor = new SparkMax(swerveCANPort, swerveConfig.angleMotorID, MotorType.kBrushless);
 
     angleMotorConfig
         .inverted(SwerveConstants.angleMotorInvert)
@@ -57,14 +61,15 @@ public class SwerveModuleIOTalonFXSparkMax implements SwerveModuleIO {
     angleMotorConfig
         .closedLoop
         .pid(SwerveConstants.ANGLE_KP, SwerveConstants.ANGLE_KI, SwerveConstants.ANGLE_KD)
-        .positionWrappingEnabled(true)
-        .positionWrappingMinInput(RevConfigs.CANCoderAngleToNeoEncoder(-0.5))
-        .positionWrappingMaxInput(RevConfigs.CANCoderAngleToNeoEncoder(0.5));
+        .positionWrappingEnabled(true);
+        //NOTE: use firmware instead?
+        // .positionWrappingMinInput(RevConfigs.CANCoderAngleToNeoEncoder(-0.5))
+        // .positionWrappingMaxInput(RevConfigs.CANCoderAngleToNeoEncoder(0.5))
     angleMotor.configure(
         angleMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     angleBuiltInEncoder = angleMotor.getEncoder();
-    absoluteAngleEncoder = new CANcoder(swerveConfig.cancoderID);
+    absoluteAngleEncoder = new CANcoder(swerveConfig.cancoderID, swerveCANBus);
     absoluteAngleEncoder.getConfigurator().apply(Robot.ctreConfigs.swerveCANcoderConfig);
 
     angleController = angleMotor.getClosedLoopController();
@@ -86,19 +91,19 @@ public class SwerveModuleIOTalonFXSparkMax implements SwerveModuleIO {
     inputs.anglePositionRad =
         Radians.of(
             Radians.convertFrom(
-                RevConfigs.NeoEncoderAngleToCANCoder(angleBuiltInEncoder.getPosition()),
+                RevConfigs.NeoEncoderAngleToCANCoder(angleBuiltInEncoder.getPosition().get()),
                 Rotations));
     inputs.angleVelocityRadPerSec =
         RadiansPerSecond.of(
             RadiansPerSecond.convertFrom(
-                RevConfigs.NeoEncoderAngleToCANCoder(angleBuiltInEncoder.getVelocity()),
+                RevConfigs.NeoEncoderAngleToCANCoder(angleBuiltInEncoder.getVelocity().get()),
                 RotationsPerSecond));
 
     inputs.driveAppliedVolts = Volts.of(driveMotor.getSupplyVoltage().getValueAsDouble());
-    inputs.angleAppliedVolts = Volts.of(angleMotor.getBusVoltage());
+    inputs.angleAppliedVolts = Volts.of(angleMotor.getBusVoltage().get());
 
     inputs.driveCurrentAmps = Amps.of(driveMotor.getStatorCurrent().getValueAsDouble());
-    inputs.angleCurrentAmps = Amps.of(angleMotor.getOutputCurrent());
+    inputs.angleCurrentAmps = Amps.of(angleMotor.getOutputCurrent().get());
 
     inputs.absoluteAngle =
         new Rotation2d(Rotations.of(absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble()));
@@ -133,6 +138,6 @@ public class SwerveModuleIOTalonFXSparkMax implements SwerveModuleIO {
 
   @Override
   public void setAnglePosition(double setpoint) {
-    angleController.setSetpoint(setpoint, ControlType.kPosition);
+    angleController.setSetpoint(setpoint, com.revrobotics.spark.SparkLowLevel.ControlType.kPosition);
   }
 }

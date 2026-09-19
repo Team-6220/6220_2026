@@ -15,6 +15,8 @@ import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.system.Timer;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.SubsystemBase;
+import org.wpilib.hardware.bus.CANPort;
+
 import frc.lib.util.TunableNumber;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -82,7 +84,8 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public ArmSubsystem() {
-    armMotor = new SparkMax(ArmConstants.armMotorID, MotorType.kBrushless);
+    CANPort armCANPort = CANPort.CAN_S1;
+    armMotor = new SparkMax(armCANPort, ArmConstants.armMotorID, MotorType.kBrushless);
     armMotorConfig.inverted(ArmConstants.armInvert);
     armMotorConfig.smartCurrentLimit(ArmConstants.stallLimit, ArmConstants.freeLimit);
     armMotorConfig.idleMode(ArmConstants.armIdleMode);
@@ -183,7 +186,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     // Motor diagnostics
     SmartDashboard.putNumber(
-        tableKey + "motor_output_volts", armMotor.getBusVoltage() * armMotor.getAppliedOutput());
+        tableKey + "motor_output_volts", armMotor.getBusVoltage().get() * armMotor.getAppliedOutput().get());
     SmartDashboard.putNumber(tableKey + "motor_current_amps", armMotor.getOutputCurrent());
     SmartDashboard.putNumber(tableKey + "motor_temp_celsius", armMotor.getMotorTemperature());
   }
@@ -219,7 +222,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public double getPosition() {
-    return armEncoder.getPosition();
+    return armEncoder.getPosition().get();
   }
 
   public boolean controllerAtGoal() {
