@@ -223,11 +223,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
     // Set motor velocities
     setTopGroupVelocityRPS(topRPS);
-    if (controller.getRightTriggerAxis() > 0.5) { // isAtSpeedFly(topRPS) &&
+    if (controller.getRightTrigger() > 0.5) { // isAtSpeedFly(topRPS) &&
       setBottomGroupVelocityRPS(bottomRPS);
     }
 
-    if (controller.getRightTriggerAxis() < 0.5) {
+    if (controller.getRightTrigger() < 0.5) {
       m_motor41.stopMotor();
       m_motor34.stopMotor();
     }

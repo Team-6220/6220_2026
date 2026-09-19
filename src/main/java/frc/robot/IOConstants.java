@@ -9,9 +9,9 @@ public final class IOConstants {
 
   public static final double kDeadband = 0.085;
 
-  public static final int translationAxis = XboxController.Axis.kLeftY.value;
-  public static final int strafeAxis = XboxController.Axis.kLeftX.value;
-  public static final int rotationAxis = XboxController.Axis.kRightX.value;
+  public static final XboxController.Axis translationAxis = XboxController.Axis.LEFT_Y;
+  public static final XboxController.Axis strafeAxis = XboxController.Axis.LEFT_X;
+  public static final XboxController.Axis rotationAxis = XboxController.Axis.RIGHT_X;
 
   /*Start from zero after dead band.
    * Eg. if your deadband is .05
@@ -82,9 +82,9 @@ public final class IOConstants {
   public static double[] getDriverInputs(XboxController driver) {
     double[] inputs = new double[3];
 
-    inputs[0] = IOConstants.modifyMoveAxis(-driver.getRawAxis(translationAxis));
-    inputs[1] = IOConstants.modifyMoveAxis(-driver.getRawAxis(strafeAxis));
-    inputs[2] = IOConstants.modifyRotAxis(driver.getRawAxis(rotationAxis));
+    inputs[0] = IOConstants.modifyMoveAxis(-driver.getAxis(translationAxis));
+    inputs[1] = IOConstants.modifyMoveAxis(-driver.getAxis(strafeAxis));
+    inputs[2] = IOConstants.modifyRotAxis(driver.getAxis(rotationAxis));
 
     inputs[0] = MathUtil.applyDeadband(inputs[0], IOConstants.kDeadband);
     inputs[1] = MathUtil.applyDeadband(inputs[1], IOConstants.kDeadband);

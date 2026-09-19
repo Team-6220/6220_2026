@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+
+import org.wpilib.driverstation.Gamepad;
 import org.wpilib.driverstation.GenericHID;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.smartdashboard.SendableChooser;
@@ -68,7 +70,7 @@ public class RobotContainer {
 
     // Configure the trigger bindings
     s_Swerve.configureAutoBuilder();
-    s_Swerve.zeroHeading(m_driverController.getHID());
+    s_Swerve.zeroHeading(m_driverController.getController());
 
     s_Swerve.setDefaultCommand(
         new SwerveCom(s_Swerve, m_driverController, m_driverController.leftBumper()));
@@ -122,7 +124,7 @@ public class RobotContainer {
 
     m_driverController
         .y()
-        .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getHID())));
+        .onTrue(new InstantCommand(() -> s_Swerve.zeroHeading(m_driverController.getController())));
 
     angleDown.whileTrue(
         Commands.runEnd(() -> m_angler.setSpeed(-0.15), () -> m_angler.stop(), m_angler));
@@ -205,13 +207,15 @@ public class RobotContainer {
     readyToShoot.onTrue(
         Commands.runOnce(
                 () -> {
-                  m_driverController.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+                  m_driverController.getHID().setRumble(GenericHID.RumbleType.RIGHT_RUMBLE, 1.0);
+                  m_driverController.getHID().setRumble(GenericHID.RumbleType.LEFT_RUMBLE, 1.0);
                 })
             .andThen(Commands.waitSeconds(0.25))
             .andThen(
                 Commands.runOnce(
                     () -> {
-                      m_driverController.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 0.0);
+                      m_driverController.getHID().setRumble(GenericHID.RumbleType.RIGHT_RUMBLE, 0.0);
+                      m_driverController.getHID().setRumble(GenericHID.RumbleType.LEFT_RUMBLE, 0.0);
                     })));
   }
 

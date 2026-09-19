@@ -53,7 +53,7 @@ public class AlignAndMove extends Command {
     s_Swerve.setTurnControllerGoal(
         Degree.of(LimelightHelpers.getTX(name) + s_Swerve.getHeadingDegrees()));
     /* Get Values, Deadband*/
-    double[] driverInputs = IOConstants.getDriverInputs(driver.getHID());
+    double[] driverInputs = IOConstants.getDriverInputs(driver.getController());
     /* Drive */
     if (Math.abs(LimelightHelpers.getTX(name)) <= 2) {
       s_Swerve.drive(

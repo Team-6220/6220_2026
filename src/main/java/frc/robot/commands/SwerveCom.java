@@ -36,7 +36,7 @@ public class SwerveCom extends Command {
   public void execute() {
     if (!RobotState.isAutonomous()) {
       /* Get Values, Deadband*/
-      double[] driverInputs = IOConstants.getDriverInputs(driver.getHID());
+      double[] driverInputs = IOConstants.getDriverInputs(driver.getController());
       /* Drive */
       s_Swerve.drive(
           new Translation2d(driverInputs[0], driverInputs[1]),
