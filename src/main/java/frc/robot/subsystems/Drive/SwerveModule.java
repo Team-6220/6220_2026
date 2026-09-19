@@ -8,7 +8,8 @@ import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.geometry.Rotation2d;
 // import org.wpilib.math.kinematics.Kinematics;
 import org.wpilib.math.kinematics.SwerveModulePosition;
-import org.wpilib.math.kinematics.SwerveModuleState;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
+
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
 import frc.lib.util.TunableNumber;
@@ -58,8 +59,8 @@ public class SwerveModule {
     }
   }
 
-  public SwerveModuleState getState() {
-    return new SwerveModuleState(
+  public SwerveModuleVelocity getVelocities() {
+    return new SwerveModuleVelocity(
         inputs.driveVelocityMps,
         Rotation2d.fromRadians(inputs.anglePositionRad.baseUnitMagnitude()));
   }
@@ -77,21 +78,21 @@ public class SwerveModule {
     return moduleNumber;
   }
 
-  public void setDesiredState(SwerveModuleState state, boolean isOpenLoop) {
+  public void setDesiredVelocities(SwerveModuleVelocity velocities, boolean isOpenLoop) {
     // optimize
-    state.optimize(getState().angle);
+    velocities.optimize(getVelocities().angle);
 
     // angle control
-    io.setAnglePosition(RevConfigs.CANCoderAngleToNeoEncoder(state.angle.getRotations()));
+    io.setAnglePosition(RevConfigs.CANCoderAngleToNeoEncoder(velocities.angle.getRotations()));
 
     // drive control
     if (isOpenLoop) {
-      driveDutyCycle.Output = state.velocity / SwerveConstants.maxSpeed();
+      driveDutyCycle.Output = velocities.velocity / SwerveConstants.maxSpeed();
       io.setDriveControlDutyCycle(driveDutyCycle);
     } else {
       driveVelocity.Velocity =
-          Conversions.MPSToRPS(state.velocity, SwerveConstants.wheelCircumference());
-      driveVelocity.FeedForward = driveFeedForward.calculate(state.velocity);
+          Conversions.MPSToRPS(velocities.velocity, SwerveConstants.wheelCircumference());
+      driveVelocity.FeedForward = driveFeedForward.calculate(velocities.velocity);
       io.setDriveControlVelocity(driveVelocity);
     }
   }

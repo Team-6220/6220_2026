@@ -15,10 +15,11 @@ import org.wpilib.math.estimator.SwerveDrivePoseEstimator;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import org.wpilib.math.kinematics.SwerveModulePosition;
-import org.wpilib.math.kinematics.SwerveModuleState;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.units.measure.Angle;
@@ -199,21 +200,25 @@ public class Swerve extends SubsystemBase {
    */
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-    SwerveModuleState[] swerveModuleStates =
+    //Calculating how to drive the robot field relative in the robot's POV
+    ChassisVelocities velocities = new ChassisVelocities(translation.getX(), translation.getY(), rotation);
+    velocities = velocities.toRobotRelative(getHeading());
+    
+    SwerveModuleVelocity[] SwerveModuleVelocities =
         SwerveConstants.kinematics()
-            .toSwerveModuleStates(
+            .toSwerveModuleVelocities(
                 fieldRelative
-                    ? ChassisVelocities.fromFieldRelativeSpeeds(
-                        translation.getX(), translation.getY(), rotation, getHeading())
+                    ? velocities
                     : new ChassisVelocities(translation.getX(), translation.getY(), rotation));
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.maxSpeed());
+    SwerveDriveKinematics.desaturateWheelVelocities(SwerveModuleVelocities, SwerveConstants.maxSpeed());
+    
 
     // set all the modules
     for (SwerveModule mod : mSwerveMods) {
       SmartDashboard.putString(
           "Mod " + mod.getModuleNumber() + " Swerve Module State",
-          swerveModuleStates[mod.getModuleNumber()].toString());
-      mod.setDesiredState(swerveModuleStates[mod.getModuleNumber()], isOpenLoop);
+          SwerveModuleVelocities[mod.getModuleNumber()].toString());
+      mod.setDesiredVelocities(SwerveModuleVelocities[mod.getModuleNumber()], isOpenLoop);
     }
   }
 
@@ -230,14 +235,14 @@ public class Swerve extends SubsystemBase {
    */
   public void lockWheels() {
     // Module order: 0=BR, 1=BL, 2=FR, 3=FL
-    SwerveModuleState[] xStates = {
-      new SwerveModuleState(0, Rotation2d.fromDegrees(45)), // BR
-      new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), // BL
-      new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), // FR
-      new SwerveModuleState(0, Rotation2d.fromDegrees(45)), // FL
+    SwerveModuleVelocity[] xStates = {
+      new SwerveModuleVelocity(0, Rotation2d.fromDegrees(45)), // BR
+      new SwerveModuleVelocity(0, Rotation2d.fromDegrees(-45)), // BL
+      new SwerveModuleVelocity(0, Rotation2d.fromDegrees(-45)), // FR
+      new SwerveModuleVelocity(0, Rotation2d.fromDegrees(45)), // FL
     };
     for (SwerveModule mod : mSwerveMods) {
-      mod.setDesiredState(xStates[mod.getModuleNumber()], true);
+      mod.setDesiredVelocities(xStates[mod.getModuleNumber()], true);
     }
   }
 
@@ -273,10 +278,9 @@ public class Swerve extends SubsystemBase {
    */
   public void driveRobotRelative(ChassisVelocities robotRelativeSpeeds) {
     System.out.println("relative");
-    ChassisVelocities targetSpeeds = ChassisVelocities.discretize(robotRelativeSpeeds, 0.02);
-
-    SwerveModuleState[] targetStates =
-        SwerveConstants.kinematics().toSwerveModuleStates(targetSpeeds);
+    ChassisVelocities targetSpeeds = robotRelativeSpeeds.discretize(0.02);
+    SwerveModuleVelocity[] targetStates =
+        SwerveConstants.kinematics().toSwerveModuleVelocities(targetSpeeds);
     setModuleStates(targetStates);
   }
 
@@ -297,21 +301,21 @@ public class Swerve extends SubsystemBase {
   }
 
   /* Used by SwerveControllerCommand in Auto */
-  public void setModuleStates(SwerveModuleState[] desiredStates) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, SwerveConstants.maxSpeed());
+  public void setModuleStates(SwerveModuleVelocity[] desiredStates) {
+    SwerveDriveKinematics.desaturateWheelVelocities(desiredStates, SwerveConstants.maxSpeed());
 
     for (SwerveModule mod : mSwerveMods) {
-      mod.setDesiredState(desiredStates[mod.getModuleNumber()], false);
+      mod.setDesiredVelocities(desiredStates[mod.getModuleNumber()], false);
     }
   }
 
   /**
    * @return list of the states of the modules
    */
-  public SwerveModuleState[] getModuleStates() {
-    SwerveModuleState[] states = new SwerveModuleState[4];
+  public SwerveModuleVelocity[] getModuleStates() {
+    SwerveModuleVelocity[] states = new SwerveModuleVelocity[4];
     for (SwerveModule mod : mSwerveMods) {
-      states[mod.getModuleNumber()] = mod.getState();
+      states[mod.getModuleNumber()] = mod.getVelocities();
     }
     return states;
   }
@@ -577,7 +581,7 @@ public class Swerve extends SubsystemBase {
       Shuffleboard.getTab(title)
           .addNumber(
               "Mod " + mod.getModuleNumber() + " Velocity",
-              () -> mod.getState().velocity);
+              () -> mod.getVelocities().velocity);
     }
     Shuffleboard.getTab(title).addNumber("Real Heading", () -> getHeading().getDegrees());
     Shuffleboard.getTab(title).addNumber("Auto Turn Heading", () -> autoTurnHeading);
