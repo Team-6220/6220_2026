@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems.Shooter;
 
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -16,11 +16,11 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.command2.sysid.SysIdRoutine;
 import frc.lib.util.TunableNumber;
 import frc.robot.LimelightHelpers;
 

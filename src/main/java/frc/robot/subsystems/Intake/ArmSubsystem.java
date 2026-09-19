@@ -9,12 +9,12 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.math.controller.ArmFeedforward;
+import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.system.Timer;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.command2.SubsystemBase;
 import frc.lib.util.TunableNumber;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -201,7 +201,7 @@ public class ArmSubsystem extends SubsystemBase {
             m_Controller.getSetpoint().position * Math.PI / 180,
             m_Controller.getSetpoint().velocity * Math.PI / 180);
 
-    lastUpdate = Timer.getFPGATimestamp();
+    lastUpdate = Timer.getTimestamp();
     PIDOutput = m_Controller.calculate(getPosition());
 
     // System.out.println("pos=" + getPosition() + " goal=" + m_Controller.getGoal().position

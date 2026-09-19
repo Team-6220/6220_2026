@@ -4,9 +4,9 @@
 
 package frc.robot.subsystems.Drive;
 
-import static edu.wpi.first.units.Units.Degrees;
+import static org.wpilib.units.Units.Degrees;
 
-import edu.wpi.first.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation2d;
 
 /** Add your docs here. */
 public class GyroIOSim implements GyroIO {

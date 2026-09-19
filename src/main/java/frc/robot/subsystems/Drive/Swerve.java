@@ -1,35 +1,39 @@
 package frc.robot.subsystems.Drive;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Radians;
+import static org.wpilib.units.Units.Degrees;
+import static org.wpilib.units.Units.Radians;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.PathPlannerLogging;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.*;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.linalg.Vector;
+import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.estimator.SwerveDrivePoseEstimator;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.math.kinematics.SwerveModuleState;
+import org.wpilib.math.numbers.N3;
+import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.framework.RobotBase;
+import org.wpilib.system.Timer;
+import org.wpilib.driverstation.XboxController;
+import org.wpilib.shuffleboard.*;
+import org.wpilib.smartdashboard.Field2d;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.command2.SubsystemBase;
 import frc.lib.util.RumbleManager;
 import frc.robot.AutoConstants;
 import frc.robot.Constants;
@@ -83,7 +87,7 @@ public class Swerve extends SubsystemBase {
   // Tracked to derive yaw rate for MegaTag2's SetRobotOrientation call, since the navX's raw
   // getRate() sign convention isn't guaranteed to match the already-verified getGyroYaw().
   private Rotation2d lastYawForRate = new Rotation2d();
-  private double lastYawRateTimestamp = Timer.getFPGATimestamp();
+  private double lastYawRateTimestamp = Timer.getTimestamp();
 
   private final int swerveAlignUpdateSecond = 20;
 
@@ -199,9 +203,9 @@ public class Swerve extends SubsystemBase {
         SwerveConstants.kinematics()
             .toSwerveModuleStates(
                 fieldRelative
-                    ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                    ? ChassisVelocities.fromFieldRelativeSpeeds(
                         translation.getX(), translation.getY(), rotation, getHeading())
-                    : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
+                    : new ChassisVelocities(translation.getX(), translation.getY(), rotation));
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.maxSpeed());
 
     // set all the modules
@@ -255,9 +259,9 @@ public class Swerve extends SubsystemBase {
                 AutoConstants.angularKDTN.get())),
         config,
         () -> {
-          var alliance = DriverStation.getAlliance();
+          var alliance = MatchState.getAlliance();
           if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
+            return alliance.get() == Alliance.RED;
           }
           return false;
         },
@@ -267,9 +271,9 @@ public class Swerve extends SubsystemBase {
   /**
    * @param robotRelativeSpeeds the speed in m/s
    */
-  public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
+  public void driveRobotRelative(ChassisVelocities robotRelativeSpeeds) {
     System.out.println("relative");
-    ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
+    ChassisVelocities targetSpeeds = ChassisVelocities.discretize(robotRelativeSpeeds, 0.02);
 
     SwerveModuleState[] targetStates =
         SwerveConstants.kinematics().toSwerveModuleStates(targetSpeeds);
@@ -287,8 +291,8 @@ public class Swerve extends SubsystemBase {
   }
 
   /** Get's the chassis speed of the robot in ROBOT RELATIVE SPEED */
-  public ChassisSpeeds getRobotRelativeSpeeds() {
-    ChassisSpeeds chassisSpeeds = SwerveConstants.kinematics().toChassisSpeeds(getModuleStates());
+  public ChassisVelocities getRobotRelativeSpeeds() {
+    ChassisVelocities chassisSpeeds = SwerveConstants.kinematics().toChassisVelocities(getModuleStates());
     return chassisSpeeds;
   }
 
@@ -488,7 +492,7 @@ public class Swerve extends SubsystemBase {
       mod.periodic();
     }
     SmartDashboard.putBoolean("is Red", Constants.isRed.equals("red"));
-    Double timestamp = Timer.getFPGATimestamp();
+    Double timestamp = Timer.getTimestamp();
 
     if (timestamp - swerveAlignUpdateSecond >= lastTurnUpdate) {
       lastTurnUpdate = timestamp;
@@ -573,7 +577,7 @@ public class Swerve extends SubsystemBase {
       Shuffleboard.getTab(title)
           .addNumber(
               "Mod " + mod.getModuleNumber() + " Velocity",
-              () -> mod.getState().speedMetersPerSecond);
+              () -> mod.getState().velocity);
     }
     Shuffleboard.getTab(title).addNumber("Real Heading", () -> getHeading().getDegrees());
     Shuffleboard.getTab(title).addNumber("Auto Turn Heading", () -> autoTurnHeading);

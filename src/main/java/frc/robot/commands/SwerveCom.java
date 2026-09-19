@@ -1,9 +1,13 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.button.CommandXboxController;
 import frc.robot.IOConstants;
 import frc.robot.subsystems.Drive.Swerve;
 import java.util.function.BooleanSupplier;
@@ -23,14 +27,14 @@ public class SwerveCom extends Command {
 
   @Override
   public void initialize() {
-    s_Swerve.setIsAuto(DriverStation.isAutonomous());
+    s_Swerve.setIsAuto(RobotState.isAutonomous());
     // Initialize so that the swerve doesn't become grumpy
     s_Swerve.resetModulesToAbsolute();
   }
 
   @Override
   public void execute() {
-    if (!DriverStation.isAutonomous()) {
+    if (!RobotState.isAutonomous()) {
       /* Get Values, Deadband*/
       double[] driverInputs = IOConstants.getDriverInputs(driver.getHID());
       /* Drive */

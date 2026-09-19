@@ -4,16 +4,16 @@
 
 package frc.robot.subsystems.LEDs;
 
-import static edu.wpi.first.units.Units.*;
+import static org.wpilib.units.Units.*;
 
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.hardware.led.AddressableLED;
+import org.wpilib.hardware.led.AddressableLEDBuffer;
+import org.wpilib.hardware.led.LEDPattern;
+import org.wpilib.system.RobotController;
+import org.wpilib.util.Color;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.SubsystemBase;
 
 public class AdressableLEDs extends SubsystemBase {
 
@@ -79,7 +79,7 @@ public class AdressableLEDs extends SubsystemBase {
   // Rainbow
   public LEDPattern scrollingRainbow() {
     LEDPattern base = LEDPattern.rainbow(255, 128);
-    return base.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLEDSpacing);
+    return base.scrollAtAbsoluteVelocity(MetersPerSecond.of(1), kLEDSpacing);
   }
 
   // Fire / Gold Gradient
@@ -91,10 +91,10 @@ public class AdressableLEDs extends SubsystemBase {
 
     LEDPattern gradient =
         LEDPattern.gradient(
-            LEDPattern.GradientType.kContinuous, yellow, teamGold, orange, teamGold);
+            LEDPattern.GradientType.CONTINUOUS, yellow, teamGold, orange, teamGold);
 
     // Scroll from start to end at a nice visible speed
-    return gradient.scrollAtAbsoluteSpeed(MetersPerSecond.of(-0.5), kLEDSpacing);
+    return gradient.scrollAtAbsoluteVelocity(MetersPerSecond.of(-0.5), kLEDSpacing);
   }
 
   // Modifiers

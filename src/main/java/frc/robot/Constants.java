@@ -4,12 +4,16 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.Pound;
+import static org.wpilib.units.Units.KilogramSquareMeters;
+import static org.wpilib.units.Units.Pound;
 
-import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.units.measure.MomentOfInertia;
-import edu.wpi.first.wpilibj.DriverStation;
+import org.wpilib.units.measure.Mass;
+import org.wpilib.units.measure.MomentOfInertia;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
 import java.util.Optional;
 
 public final class Constants {
@@ -17,7 +21,7 @@ public final class Constants {
   public static final RobotType TYPE = RobotType.COMPBOT;
   public static boolean TUNING_MODE = true;
 
-  public static Optional<DriverStation.Alliance> ALLIANCE_COLOR = DriverStation.getAlliance();
+  public static Optional<Alliance> ALLIANCE_COLOR = MatchState.getAlliance();
 
   public static final Mass robotMass = Pound.of(140);
   public static final MomentOfInertia robotMOI = KilogramSquareMeters.of(4.563);

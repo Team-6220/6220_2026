@@ -4,9 +4,9 @@
 
 package frc.lib.util;
 
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
+import org.wpilib.driverstation.GenericHID.RumbleType;
+import org.wpilib.system.Timer;
+import org.wpilib.driverstation.XboxController;
 
 /** Add your docs here. */
 public class RumbleManager {

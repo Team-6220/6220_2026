@@ -1,19 +1,19 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static org.wpilib.units.Units.Degrees;
+import static org.wpilib.units.Units.DegreesPerSecond;
+import static org.wpilib.units.Units.DegreesPerSecondPerSecond;
+import static org.wpilib.units.Units.MetersPerSecond;
+import static org.wpilib.units.Units.MetersPerSecondPerSecond;
+import static org.wpilib.units.Units.RadiansPerSecond;
+import static org.wpilib.units.Units.RadiansPerSecondPerSecond;
 
 import com.pathplanner.lib.path.PathConstraints;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.units.measure.LinearVelocity;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularAcceleration;
+import org.wpilib.units.measure.AngularVelocity;
+import org.wpilib.units.measure.LinearAcceleration;
+import org.wpilib.units.measure.LinearVelocity;
 import frc.lib.util.TunableNumber;
 
 public final class AutoConstants {

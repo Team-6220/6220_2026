@@ -13,9 +13,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.command2.SubsystemBase;
 import frc.lib.util.TunableNumber;
 
 public class AnglerSubsystem extends SubsystemBase {
@@ -115,7 +115,7 @@ public class AnglerSubsystem extends SubsystemBase {
    * @param degrees Target angle in degrees
    */
   public void setAngle(double degrees) {
-    double clampedDegrees = MathUtil.clamp(degrees, MIN_SHAFT_ROT, MAX_SHAFT_ROT);
+    double clampedDegrees = Math.clamp(degrees, MIN_SHAFT_ROT, MAX_SHAFT_ROT);
     m_closedLoopController.setSetpoint(clampedDegrees, SparkMax.ControlType.kPosition);
   }
 

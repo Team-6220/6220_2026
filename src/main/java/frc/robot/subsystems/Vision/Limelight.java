@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems.Vision;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.command2.SubsystemBase;
 import frc.robot.LimelightHelpers;
 
 public class Limelight extends SubsystemBase {

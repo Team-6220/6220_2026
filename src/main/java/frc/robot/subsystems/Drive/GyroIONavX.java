@@ -7,7 +7,7 @@ package frc.robot.subsystems.Drive;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 import com.studica.frc.AHRS.NavXUpdateRate;
-import edu.wpi.first.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation2d;
 import frc.robot.Constants;
 
 /** NavX gyro IO with optional upside-down mounting correction. */

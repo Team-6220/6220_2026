@@ -4,22 +4,22 @@
 
 package frc.robot.subsystems.Drive;
 
-import static edu.wpi.first.units.Units.Amp;
-import static edu.wpi.first.units.Units.Meter;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radian;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.Amp;
+import static org.wpilib.units.Units.Meter;
+import static org.wpilib.units.Units.MetersPerSecond;
+import static org.wpilib.units.Units.Radian;
+import static org.wpilib.units.Units.RadiansPerSecond;
+import static org.wpilib.units.Units.Volts;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Voltage;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularVelocity;
+import org.wpilib.units.measure.Current;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.units.measure.LinearVelocity;
+import org.wpilib.units.measure.Voltage;
 
 /** Add your docs here. */
 public interface SwerveModuleIO {

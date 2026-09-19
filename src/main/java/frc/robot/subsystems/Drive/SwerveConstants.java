@@ -1,17 +1,17 @@
 package frc.robot.subsystems.Drive;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
+import static org.wpilib.units.Units.Inches;
+import static org.wpilib.units.Units.Meters;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.measure.Distance;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.math.system.DCMotor;
+import org.wpilib.units.measure.Distance;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.Constants;
 
@@ -57,16 +57,16 @@ public final class SwerveConstants {
   private static final Distance COMP_WHEEL_BASE = Inches.of(20.75);
   private static final SwerveModuleConstants COMP_BACK_RIGHT_MODULE =
       new SwerveModuleConstants(
-          8, 10, 4, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(120.5859375));
+          8, 10, 4, org.wpilib.math.geometry.Rotation2d.fromDegrees(120.5859375));
   private static final SwerveModuleConstants COMP_BACK_LEFT_MODULE =
       new SwerveModuleConstants(
-          5, 12, 2, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-179.208984375));
+          5, 12, 2, org.wpilib.math.geometry.Rotation2d.fromDegrees(-179.208984375));
   private static final SwerveModuleConstants COMP_FRONT_RIGHT_MODULE =
       new SwerveModuleConstants(
-          7, 11, 1, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-94.306640625));
+          7, 11, 1, org.wpilib.math.geometry.Rotation2d.fromDegrees(-94.306640625));
   private static final SwerveModuleConstants COMP_FRONT_LEFT_MODULE =
       new SwerveModuleConstants(
-          6, 9, 3, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(115.927734375));
+          6, 9, 3, org.wpilib.math.geometry.Rotation2d.fromDegrees(115.927734375));
   private static final DCMotor COMP_DC_MOTOR = new DCMotor(12, 7.09, 366, 2, 628.32, 1);
   private static final double COMP_DRIVE_KP = 0.12;
   private static final double COMP_DRIVE_KI = 0;
@@ -92,16 +92,16 @@ public final class SwerveConstants {
   // between the GEORGE_* variables (old FRONT_LEFT -> BACK_RIGHT, etc.).
   private static final SwerveModuleConstants GEORGE_BACK_RIGHT_MODULE =
       new SwerveModuleConstants(
-          1, 2, 3, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-41.22));
+          1, 2, 3, org.wpilib.math.geometry.Rotation2d.fromDegrees(-41.22));
   private static final SwerveModuleConstants GEORGE_BACK_LEFT_MODULE =
       new SwerveModuleConstants(
-          4, 5, 6, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(12.563));
+          4, 5, 6, org.wpilib.math.geometry.Rotation2d.fromDegrees(12.563));
   private static final SwerveModuleConstants GEORGE_FRONT_RIGHT_MODULE =
       new SwerveModuleConstants(
-          7, 8, 9, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-85.869));
+          7, 8, 9, org.wpilib.math.geometry.Rotation2d.fromDegrees(-85.869));
   private static final SwerveModuleConstants GEORGE_FRONT_LEFT_MODULE =
       new SwerveModuleConstants(
-          10, 11, 12, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-59.386 - 90));
+          10, 11, 12, org.wpilib.math.geometry.Rotation2d.fromDegrees(-59.386 - 90));
   private static final DCMotor GEORGE_DC_MOTOR = new DCMotor(12, 4.69, 257, 1.5, 668.112, 1);
   private static final double GEORGE_DRIVE_KP = 0.12;
   private static final double GEORGE_DRIVE_KI = 0;

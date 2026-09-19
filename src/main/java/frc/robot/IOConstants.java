@@ -1,7 +1,7 @@
 package frc.robot;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.XboxController;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.driverstation.XboxController;
 import frc.robot.subsystems.Drive.SwerveConstants;
 
 public final class IOConstants {

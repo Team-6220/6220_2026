@@ -5,15 +5,15 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.smartdashboard.SendableChooser;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
+import org.wpilib.command2.InstantCommand;
+import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.command2.button.Trigger;
 import frc.robot.commands.AlignAndFlywheels;
 import frc.robot.commands.ArmToPositionCommand;
 import frc.robot.commands.ArmUpAndDown;
@@ -95,9 +95,9 @@ public class RobotContainer {
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
    * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+   * org.wpilib.command2.button.CommandGenericHID}'s subclasses for {@link
+   * CommandXboxController Xbox}/{@link org.wpilib.command2.button.CommandPS4Controller
+   * PS4} controllers or {@link org.wpilib.command2.button.CommandJoystick Flight
    * joysticks}.
    */
   private void configureBindings() {

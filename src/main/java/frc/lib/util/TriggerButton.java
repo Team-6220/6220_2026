@@ -1,7 +1,7 @@
 package frc.lib.util;
 
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import org.wpilib.driverstation.XboxController;
+import org.wpilib.command2.button.Trigger;
 
 public class TriggerButton extends Trigger {
 

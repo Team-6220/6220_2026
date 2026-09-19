@@ -5,15 +5,19 @@
 package frc.robot;
 
 import com.pathplanner.lib.commands.PathfindingCommand;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.system.DataLogManager;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.framework.TimedRobot;
+import org.wpilib.system.Timer;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.CommandScheduler;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -90,12 +94,12 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    Optional<Alliance> ally = DriverStation.getAlliance();
+    Optional<Alliance> ally = MatchState.getAlliance();
     if (ally.isPresent()) {
-      if (ally.get() == Alliance.Red) {
+      if (ally.get() == Alliance.RED) {
         Constants.isRed = "red";
       }
-      if (ally.get() == Alliance.Blue) {
+      if (ally.get() == Alliance.BLUE) {
         Constants.isRed = "blue";
       }
     } else {
@@ -112,12 +116,12 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     if (Constants.isRed.equals("N/A")) {
-      Optional<Alliance> ally = DriverStation.getAlliance();
+      Optional<Alliance> ally = MatchState.getAlliance();
       if (ally.isPresent()) {
-        if (ally.get() == Alliance.Red) {
+        if (ally.get() == Alliance.RED) {
           Constants.isRed = "red";
         }
-        if (ally.get() == Alliance.Blue) {
+        if (ally.get() == Alliance.BLUE) {
           Constants.isRed = "blue";
         }
       } else {
@@ -126,7 +130,7 @@ public class Robot extends TimedRobot {
     }
 
     // Track shift during auto for dashboard display
-    double matchTime = DriverStation.getMatchTime() + 1;
+    double matchTime = MatchState.getMatchTime() + 1;
     currentShift = 0;
     shiftName = "AUTO";
     shiftCountdownTime = matchTime; // Counts from 20 seconds down to 0
@@ -143,12 +147,12 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    Optional<Alliance> ally = DriverStation.getAlliance();
+    Optional<Alliance> ally = MatchState.getAlliance();
     if (ally.isPresent()) {
-      if (ally.get() == Alliance.Red) {
+      if (ally.get() == Alliance.RED) {
         Constants.isRed = "red";
       }
-      if (ally.get() == Alliance.Blue) {
+      if (ally.get() == Alliance.BLUE) {
         Constants.isRed = "blue";
       }
     } else {
@@ -162,7 +166,7 @@ public class Robot extends TimedRobot {
     // Initialize shift tracking
     // Match starts at 2:20 (140s). AUTO 0:20-0:00, TRANSITION 2:20-2:10, SHIFT 1-4, ENDGAME
     // 0:30-0:00
-    teleOpStartTime = Timer.getFPGATimestamp() + 1;
+    teleOpStartTime = Timer.getTimestamp() + 1;
     currentShift = 0;
     shiftName = "TRANSITION";
   }
@@ -171,12 +175,12 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     if (Constants.isRed.equals("N/A")) {
-      Optional<Alliance> ally = DriverStation.getAlliance();
+      Optional<Alliance> ally = MatchState.getAlliance();
       if (ally.isPresent()) {
-        if (ally.get() == Alliance.Red) {
+        if (ally.get() == Alliance.RED) {
           Constants.isRed = "red";
         }
-        if (ally.get() == Alliance.Blue) {
+        if (ally.get() == Alliance.BLUE) {
           Constants.isRed = "blue";
         }
       } else {
@@ -185,17 +189,17 @@ public class Robot extends TimedRobot {
     }
 
     // Update shift tracking based on match time
-    double matchTime = DriverStation.getMatchTime();
+    double matchTime = MatchState.getMatchTime();
 
     // Send raw FMS match time to SmartDashboard for Elastic
     SmartDashboard.putNumber("Match/Time", matchTime);
 
     // Use a strict elapsed timer for shift calculation to bypass FMS disabled gaps
     // Teleop is 140 seconds (2:20) in this structure.
-    double elapsedTeleop = Timer.getFPGATimestamp() - teleOpStartTime - 1;
+    double elapsedTeleop = Timer.getTimestamp() - teleOpStartTime - 1;
     double calculatedMatchTime = 140.0 - elapsedTeleop;
 
-    if (matchTime < 0.0 && !DriverStation.isFMSAttached()) {
+    if (matchTime < 0.0 && !RobotState.isFMSAttached()) {
       // Not connected to FMS and time implies no match running
       currentShift = -1;
       shiftName = "N/A";
@@ -239,14 +243,14 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testInit() {
+  public void utilityInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
   }
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void utilityPeriodic() {}
 
   /** This function is called once when the robot is first started up. */
   @Override

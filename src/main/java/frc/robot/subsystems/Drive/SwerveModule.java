@@ -1,14 +1,14 @@
 package frc.robot.subsystems.Drive;
 
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.Volts;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Rotation2d;
-// import edu.wpi.first.math.kinematics.Kinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.math.geometry.Rotation2d;
+// import org.wpilib.math.kinematics.Kinematics;
+import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.math.kinematics.SwerveModuleState;
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
 import frc.lib.util.TunableNumber;
@@ -86,12 +86,12 @@ public class SwerveModule {
 
     // drive control
     if (isOpenLoop) {
-      driveDutyCycle.Output = state.speedMetersPerSecond / SwerveConstants.maxSpeed();
+      driveDutyCycle.Output = state.velocity / SwerveConstants.maxSpeed();
       io.setDriveControlDutyCycle(driveDutyCycle);
     } else {
       driveVelocity.Velocity =
-          Conversions.MPSToRPS(state.speedMetersPerSecond, SwerveConstants.wheelCircumference());
-      driveVelocity.FeedForward = driveFeedForward.calculate(state.speedMetersPerSecond);
+          Conversions.MPSToRPS(state.velocity, SwerveConstants.wheelCircumference());
+      driveVelocity.FeedForward = driveFeedForward.calculate(state.velocity);
       io.setDriveControlVelocity(driveVelocity);
     }
   }

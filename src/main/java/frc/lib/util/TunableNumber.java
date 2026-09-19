@@ -2,7 +2,7 @@ package frc.lib.util;
 
 import static frc.robot.Constants.*;
 
-import edu.wpi.first.wpilibj.smartdashboard.*;
+import org.wpilib.smartdashboard.*;
 
 public class TunableNumber {
   private static final String TABLE_KEY = "TunableNumbers";
