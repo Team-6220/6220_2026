@@ -112,7 +112,7 @@ public class Swerve extends SubsystemBase {
 
   /** initializes the swerve drive and sets up the variables and constants */
   public Swerve() {
-    gyro = RobotBase.isSimulation() ? new GyroIOSim() : new GyroIONavX();
+    gyro = RobotBase.isSimulation() ? new GyroIOSim() : new GyroIOSystemCore();
 
     mSwerveMods =
         new SwerveModule[] {
