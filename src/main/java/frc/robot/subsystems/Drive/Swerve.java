@@ -30,10 +30,10 @@ import org.wpilib.driverstation.MatchType;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.system.Timer;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.driverstation.XboxController;
-import org.wpilib.shuffleboard.*;
 import org.wpilib.smartdashboard.Field2d;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.SubsystemBase;
 import frc.lib.util.RumbleManager;
 import frc.robot.AutoConstants;
@@ -77,7 +77,8 @@ public class Swerve extends SubsystemBase {
   private HashMap<Double, Rotation2d> gyro_headings = new HashMap<Double, Rotation2d>();
   private LinkedList<Double> gyro_timestamps = new LinkedList<Double>();
 
-  public ShuffleboardTab fieldPoseTab = Shuffleboard.getTab("Field Pose 2d tab (map)");
+  private final TelemetryTable m_driveTelemetry =
+    Telemetry.getTable("Drive");
 
   public Field2d field2d = new Field2d();
   private final Field2d megatag2Pose = new Field2d();
@@ -187,7 +188,7 @@ public class Swerve extends SubsystemBase {
     // Also https://pathplanner.dev/api/java/com/pathplanner/lib/config/RobotConfig.html for API
     // e.printStackTrace();
     // }
-    createShuffleOutputs();
+    updateTelemetry();
   }
 
   /**
@@ -215,7 +216,10 @@ public class Swerve extends SubsystemBase {
 
     // set all the modules
     for (SwerveModule mod : mSwerveMods) {
-      SmartDashboard.putString(
+      m_driveTelemetry.log(
+          "Mod " + mod.getModuleNumber() + " Swerve Module State",
+          SwerveModuleVelocities[mod.getModuleNumber()].toString());
+      m_driveTelemetry.log(
           "Mod " + mod.getModuleNumber() + " Swerve Module State",
           SwerveModuleVelocities[mod.getModuleNumber()].toString());
       mod.setDesiredVelocities(SwerveModuleVelocities[mod.getModuleNumber()], isOpenLoop);
@@ -491,11 +495,11 @@ public class Swerve extends SubsystemBase {
 
   @Override
   public void periodic() {
+    updateTelemetry();
     gyro.updateInputs(gyroInputs);
     for (SwerveModule mod : mSwerveMods) {
       mod.periodic();
     }
-    SmartDashboard.putBoolean("is Red", Constants.isRed.equals("red"));
     Double timestamp = Timer.getTimestamp();
 
     if (timestamp - swerveAlignUpdateSecond >= lastTurnUpdate) {
@@ -536,8 +540,6 @@ public class Swerve extends SubsystemBase {
     }
     // vision stuff ends
 
-    field2d.setRobotPose(getPose());
-
     if (AutoConstants.angularKPTN.hasChanged()
         || AutoConstants.angularKITN.hasChanged()
         || AutoConstants.angularKDTN.hasChanged()) {
@@ -557,35 +559,28 @@ public class Swerve extends SubsystemBase {
     }
   }
 
-  private void createShuffleOutputs() {
-    String title = "Swerve";
-    // Shuffleboard.getTab(title).addString("Robot Pose", () -> getPose().toString());
-    Shuffleboard.getTab(title).add(field2d);
-    SmartDashboard.putData("megatag2", megatag2Pose);
-    Shuffleboard.getTab(title)
-        .addNumber("where the bot think it is swerve X", () -> getPose().getX());
-    Shuffleboard.getTab(title)
-        .addNumber("where the bot think it is swerve Y", () -> getPose().getY());
-    Shuffleboard.getTab(title)
-        .addNumber(
-            "where the bot think it is swerve degree", () -> getPose().getRotation().getDegrees());
+  private void updateTelemetry() {
+    field2d.setRobotPose(getPose());
+    m_driveTelemetry.log("Field 2d", field2d);
+    m_driveTelemetry.log("megatag2", megatag2Pose);
+    m_driveTelemetry.log("where the bot think it is swerve x", getPose().getX());
+    m_driveTelemetry.log("where the bot think it is swerve y", getPose().getY());
+    m_driveTelemetry.log(
+            "where the bot think it is swerve degree", getPose().getRotation().getDegrees());
 
     for (SwerveModule mod : mSwerveMods) {
-      Shuffleboard.getTab(title)
-          .addNumber(
-              "Mod " + mod.getModuleNumber() + " CANcoder", () -> mod.getCANcoder().getDegrees());
-      Shuffleboard.getTab(title)
-          .addNumber(
+      m_driveTelemetry.log(
+              "Mod " + mod.getModuleNumber() + " CANcoder", mod.getCANcoder().getDegrees());
+      m_driveTelemetry.log(
               "Mod " + mod.getModuleNumber() + " Angle",
-              () -> mod.getPosition().angle.getDegrees());
-      Shuffleboard.getTab(title)
-          .addNumber(
+              mod.getPosition().angle.getDegrees());
+      m_driveTelemetry.log(
               "Mod " + mod.getModuleNumber() + " Velocity",
-              () -> mod.getVelocities().velocity);
+              mod.getVelocities().velocity);
     }
-    Shuffleboard.getTab(title).addNumber("Real Heading", () -> getHeading().getDegrees());
-    Shuffleboard.getTab(title).addNumber("Auto Turn Heading", () -> autoTurnHeading);
-    Shuffleboard.getTab(title)
-        .addNumber("Turn Controller Setpoint", () -> turnPidController.getSetpoint().position);
-  }
+    m_driveTelemetry.log("Real Heading", getHeading().getDegrees());
+    m_driveTelemetry.log("Auto Turn Heading", autoTurnHeading);
+    m_driveTelemetry.log("Turn Controller Setpoint", turnPidController.getSetpoint().position);
+    m_driveTelemetry.log("is Red", Constants.isRed.equals("red"));
+      }
 }

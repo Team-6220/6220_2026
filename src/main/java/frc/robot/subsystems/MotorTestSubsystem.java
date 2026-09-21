@@ -8,6 +8,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.command2.SubsystemBase;
 
 /**
@@ -17,6 +19,8 @@ import org.wpilib.command2.SubsystemBase;
  * <p>This is a temporary diagnostic tool — remove it before competition.
  */
 public class MotorTestSubsystem extends SubsystemBase {
+  TelemetryTable m_motorTestTelemetry =
+    Telemetry.getTable("Motor Test");
 
   // ---------------------------------------------------------------------------
   // Falcon 500 motors (built-in TalonFX controller)
@@ -68,7 +72,7 @@ public class MotorTestSubsystem extends SubsystemBase {
    */
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("MotorTest/ActiveIndex", currentMotorIndex);
+    m_motorTestTelemetry.log("MotorTest/ActiveIndex", currentMotorIndex);
   }
 
   /**
@@ -89,31 +93,31 @@ public class MotorTestSubsystem extends SubsystemBase {
     switch (currentMotorIndex) {
       case 0:
         falconShooter9.set(TEST_SPEED);
-        SmartDashboard.putString("MotorTest/Running", "Shooter Falcon (CAN 9)");
+        m_motorTestTelemetry.log("MotorTest/Running", "Shooter Falcon (CAN 9)");
         break;
       case 1:
         falconShooter35.set(TEST_SPEED);
-        SmartDashboard.putString("MotorTest/Running", "Shooter Falcon (CAN 35)");
+        m_motorTestTelemetry.log("MotorTest/Running", "Shooter Falcon (CAN 35)");
         break;
       case 2:
         falconShooter31.set(TEST_SPEED);
-        SmartDashboard.putString("MotorTest/Running", "Shooter Falcon (CAN 31)");
+        m_motorTestTelemetry.log("MotorTest/Running", "Shooter Falcon (CAN 31)");
         break;
       case 3:
         falconRear34.set(TEST_SPEED);
-        SmartDashboard.putString("MotorTest/Running", "Rear Assembly Falcon (CAN 34)");
+        m_motorTestTelemetry.log("MotorTest/Running", "Rear Assembly Falcon (CAN 34)");
         break;
       case 4:
         falconRear41.set(TEST_SPEED);
-        SmartDashboard.putString("MotorTest/Running", "Rear Assembly Falcon (CAN 41)");
+        m_motorTestTelemetry.log("MotorTest/Running", "Rear Assembly Falcon (CAN 41)");
         break;
       case 5:
         neo550Intake15.set(TEST_SPEED);
-        SmartDashboard.putString("MotorTest/Running", "Intake NEO 550 (CAN 15)");
+        m_motorTestTelemetry.log("MotorTest/Running", "Intake NEO 550 (CAN 15)");
         break;
       case 6:
         neo550Rear19.set(TEST_SPEED);
-        SmartDashboard.putString("MotorTest/Running", "Rear Assembly NEO 550 (CAN 19)");
+        m_motorTestTelemetry.log("MotorTest/Running", "Rear Assembly NEO 550 (CAN 19)");
         break;
       default:
         stopAll();
@@ -130,6 +134,6 @@ public class MotorTestSubsystem extends SubsystemBase {
     falconRear41.set(0);
     neo550Intake15.set(0);
     neo550Rear19.set(0);
-    SmartDashboard.putString("MotorTest/Running", "None");
+    m_motorTestTelemetry.log("MotorTest/Running", "None");
   }
 }

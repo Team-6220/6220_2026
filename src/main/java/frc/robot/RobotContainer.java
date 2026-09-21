@@ -9,8 +9,10 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import org.wpilib.driverstation.Gamepad;
 import org.wpilib.driverstation.GenericHID;
 import org.wpilib.driverstation.Joystick;
-import org.wpilib.smartdashboard.SendableChooser;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.tunable.Tunables;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
 import org.wpilib.command2.InstantCommand;
@@ -45,7 +47,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   // private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
-  private final SendableChooser<Command> autoChooser;
+  private final Selectable<Command> autoChooser;
 
   /* Subsystems */
   private final AdressableLEDs s_LED = new AdressableLEDs();
@@ -62,6 +64,8 @@ public class RobotContainer {
 
   private final GenericHID m_buttonBoard = new GenericHID(2);
 
+  private final TelemetryTable m_shooterTelemetry = Telemetry.getTable("Shooter");
+
   private static final double ALIGN_TOLERANCE_DEG = 2.0;
   private static final double MAX_SHOOT_DISTANCE_M = 4.0;
 
@@ -77,19 +81,20 @@ public class RobotContainer {
 
     arm.setDefaultCommand(new ManualArm(m_joystick));
 
-    autoChooser = AutoBuilder.buildAutoChooser();
+    autoChooser = new Selectable<>();
 
     // TODO: Register named commands as needed for auto
     // NamedCommands.registerCommand("AutoClimber", new AutoClimberCommand(climberSubsystem));
-
+    
+    autoChooser.addDefault("Do nothing", new InstantCommand());
     // NamedCommands.registerCommand(null, null);
-    autoChooser.addOption(
+    autoChooser.add(
         "Red", new BasicAutoRed(s_Swerve, m_angler, m_shooter, belt, m_driverController));
-    autoChooser.addOption(
+    autoChooser.add(
         "Blue", new BasicAutoBlue(s_Swerve, m_angler, m_shooter, belt, m_driverController));
-    SmartDashboard.putData(autoChooser);
-    autoChooser.addOption("samautov1", new SamAutoV1(s_Swerve));
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    autoChooser.add("samautov1", new SamAutoV1(s_Swerve));
+    autoChooser.onChange(command -> System.out.println("Auto selected: " + command.getName()));
+    Tunables.publish("Auto Chooser", autoChooser);
     configureBindings();
   }
 
@@ -227,9 +232,9 @@ public class RobotContainer {
     double dist = m_shooter.getDist();
     boolean shortRange = dist > 0 && dist <= MAX_SHOOT_DISTANCE_M;
 
-    SmartDashboard.putBoolean("Shooter/Aligned", aligned);
-    SmartDashboard.putBoolean("Shooter/FlywheelsAtTarget", m_shooter.isAtTargetSpeed());
-    SmartDashboard.putBoolean("Shooter/ShortRange", shortRange);
+    m_shooterTelemetry.log("Shooter/Aligned", aligned);
+    m_shooterTelemetry.log("Shooter/FlywheelsAtTarget", m_shooter.isAtTargetSpeed());
+    m_shooterTelemetry.log("Shooter/ShortRange", shortRange);
   }
 
   /**
@@ -241,5 +246,4 @@ public class RobotContainer {
     System.out.println("auto: " + autoChooser.getSelected());
     return autoChooser.getSelected();
   }
-  // An example command will be run in autonomous
 }

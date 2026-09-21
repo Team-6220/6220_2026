@@ -15,7 +15,8 @@ import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.system.Timer;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import java.util.ArrayList;
@@ -34,6 +35,9 @@ public class Robot extends TimedRobot {
   public static final CTREConfigs ctreConfigs = new CTREConfigs();
 
   private final RobotContainer m_robotContainer;
+
+  private final TelemetryTable m_matchTelemetry =
+    Telemetry.getTable("Match");
 
   // Shift tracking for 2026 FRC game
   private double teleOpStartTime = 0.0;
@@ -136,9 +140,9 @@ public class Robot extends TimedRobot {
     shiftCountdownTime = matchTime; // Counts from 20 seconds down to 0
 
     // Publish shift info
-    SmartDashboard.putString("Match/ShiftName", shiftName);
-    SmartDashboard.putNumber("Match/CurrentShift", currentShift);
-    SmartDashboard.putNumber("Match/ShiftCountdown", shiftCountdownTime);
+    m_matchTelemetry.log("ShiftName", shiftName);
+    m_matchTelemetry.log("CurrentShift", currentShift);
+    m_matchTelemetry.log("ShiftCountdown", shiftCountdownTime);
   }
 
   @Override
@@ -191,8 +195,8 @@ public class Robot extends TimedRobot {
     // Update shift tracking based on match time
     double matchTime = MatchState.getMatchTime();
 
-    // Send raw FMS match time to SmartDashboard for Elastic
-    SmartDashboard.putNumber("Match/Time", matchTime);
+    // Send raw FMS match time to TelemetryTable for Elastic
+    m_matchTelemetry.log("Time", matchTime);
 
     // Use a strict elapsed timer for shift calculation to bypass FMS disabled gaps
     // Teleop is 140 seconds (2:20) in this structure.
@@ -236,10 +240,10 @@ public class Robot extends TimedRobot {
       shiftCountdownTime = Math.max(0.0, calculatedMatchTime); // Counts from 30 down to 0
     }
 
-    // Publish shift info to SmartDashboard
-    SmartDashboard.putString("Match/ShiftName", shiftName);
-    SmartDashboard.putNumber("Match/CurrentShift", currentShift);
-    SmartDashboard.putNumber("Match/ShiftCountdown", shiftCountdownTime);
+    // Publish shift info to Telemetry Table
+    m_matchTelemetry.log("ShiftName", shiftName);
+    m_matchTelemetry.log("CurrentShift", currentShift);
+    m_matchTelemetry.log("ShiftCountdown", shiftCountdownTime);
   }
 
   @Override

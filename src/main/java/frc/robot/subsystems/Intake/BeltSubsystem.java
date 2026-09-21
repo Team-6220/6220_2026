@@ -8,7 +8,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.hardware.bus.CANPort;
 
@@ -16,6 +17,8 @@ public class BeltSubsystem extends SubsystemBase {
 
   private static BeltSubsystem INSTANCE = null;
 
+  private final TelemetryTable m_beltTelemetry =
+    Telemetry.getTable("Belt");
   private final String tableKey = "belt_";
 
   private final SparkMax beltMotor;
@@ -49,8 +52,8 @@ public class BeltSubsystem extends SubsystemBase {
   public void simpleDrive(double motorOutput) {
     double pct = Math.max(-1.0, Math.min(1.0, motorOutput));
     double volts = pct * 12.0;
-    SmartDashboard.putNumber(tableKey + "output pct", pct);
-    SmartDashboard.putNumber(tableKey + "output (V)", volts);
+    m_beltTelemetry.log(tableKey + "output pct", pct);
+    m_beltTelemetry.log(tableKey + "output (V)", volts);
     beltMotor.setVoltage(volts);
   }
 

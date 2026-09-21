@@ -9,7 +9,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.hardware.bus.CANPort;
 
@@ -17,7 +18,8 @@ public class RollerSubsystem extends SubsystemBase {
 
   private static RollerSubsystem INSTANCE = null;
 
-  private final String tableKey = "roller_";
+  private final TelemetryTable m_rollerTelemetry =
+    Telemetry.getTable("Roller");
 
   private final TalonFX rollerMotor;
   private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(true);
@@ -49,10 +51,10 @@ public class RollerSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber(
-        tableKey + "output (V)", rollerMotor.getMotorVoltage().getValueAsDouble());
-    SmartDashboard.putNumber(
-        tableKey + "output pct", rollerMotor.getDutyCycle().getValueAsDouble());
+    m_rollerTelemetry.log(
+        "output (V)", rollerMotor.getMotorVoltage().getValueAsDouble());
+    m_rollerTelemetry.log(
+        "output pct", rollerMotor.getDutyCycle().getValueAsDouble());
   }
 
   public void simpleDrive(double motorOutput) {

@@ -17,7 +17,8 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.command2.button.CommandXboxController;
@@ -29,6 +30,8 @@ import frc.robot.LimelightHelpers;
 
 public class ShooterSubsystem extends SubsystemBase {
 
+  private final TelemetryTable m_shooterTelemetry =
+    Telemetry.getTable("Shooter");
   // Motor CAN IDs
   private static final int MOTOR_41_ID = 41;
   private static final int MOTOR_34_ID = 34;
@@ -528,49 +531,49 @@ public class ShooterSubsystem extends SubsystemBase {
     if (m_firstShotBoostTN.hasChanged()) {
       ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER = m_firstShotBoostTN.get();
     }
-    SmartDashboard.putNumber("Shooter/ForwardDistance", getDist());
+    m_shooterTelemetry.log("Shooter/ForwardDistance", getDist());
 
     // RPM Telemetry
-    SmartDashboard.putNumber("Shooter/Motor41RPM", getMotor41RPM());
-    SmartDashboard.putNumber("Shooter/Motor1RPM", getMotor1RPM());
-    SmartDashboard.putNumber("Shooter/Motor9RPM", getMotor9RPM());
-    SmartDashboard.putNumber("Shooter/Motor31RPM", getMotor31RPM());
-    SmartDashboard.putNumber("Shooter/Motor2RPM", getMotor2RPM());
+    m_shooterTelemetry.log("Shooter/Motor41RPM", getMotor41RPM());
+    m_shooterTelemetry.log("Shooter/Motor1RPM", getMotor1RPM());
+    m_shooterTelemetry.log("Shooter/Motor9RPM", getMotor9RPM());
+    m_shooterTelemetry.log("Shooter/Motor31RPM", getMotor31RPM());
+    m_shooterTelemetry.log("Shooter/Motor2RPM", getMotor2RPM());
 
-    SmartDashboard.putNumber("Shooter/TopTargetRPM", m_topTargetRPMTN.get());
-    SmartDashboard.putNumber("Shooter/BottomTargetRPM", m_bottomTargetRPMTN.get());
-    SmartDashboard.putNumber(
+    m_shooterTelemetry.log("Shooter/TopTargetRPM", m_topTargetRPMTN.get());
+    m_shooterTelemetry.log("Shooter/BottomTargetRPM", m_bottomTargetRPMTN.get());
+    m_shooterTelemetry.log(
         "Shooter/FirstShotBoost", ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER);
 
-    SmartDashboard.putBoolean("Shooter/isFirstShot", isFirstShot);
+    m_shooterTelemetry.log("Shooter/isFirstShot", isFirstShot);
 
     // Voltage Telemetry
-    SmartDashboard.putNumber(
+    m_shooterTelemetry.log(
         "Shooter/Motor41Voltage", m_motor41.getMotorVoltage().getValueAsDouble());
-    SmartDashboard.putNumber(
+    m_shooterTelemetry.log(
         "Shooter/Motor1Voltage", m_motor34.getMotorVoltage().getValueAsDouble());
-    SmartDashboard.putNumber(
+    m_shooterTelemetry.log(
         "Shooter/Motor9Voltage", m_motor9.getMotorVoltage().getValueAsDouble());
-    SmartDashboard.putNumber(
+    m_shooterTelemetry.log(
         "Shooter/Motor31Voltage", m_motor31.getMotorVoltage().getValueAsDouble());
-    SmartDashboard.putNumber(
+    m_shooterTelemetry.log(
         "Shooter/Motor2Voltage", m_motor35.getMotorVoltage().getValueAsDouble());
 
     // Current Telemetry
-    SmartDashboard.putNumber(
+    m_shooterTelemetry.log(
         "Shooter/Motor41Current", m_motor41.getSupplyCurrent().getValueAsDouble());
-    SmartDashboard.putNumber(
+    m_shooterTelemetry.log(
         "Shooter/Motor1Current", m_motor34.getSupplyCurrent().getValueAsDouble());
-    SmartDashboard.putNumber(
+    m_shooterTelemetry.log(
         "Shooter/Motor9Current", m_motor9.getSupplyCurrent().getValueAsDouble());
-    SmartDashboard.putNumber(
+    m_shooterTelemetry.log(
         "Shooter/Motor31Current", m_motor31.getSupplyCurrent().getValueAsDouble());
-    SmartDashboard.putNumber(
+    m_shooterTelemetry.log(
         "Shooter/Motor2Current", m_motor35.getSupplyCurrent().getValueAsDouble());
 
     // LED Telemetry (Shooter Status, Debug Purposes; temporary)
-    SmartDashboard.putBoolean("Shooter/FlywheelsReady", isAtSpeedFly(getTopTargetRPM() / 60.0));
-    SmartDashboard.putBoolean("Shooter/TargetVisible", LimelightHelpers.getTV("limelight-front"));
-    SmartDashboard.putNumber("Shooter/LimelightTX", LimelightHelpers.getTX("limelight-front"));
+    m_shooterTelemetry.log("Shooter/FlywheelsReady", isAtSpeedFly(getTopTargetRPM() / 60.0));
+    m_shooterTelemetry.log("Shooter/TargetVisible", LimelightHelpers.getTV("limelight-front"));
+    m_shooterTelemetry.log("Shooter/LimelightTX", LimelightHelpers.getTX("limelight-front"));
   }
 }

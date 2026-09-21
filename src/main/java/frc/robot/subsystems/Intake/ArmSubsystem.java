@@ -13,7 +13,8 @@ import org.wpilib.math.controller.ArmFeedforward;
 import org.wpilib.math.controller.ProfiledPIDController;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.system.Timer;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.hardware.bus.CANPort;
 
@@ -22,6 +23,9 @@ import frc.lib.util.TunableNumber;
 public class ArmSubsystem extends SubsystemBase {
 
   private static ArmSubsystem INSTANCE = null;
+
+  private final TelemetryTable m_armtelemetry =
+    Telemetry.getTable("Arm");
 
   // Non-gain tunables (kept as TunableNumber)
   private final TunableNumber ArmIZone = new TunableNumber("arm izone", ArmConstants.armIZone);
@@ -48,7 +52,6 @@ public class ArmSubsystem extends SubsystemBase {
   private double lastUpdate = 0;
 
   // Telemetry keys
-  private final String tableKey = "arm_";
   private final String tuningKey = "arm_tune_";
 
   private final SparkMax armMotor;
@@ -170,25 +173,25 @@ public class ArmSubsystem extends SubsystemBase {
     // --- Telemetry ---
 
     // Position & controller state
-    SmartDashboard.putNumber(tableKey + "position", getPosition());
-    SmartDashboard.putNumber(tableKey + "goal", m_Controller.getGoal().position);
-    SmartDashboard.putNumber(tableKey + "setpoint_pos", m_Controller.getSetpoint().position);
-    SmartDashboard.putNumber(tableKey + "setpoint_vel", m_Controller.getSetpoint().velocity);
-    SmartDashboard.putNumber(tableKey + "position_error", m_Controller.getPositionError());
-    SmartDashboard.putNumber(tableKey + "velocity_error", m_Controller.getVelocityError());
-    SmartDashboard.putBoolean(tableKey + "at_setpoint", m_Controller.atSetpoint());
-    SmartDashboard.putBoolean(tableKey + "at_goal", m_Controller.atGoal());
+    m_armtelemetry.log("position", getPosition());
+    m_armtelemetry.log("goal", m_Controller.getGoal().position);
+    m_armtelemetry.log("setpoint_pos", m_Controller.getSetpoint().position);
+    m_armtelemetry.log("setpoint_vel", m_Controller.getSetpoint().velocity);
+    m_armtelemetry.log("position_error", m_Controller.getPositionError());
+    m_armtelemetry.log("velocity_error", m_Controller.getVelocityError());
+    m_armtelemetry.log("at_setpoint", m_Controller.atSetpoint());
+    m_armtelemetry.log("at_goal", m_Controller.atGoal());
 
     // Controller outputs
-    SmartDashboard.putNumber(tableKey + "ff_output", feedForwardOutput);
-    SmartDashboard.putNumber(tableKey + "pid_output", PIDOutput);
-    SmartDashboard.putNumber(tableKey + "total_output", feedForwardOutput + PIDOutput);
+    m_armtelemetry.log("ff_output", feedForwardOutput);
+    m_armtelemetry.log("pid_output", PIDOutput);
+    m_armtelemetry.log("total_output", feedForwardOutput + PIDOutput);
 
     // Motor diagnostics
-    SmartDashboard.putNumber(
-        tableKey + "motor_output_volts", armMotor.getBusVoltage().get() * armMotor.getAppliedOutput().get());
-    SmartDashboard.putNumber(tableKey + "motor_current_amps", armMotor.getOutputCurrent());
-    SmartDashboard.putNumber(tableKey + "motor_temp_celsius", armMotor.getMotorTemperature());
+    m_armtelemetry.log(
+        "motor_output_volts", armMotor.getBusVoltage().get() * armMotor.getAppliedOutput().get());
+    m_armtelemetry.log("motor_current_amps", armMotor.getOutputCurrent());
+    m_armtelemetry.log("motor_temp_celsius", armMotor.getMotorTemperature());
   }
 
   public void setGoal(double goal) {
@@ -240,12 +243,12 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void setMaxVel(double maxVel) {
     ArmMaxVel.setDefault(maxVel);
-    SmartDashboard.putNumber(tableKey + "max vel", maxVel);
+    m_armtelemetry.log("max vel", maxVel);
   }
 
   public void setMaxAccel(double maxAccel) {
     ArmMaxAccel.setDefault(maxAccel);
-    SmartDashboard.putNumber(tableKey + "max accel", maxAccel);
+    m_armtelemetry.log("max accel", maxAccel);
   }
 
   public void stopDriving() {

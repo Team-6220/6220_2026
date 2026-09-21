@@ -14,13 +14,17 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import org.wpilib.math.util.MathUtil;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.hardware.bus.CANPort;
 
 import frc.lib.util.TunableNumber;
 
 public class AnglerSubsystem extends SubsystemBase {
+
+  private final TelemetryTable m_anglerTelemetry =
+    Telemetry.getTable("Angler");
 
   private static final int ANGLER_MOTOR_ID = 19;
   private static final int CURRENT_LIMIT = 30;
@@ -178,13 +182,13 @@ public class AnglerSubsystem extends SubsystemBase {
     }
 
     // Telemetry
-    SmartDashboard.putNumber("Angler/CurrentAngleDeg", getCurrentAngleDeg());
-    SmartDashboard.putNumber("Angler/TargetAngleDeg", m_targetAngle.get());
-    SmartDashboard.putBoolean("Angler/AtTarget", isAtTargetAngle());
-    SmartDashboard.putNumber("Angler/MotorOutput", m_anglerMotor.getAppliedOutput());
-    SmartDashboard.putNumber("Angler/MotorCurrent", m_anglerMotor.getOutputCurrent());
-    SmartDashboard.putNumber("Angler/MinAngleDeg", MIN_SHAFT_ROT);
-    SmartDashboard.putNumber("Angler/MaxAngleDeg", MAX_SHAFT_ROT);
+    m_anglerTelemetry.log("Angler/CurrentAngleDeg", getCurrentAngleDeg());
+    m_anglerTelemetry.log("Angler/TargetAngleDeg", m_targetAngle.get());
+    m_anglerTelemetry.log("Angler/AtTarget", isAtTargetAngle());
+    m_anglerTelemetry.log("Angler/MotorOutput", m_anglerMotor.getAppliedOutput());
+    m_anglerTelemetry.log("Angler/MotorCurrent", m_anglerMotor.getOutputCurrent());
+    m_anglerTelemetry.log("Angler/MinAngleDeg", MIN_SHAFT_ROT);
+    m_anglerTelemetry.log("Angler/MaxAngleDeg", MAX_SHAFT_ROT);
   }
 
   public double getAnglerAngle() {
