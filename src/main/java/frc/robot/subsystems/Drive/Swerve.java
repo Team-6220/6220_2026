@@ -3,11 +3,9 @@ package frc.robot.subsystems.Drive;
 import static org.wpilib.units.Units.Degrees;
 import static org.wpilib.units.Units.Radians;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.util.PathPlannerLogging;
+import com.limelightvision.Limelight;
+import com.limelightvision.PoseEstimate;
+import com.limelightvision.PoseEstimateType;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.controller.ProfiledPIDController;
@@ -39,7 +37,7 @@ import frc.lib.util.RumbleManager;
 import frc.lib.util.TunableHelper;
 import frc.robot.AutoConstants;
 import frc.robot.Constants;
-import frc.robot.LimelightHelpers;
+import frc.robot.subsystems.Vision.Cameras;
 import frc.robot.subsystems.Drive.GyroIO.GyroIOInputs;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -516,7 +514,8 @@ public class Swerve extends SubsystemBase {
     poseEstimator.update(getGyroYaw(), getModulePositions());
 
     // vision stuff begin
-    double robotYaw = getGyroYaw().getDegrees();
+    // MegaTag2 needs the field-space heading, so use the pose estimator's heading (not raw gyro)
+    double robotYaw = getHeading().getDegrees();
 
     double yawRateDegPerSec = 0.0;
     double rateDt = timestamp - lastYawRateTimestamp;
@@ -526,22 +525,16 @@ public class Swerve extends SubsystemBase {
     lastYawForRate = getGyroYaw();
     lastYawRateTimestamp = timestamp;
 
-    LimelightHelpers.SetRobotOrientation(
-        "limelight-front", robotYaw, yawRateDegPerSec, 0.0, 0.0, 0.0, 0.0);
+    // Publish yaw before reading the queue. Shared orientation feeds every MegaTag2 camera.
+    Limelight.setSharedRobotOrientation(robotYaw, yawRateDegPerSec, 0.0, 0.0, 0.0, 0.0);
 
-    // Get the pose estimate
-    LimelightHelpers.PoseEstimate limelightMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
-
-    megatag2Pose.setRobotPose(limelightMeasurement.pose);
-
-    // Reject the update if no tags were seen - MegaTag2 returns a degenerate/garbage
-    // pose when tagCount == 0, and blindly fusing it corrupts the odometry.
-    boolean visionAccepted = limelightMeasurement.tagCount > 0;
-    if (visionAccepted) {
-      poseEstimator.setVisionMeasurementStdDevs(visionMeasurementStdDevs);
+    // Drain every queued estimate that passed the camera's PoseEstimateConfig filters
+    // (see Cameras.MT2_CONFIG). Each estimate carries its own distance/tag-count scaled std devs.
+    for (PoseEstimate estimate :
+        Cameras.FRONT.readAcceptedPoseEstimates(PoseEstimateType.MT2_WPIBLUE)) {
       poseEstimator.addVisionMeasurement(
-          limelightMeasurement.pose, limelightMeasurement.timestampSeconds);
+          estimate.pose, estimate.timestampSeconds, estimate.stdDevs);
+      megatag2Pose.setRobotPose(estimate.pose);
     }
     // vision stuff ends
 

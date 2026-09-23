@@ -27,7 +27,8 @@ import org.wpilib.hardware.bus.CANPort;
 
 import frc.lib.util.TunableHelper;
 import org.wpilib.tunable.TunableDouble;
-import frc.robot.LimelightHelpers;
+import com.limelightvision.LimelightResults;
+import frc.robot.subsystems.Vision.Cameras;
 
 public class ShooterSubsystem extends SubsystemBase {
 
@@ -504,17 +505,15 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public double getDist() {
-    try {
-      int a =
-          ((int) (LimelightHelpers.getTargetPose3d_CameraSpace("limelight-front").getZ() * 100));
-      double b = (double) a;
-      b = b / 20.0;
-      b = Math.round(b) * 2.0;
-      return b / 10.0;
-    } catch (Exception e) {
-      System.out.println("distance doens't work");
-    }
-    return -1.0;
+    if (!Cameras.FRONT.hasTarget()) return -1.0;
+    LimelightResults results = Cameras.FRONT.getLatestResults();
+    if (results.fiducialTargets == null || results.fiducialTargets.length == 0) return -1.0;
+    // Camera space is NWU (X out of the lens), so forward distance is X
+    int a = (int) (results.fiducialTargets[0].getTargetPose_CameraSpace().getX() * 100);
+    double b = (double) a;
+    b = b / 20.0;
+    b = Math.round(b) * 2.0;
+    return b / 10.0;
   }
 
   @Override
@@ -569,7 +568,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     // LED Telemetry (Shooter Status, Debug Purposes; temporary)
     m_shooterTelemetry.log("Shooter/FlywheelsReady", isAtSpeedFly(getTopTargetRPM() / 60.0));
-    m_shooterTelemetry.log("Shooter/TargetVisible", LimelightHelpers.getTV("limelight-front"));
-    m_shooterTelemetry.log("Shooter/LimelightTX", LimelightHelpers.getTX("limelight-front"));
+    m_shooterTelemetry.log("Shooter/TargetVisible", Cameras.FRONT.hasTarget());
+    m_shooterTelemetry.log("Shooter/LimelightTX", Cameras.FRONT.getTXDegrees());
   }
 }

@@ -35,7 +35,7 @@ import frc.robot.subsystems.Intake.RollerSubsystem;
 import frc.robot.subsystems.LEDs.AdressableLEDs;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
-import frc.robot.subsystems.Vision.Limelight;
+import frc.robot.subsystems.Vision.Cameras;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -57,7 +57,6 @@ public class RobotContainer {
   private final ArmSubsystem arm = ArmSubsystem.getInstance();
   private final BeltSubsystem belt = BeltSubsystem.getInstance();
   private final RollerSubsystem roller = RollerSubsystem.getInstance();
-  private final Limelight s_Limelight = new Limelight();
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
   private final Joystick m_joystick = new Joystick(1);
@@ -168,8 +167,8 @@ public class RobotContainer {
     Trigger aligned =
         new Trigger(
             () ->
-                Math.abs(LimelightHelpers.getTX("limelight-front")) < ALIGN_TOLERANCE_DEG
-                    && LimelightHelpers.getTV("limelight-front"));
+                Math.abs(Cameras.FRONT.getTXDegrees()) < ALIGN_TOLERANCE_DEG
+                    && Cameras.FRONT.hasTarget());
 
     Trigger inRange =
         new Trigger(
@@ -227,8 +226,8 @@ public class RobotContainer {
   /** Publish shooter booleans needed by Elastic dashboard widgets. */
   public void publishDriverDashboardBooleans() {
     boolean aligned =
-        LimelightHelpers.getTV("limelight-front")
-            && Math.abs(LimelightHelpers.getTX("limelight-front")) < ALIGN_TOLERANCE_DEG;
+        Cameras.FRONT.hasTarget()
+            && Math.abs(Cameras.FRONT.getTXDegrees()) < ALIGN_TOLERANCE_DEG;
     double dist = m_shooter.getDist();
     boolean shortRange = dist > 0 && dist <= MAX_SHOOT_DISTANCE_M;
 
