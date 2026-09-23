@@ -6,7 +6,8 @@ import static org.wpilib.units.Units.Meters;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.pathplanner.lib.config.ModuleConfig;
+// TODO: AUTO - PathPlanner doesn't support WPILib 2027 alpha 7 yet.
+// import com.pathplanner.lib.config.ModuleConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
@@ -272,8 +273,10 @@ public final class SwerveConstants {
     return maxSpeed() / Math.hypot(tw / 2.0, wb / 2.0);
   }
 
-  public static ModuleConfig swerveModuleConfig() {
-    return new ModuleConfig(
-        wheelRadius(), maxSpeed(), 1.0, DC_MOTOR, DRIVE_GEAR_RATIO, driveStatorCurrentLimit, 1);
-  }
+  // TODO: AUTO - PathPlanner module config (used by Swerve's RobotConfig), disabled until
+  // PathPlanner supports WPILib 2027 alpha 7.
+  // public static ModuleConfig swerveModuleConfig() {
+  //   return new ModuleConfig(
+  //       wheelRadius(), maxSpeed(), 1.0, DC_MOTOR, DRIVE_GEAR_RATIO, driveStatorCurrentLimit, 1);
+  // }
 }

@@ -4,7 +4,8 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
+// TODO: AUTO - PathPlanner doesn't support WPILib 2027 alpha 7 yet.
+// import com.pathplanner.lib.auto.AutoBuilder;
 
 import org.wpilib.driverstation.Gamepad;
 import org.wpilib.driverstation.GenericHID;
@@ -24,6 +25,7 @@ import frc.robot.commands.ArmUpAndDown;
 import frc.robot.commands.Autos.BasicAutoBlue;
 import frc.robot.commands.Autos.BasicAutoRed;
 import frc.robot.commands.Autos.SamAuto.SamAutoV1;
+import frc.robot.commands.Autos.SamAuto.SamAutoV2;
 import frc.robot.commands.ManualArm;
 import frc.robot.commands.PassToAlliance;
 import frc.robot.commands.SwerveCom;
@@ -72,7 +74,8 @@ public class RobotContainer {
     // Initialize climber subsystem based on robot mode
 
     // Configure the trigger bindings
-    s_Swerve.configureAutoBuilder();
+    // TODO: AUTO - re-enable once PathPlanner supports WPILib 2027 alpha 7.
+    // s_Swerve.configureAutoBuilder();
     s_Swerve.zeroHeading(m_driverController.getController());
 
     s_Swerve.setDefaultCommand(
@@ -92,6 +95,7 @@ public class RobotContainer {
     autoChooser.add(
         "Blue", new BasicAutoBlue(s_Swerve, m_angler, m_shooter, belt, m_driverController));
     autoChooser.add("samautov1", new SamAutoV1(s_Swerve));
+    autoChooser.add("samautov2", new SamAutoV2(s_Swerve));
     autoChooser.onChange(command -> System.out.println("Auto selected: " + command.getName()));
     Tunables.publish("Auto Chooser", autoChooser);
     configureBindings();

@@ -8,7 +8,8 @@ import static org.wpilib.units.Units.MetersPerSecondPerSecond;
 import static org.wpilib.units.Units.RadiansPerSecond;
 import static org.wpilib.units.Units.RadiansPerSecondPerSecond;
 
-import com.pathplanner.lib.path.PathConstraints;
+// TODO: AUTO - PathPlanner doesn't support WPILib 2027 alpha 7 yet.
+// import com.pathplanner.lib.path.PathConstraints;
 import org.wpilib.units.measure.Angle;
 import org.wpilib.units.measure.AngularAcceleration;
 import org.wpilib.units.measure.AngularVelocity;
@@ -40,13 +41,15 @@ public final class AutoConstants {
 
   public static final Angle angularTolerance = Degrees.of(5);
 
-  public static PathConstraints getPathConstraints() {
-    return new PathConstraints(
-        MetersPerSecond.of(translationMaxVelMpsTN.get()),
-        MetersPerSecondPerSecond.of(translationMaxAccelMpsSqTN.get()),
-        RadiansPerSecond.of(angularMaxVelRadPerSec()),
-        RadiansPerSecondPerSecond.of(angularMaxAccelRadPerSecSq()));
-  }
+  // TODO: AUTO - PathPlanner path constraints, disabled until PathPlanner supports WPILib 2027
+  // alpha 7. The tunable limits below are still available to any other path follower.
+  // public static PathConstraints getPathConstraints() {
+  //   return new PathConstraints(
+  //       MetersPerSecond.of(translationMaxVelMpsTN.get()),
+  //       MetersPerSecondPerSecond.of(translationMaxAccelMpsSqTN.get()),
+  //       RadiansPerSecond.of(angularMaxVelRadPerSec()),
+  //       RadiansPerSecondPerSecond.of(angularMaxAccelRadPerSecSq()));
+  // }
 
   // -----------------------------
   // TRANSLATION PID (raw doubles)
