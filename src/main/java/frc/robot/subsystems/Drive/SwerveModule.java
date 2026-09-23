@@ -82,7 +82,7 @@ public class SwerveModule {
 
   public void setDesiredVelocities(SwerveModuleVelocity velocities, boolean isOpenLoop) {
     // optimize
-    velocities.optimize(getVelocities().angle);
+    velocities = velocities.optimize(getVelocities().angle);
 
     // angle control
     io.setAnglePosition(RevConfigs.CANCoderAngleToNeoEncoder(velocities.angle.getRotations()));

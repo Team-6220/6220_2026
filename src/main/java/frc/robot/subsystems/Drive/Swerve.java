@@ -213,7 +213,9 @@ public class Swerve extends SubsystemBase {
                 fieldRelative
                     ? velocities
                     : new ChassisVelocities(translation.getX(), translation.getY(), rotation));
-    SwerveDriveKinematics.desaturateWheelVelocities(SwerveModuleVelocities, SwerveConstants.maxSpeed());
+    SwerveModuleVelocities =
+        SwerveDriveKinematics.desaturateWheelVelocities(
+            SwerveModuleVelocities, SwerveConstants.maxSpeed());
     
 
     // set all the modules
@@ -311,7 +313,8 @@ public class Swerve extends SubsystemBase {
 
   /* Used by SwerveControllerCommand in Auto */
   public void setModuleStates(SwerveModuleVelocity[] desiredStates) {
-    SwerveDriveKinematics.desaturateWheelVelocities(desiredStates, SwerveConstants.maxSpeed());
+    desiredStates =
+        SwerveDriveKinematics.desaturateWheelVelocities(desiredStates, SwerveConstants.maxSpeed());
 
     for (SwerveModule mod : mSwerveMods) {
       mod.setDesiredVelocities(desiredStates[mod.getModuleNumber()], false);
