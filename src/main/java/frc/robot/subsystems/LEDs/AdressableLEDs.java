@@ -8,6 +8,7 @@ import static org.wpilib.units.Units.*;
 
 import org.wpilib.units.measure.Distance;
 import org.wpilib.hardware.led.AddressableLED;
+import org.wpilib.hardware.led.AddressableLED.ColorOrder;
 import org.wpilib.hardware.led.AddressableLEDBuffer;
 import org.wpilib.hardware.led.LEDPattern;
 import org.wpilib.system.RobotController;
@@ -21,6 +22,11 @@ public class AdressableLEDs extends SubsystemBase {
   private static final int kPort = 9;
   private static final int kLength = 120;
 
+  // Byte order the LED strip expects. WS2812B strips are usually GRB. WPILib 2027 converts our
+  // normal RGB colors into this order, so colors below are written as plain RGB.
+  // If red and green come out swapped on the robot, change this to ColorOrder.RGB.
+  private static final ColorOrder kColorOrder = ColorOrder.GRB;
+
   private final AddressableLED m_led;
   private final AddressableLEDBuffer m_buffer;
 
@@ -31,21 +37,22 @@ public class AdressableLEDs extends SubsystemBase {
     m_led = new AddressableLED(kPort);
     m_buffer = new AddressableLEDBuffer(kLength);
 
+    m_led.setColorOrder(kColorOrder);
     m_led.setLength(kLength);
-    m_led.start();
+    // No start() in WPILib 2027: output begins once length and data are set.
 
     // Default to a scrolling gradient
     setDefaultCommand(runPattern(scrollingFireGradient()).withName("LEDs Idle"));
   }
 
-  // Solid Colors
+  // Solid Colors (plain RGB; kColorOrder handles the strip's GRB byte order)
 
   public LEDPattern solidRed() {
-    return LEDPattern.solid(new Color(0.0, 255.0 / 255.0, 0.0));
+    return LEDPattern.solid(new Color(255.0 / 255.0, 0.0, 0.0));
   }
 
   public LEDPattern solidGreen() {
-    return LEDPattern.solid(new Color(255.0 / 255.0, 0.0, 0.0));
+    return LEDPattern.solid(new Color(0.0, 255.0 / 255.0, 0.0));
   }
 
   public LEDPattern solidWhite() {
@@ -57,23 +64,23 @@ public class AdressableLEDs extends SubsystemBase {
   }
 
   public LEDPattern solidPink() {
-    return LEDPattern.solid(new Color(105.0 / 255.0, 255.0 / 255.0, 180.0 / 255.0));
+    // rgb(255, 105, 180)
+    return LEDPattern.solid(new Color(255.0 / 255.0, 105.0 / 255.0, 180.0 / 255.0));
   }
 
   public LEDPattern solidGold() {
-    return LEDPattern.solid(new Color(215.0 / 255.0, 255.0 / 255.0, 0.0));
+    // rgb(255, 215, 0)
+    return LEDPattern.solid(new Color(255.0 / 255.0, 215.0 / 255.0, 0.0));
   }
 
   public LEDPattern solidTeamGold() {
     // #ffa300 = rgb(255, 163, 0)
-    // Swapped R and G for GRB format
-    return LEDPattern.solid(new Color(163.0 / 255.0, 255.0 / 255.0, 0.0));
+    return LEDPattern.solid(new Color(255.0 / 255.0, 163.0 / 255.0, 0.0));
   }
 
   public LEDPattern solidDarkOrange() {
-    // Swapped R and G for GRB format
-    return LEDPattern.solid(new Color(105.0 / 255.0, 160.0 / 255.0, 10.0 / 255.0));
     // rgb(160, 105, 10)
+    return LEDPattern.solid(new Color(160.0 / 255.0, 105.0 / 255.0, 10.0 / 255.0));
   }
 
   // Rainbow
@@ -84,10 +91,10 @@ public class AdressableLEDs extends SubsystemBase {
 
   // Fire / Gold Gradient
   public LEDPattern scrollingFireGradient() {
-    // GRB formatted colors
+    // Plain RGB colors
     Color yellow = new Color(255.0 / 255.0, 255.0 / 255.0, 0.0);
-    Color teamGold = new Color(163.0 / 255.0, 255.0 / 255.0, 0.0);
-    Color orange = new Color(50.0 / 255.0, 255.0 / 255.0, 0.0);
+    Color teamGold = new Color(255.0 / 255.0, 163.0 / 255.0, 0.0);
+    Color orange = new Color(255.0 / 255.0, 50.0 / 255.0, 0.0);
 
     LEDPattern gradient =
         LEDPattern.gradient(
