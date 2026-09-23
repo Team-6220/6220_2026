@@ -18,7 +18,8 @@ import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.hardware.bus.CANPort;
 
-import frc.lib.util.TunableNumber;
+import frc.lib.util.TunableHelper;
+import org.wpilib.tunable.TunableDouble;
 
 public class ArmSubsystem extends SubsystemBase {
 
@@ -27,20 +28,25 @@ public class ArmSubsystem extends SubsystemBase {
   private final TelemetryTable m_armtelemetry =
     Telemetry.getTable("Arm");
 
-  // Non-gain tunables (kept as TunableNumber)
-  private final TunableNumber ArmIZone = new TunableNumber("arm izone", ArmConstants.armIZone);
-  private final TunableNumber ArmTolerance =
-      new TunableNumber("arm tolerance", ArmConstants.armTolerance);
-  private final TunableNumber ArmMaxVel = new TunableNumber("arm max vel", ArmConstants.armMaxVel);
-  private final TunableNumber ArmMaxAccel =
-      new TunableNumber("arm max accel", ArmConstants.armMaxAccel);
-  private final TunableNumber ArmIdleVoltage =
-      new TunableNumber("arm idle voltage", ArmConstants.armIdleVoltage);
-  private final TunableNumber ArmVoltage =
-      new TunableNumber("arm voltage", ArmConstants.armVoltage);
+  // Non-gain tunables (kept as TunableDouble)
+  private final TunableDouble ArmIZone = TunableHelper.addDouble("arm izone", ArmConstants.armIZone);
+  private final TunableDouble ArmTolerance =
+      TunableHelper.addDouble("arm tolerance", ArmConstants.armTolerance);
+  private final TunableDouble ArmMaxVel = TunableHelper.addDouble("arm max vel", ArmConstants.armMaxVel);
+  private final TunableDouble ArmMaxAccel =
+      TunableHelper.addDouble("arm max accel", ArmConstants.armMaxAccel);
+  private final TunableDouble ArmIdleVoltage =
+      TunableHelper.addDouble("arm idle voltage", ArmConstants.armIdleVoltage);
+  private final TunableDouble ArmVoltage =
+      TunableHelper.addDouble("arm voltage", ArmConstants.armVoltage);
 
-  // Tracked gain values — compared each loop to detect SmartDashboard edits
-  private double lastKp, lastKi, lastKd, lastKs, lastKg, lastKv;
+  // Gain tunables — editable on the dashboard, applied in periodic() when changed
+  private final TunableDouble ArmKp = TunableHelper.addDouble("arm_tune_kP", ArmConstants.armKp);
+  private final TunableDouble ArmKi = TunableHelper.addDouble("arm_tune_kI", ArmConstants.armKi);
+  private final TunableDouble ArmKd = TunableHelper.addDouble("arm_tune_kD", ArmConstants.armKd);
+  private final TunableDouble ArmKs = TunableHelper.addDouble("arm_tune_kS", ArmConstants.armKs);
+  private final TunableDouble ArmKg = TunableHelper.addDouble("arm_tune_kG", ArmConstants.armKg);
+  private final TunableDouble ArmKv = TunableHelper.addDouble("arm_tune_kV", ArmConstants.armKv);
 
   private double idleOutVolt = ArmConstants.armIdleVoltage;
   private double intakeOutVolt = ArmConstants.armVoltage;
@@ -50,9 +56,6 @@ public class ArmSubsystem extends SubsystemBase {
   private TrapezoidProfile.Constraints m_Constraints;
   private double feedForwardOutput, PIDOutput;
   private double lastUpdate = 0;
-
-  // Telemetry keys
-  private final String tuningKey = "arm_tune_";
 
   private final SparkMax armMotor;
   private final SparkMaxConfig armMotorConfig = new SparkMaxConfig();
@@ -109,63 +112,36 @@ public class ArmSubsystem extends SubsystemBase {
             ArmConstants.armKs, ArmConstants.armKg, ArmConstants.armKv, ArmConstants.armKa);
     m_Controller.setIZone(ArmIZone.get());
     m_Controller.setTolerance(ArmTolerance.get());
-
-    // Seed tracked values so we can detect changes in periodic()
-    lastKp = ArmConstants.armKp;
-    lastKi = ArmConstants.armKi;
-    lastKd = ArmConstants.armKd;
-    lastKs = ArmConstants.armKs;
-    lastKg = ArmConstants.armKg;
-    lastKv = ArmConstants.armKv;
-
-    // Push initial gain values to SmartDashboard — these will show as editable fields
-    SmartDashboard.putNumber(tuningKey + "kP", lastKp);
-    SmartDashboard.putNumber(tuningKey + "kI", lastKi);
-    SmartDashboard.putNumber(tuningKey + "kD", lastKd);
-    SmartDashboard.putNumber(tuningKey + "kS", lastKs);
-    SmartDashboard.putNumber(tuningKey + "kG", lastKg);
-    SmartDashboard.putNumber(tuningKey + "kV", lastKv);
   }
 
   @Override
   public void periodic() {
-    // --- Live gain tuning via SmartDashboard ---
-    // Read whatever is currently in the dashboard fields
-    double sdKp = SmartDashboard.getNumber(tuningKey + "kP", lastKp);
-    double sdKi = SmartDashboard.getNumber(tuningKey + "kI", lastKi);
-    double sdKd = SmartDashboard.getNumber(tuningKey + "kD", lastKd);
-    double sdKs = SmartDashboard.getNumber(tuningKey + "kS", lastKs);
-    double sdKg = SmartDashboard.getNumber(tuningKey + "kG", lastKg);
-    double sdKv = SmartDashboard.getNumber(tuningKey + "kV", lastKv);
-
+    // --- Live gain tuning via Tunables ---
     // If P, I, or D changed, push update to controller
-    if (sdKp != lastKp || sdKi != lastKi || sdKd != lastKd) {
-      m_Controller.setPID(sdKp, sdKi, sdKd);
-      lastKp = sdKp;
-      lastKi = sdKi;
-      lastKd = sdKd;
-      System.out.println("[Arm] PID updated -> P:" + sdKp + " I:" + sdKi + " D:" + sdKd);
+    if (TunableHelper.consumeChanged(ArmKp, ArmKi, ArmKd)) {
+      m_Controller.setPID(ArmKp.get(), ArmKi.get(), ArmKd.get());
+      System.out.println(
+          "[Arm] PID updated -> P:" + ArmKp.get() + " I:" + ArmKi.get() + " D:" + ArmKd.get());
     }
 
     // If Ks, Kg, or Kv changed, rebuild feedforward
-    if (sdKs != lastKs || sdKg != lastKg || sdKv != lastKv) {
-      m_Feedforward = new ArmFeedforward(sdKs, sdKg, sdKv, ArmConstants.armKa);
-      lastKs = sdKs;
-      lastKg = sdKg;
-      lastKv = sdKv;
-      System.out.println("[Arm] FF updated -> Ks:" + sdKs + " Kg:" + sdKg + " Kv:" + sdKv);
+    if (TunableHelper.consumeChanged(ArmKs, ArmKg, ArmKv)) {
+      m_Feedforward =
+          new ArmFeedforward(ArmKs.get(), ArmKg.get(), ArmKv.get(), ArmConstants.armKa);
+      System.out.println(
+          "[Arm] FF updated -> Ks:" + ArmKs.get() + " Kg:" + ArmKg.get() + " Kv:" + ArmKv.get());
     }
 
-    // --- Other TunableNumber updates ---
-    if (ArmIZone.hasChanged()) {
+    // --- Other tunable updates ---
+    if (TunableHelper.consumeChanged(ArmIZone)) {
       m_Controller.setIZone(ArmIZone.get());
     }
 
-    if (ArmTolerance.hasChanged()) {
+    if (TunableHelper.consumeChanged(ArmTolerance)) {
       m_Controller.setTolerance(ArmTolerance.get());
     }
 
-    if (ArmMaxVel.hasChanged() || ArmMaxAccel.hasChanged()) {
+    if (TunableHelper.consumeChanged(ArmMaxVel, ArmMaxAccel)) {
       m_Constraints = new TrapezoidProfile.Constraints(ArmMaxVel.get(), ArmMaxAccel.get());
       m_Controller.setConstraints(m_Constraints);
     }
@@ -237,17 +213,17 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void maintain() {
-    if (ArmIdleVoltage.hasChanged()) idleOutVolt = ArmIdleVoltage.get();
+    if (TunableHelper.consumeChanged(ArmIdleVoltage)) idleOutVolt = ArmIdleVoltage.get();
     armMotor.setVoltage(-idleOutVolt);
   }
 
   public void setMaxVel(double maxVel) {
-    ArmMaxVel.setDefault(maxVel);
+    ArmMaxVel.set(maxVel);
     m_armtelemetry.log("max vel", maxVel);
   }
 
   public void setMaxAccel(double maxAccel) {
-    ArmMaxAccel.setDefault(maxAccel);
+    ArmMaxAccel.set(maxAccel);
     m_armtelemetry.log("max accel", maxAccel);
   }
 

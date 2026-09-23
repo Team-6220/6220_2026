@@ -12,7 +12,8 @@ import org.wpilib.math.kinematics.SwerveModuleVelocity;
 
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
-import frc.lib.util.TunableNumber;
+import frc.lib.util.TunableHelper;
+import org.wpilib.tunable.TunableDouble;
 import frc.robot.RevConfigs;
 import frc.robot.subsystems.Drive.SwerveModuleIO.SwerveModuleIOInputs;
 
@@ -25,17 +26,20 @@ public class SwerveModule {
   private final DutyCycleOut driveDutyCycle = new DutyCycleOut(0);
   private final VelocityVoltage driveVelocity = new VelocityVoltage(0);
 
+  // Drive feedforward tunables are shared by all modules (a key can only be published once).
+  // Swerve.periodic() checks them for changes and calls updateDriveFeedForward() on each module.
+
   /** driveKS Tunable Number */
-  private final TunableNumber driveKSTN =
-      new TunableNumber("SwerveModule_kS", SwerveConstants.DRIVE_KS);
+  static final TunableDouble driveKSTN =
+      TunableHelper.addDouble("SwerveModule_kS", SwerveConstants.DRIVE_KS);
 
   /** driveKV Tunable Number */
-  private final TunableNumber driveKVTN =
-      new TunableNumber("SwerveModule_kV", SwerveConstants.DRIVE_KV);
+  static final TunableDouble driveKVTN =
+      TunableHelper.addDouble("SwerveModule_kV", SwerveConstants.DRIVE_KV);
 
   /** driveKA Tunable Number */
-  private final TunableNumber driveKATN =
-      new TunableNumber("SwerveModule_kA", SwerveConstants.DRIVE_KA);
+  static final TunableDouble driveKATN =
+      TunableHelper.addDouble("SwerveModule_kA", SwerveConstants.DRIVE_KA);
 
   private final SimpleMotorFeedforward driveFeedForward =
       new SimpleMotorFeedforward(driveKSTN.get(), driveKVTN.get(), driveKATN.get());
@@ -48,15 +52,13 @@ public class SwerveModule {
 
   public void periodic() {
     io.updateInputs(inputs);
-    if (driveKSTN.hasChanged()) {
-      driveFeedForward.setKs(driveKSTN.get());
-    }
-    if (driveKVTN.hasChanged()) {
-      driveFeedForward.setKv(driveKVTN.get());
-    }
-    if (driveKATN.hasChanged()) {
-      driveFeedForward.setKa(driveKATN.get());
-    }
+  }
+
+  /** Applies the current drive feedforward tunable values to this module. */
+  public void updateDriveFeedForward() {
+    driveFeedForward.setKs(driveKSTN.get());
+    driveFeedForward.setKv(driveKVTN.get());
+    driveFeedForward.setKa(driveKATN.get());
   }
 
   public SwerveModuleVelocity getVelocities() {

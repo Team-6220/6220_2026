@@ -195,7 +195,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/TunableNumbers/Shooter/kP",
+              "topic": "/Tunables/Shooter/kP",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
@@ -209,7 +209,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/TunableNumbers/Shooter/kI",
+              "topic": "/Tunables/Shooter/kI",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
@@ -223,7 +223,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/TunableNumbers/Shooter/kD",
+              "topic": "/Tunables/Shooter/kD",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
@@ -237,7 +237,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/TunableNumbers/Shooter/kA",
+              "topic": "/Tunables/Shooter/kA",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
@@ -251,7 +251,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/TunableNumbers/Shooter/kV",
+              "topic": "/Tunables/Shooter/kV",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
@@ -265,7 +265,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/TunableNumbers/Shooter/kS",
+              "topic": "/Tunables/Shooter/kS",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
@@ -323,7 +323,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/TunableNumbers/Shooter/TopTargetRPM",
+              "topic": "/Tunables/Shooter/TopTargetRPM",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
@@ -367,7 +367,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/TunableNumbers/Shooter/FirstShotBoost",
+              "topic": "/Tunables/Shooter/FirstShotBoost",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true

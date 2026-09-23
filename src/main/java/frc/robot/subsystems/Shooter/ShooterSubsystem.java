@@ -25,7 +25,8 @@ import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.sysid.SysIdRoutine;
 import org.wpilib.hardware.bus.CANPort;
 
-import frc.lib.util.TunableNumber;
+import frc.lib.util.TunableHelper;
+import org.wpilib.tunable.TunableDouble;
 import frc.robot.LimelightHelpers;
 
 public class ShooterSubsystem extends SubsystemBase {
@@ -63,21 +64,21 @@ public class ShooterSubsystem extends SubsystemBase {
   private final SysIdRoutine m_sysIdRoutine;
 
   // Tunable PID and feedforward values
-  private final TunableNumber m_kp = new TunableNumber("Shooter/kP", 0.4);
-  private final TunableNumber m_ki = new TunableNumber("Shooter/kI", 0.0);
-  private final TunableNumber m_kd = new TunableNumber("Shooter/kD", 0.003);
-  private final TunableNumber m_kv = new TunableNumber("Shooter/kV", 0.12);
-  private final TunableNumber m_ks = new TunableNumber("Shooter/kS", 0.0);
-  private final TunableNumber m_ka = new TunableNumber("Shooter/kA", 0.4);
+  private final TunableDouble m_kp = TunableHelper.addDouble("Shooter/kP", 0.4);
+  private final TunableDouble m_ki = TunableHelper.addDouble("Shooter/kI", 0.0);
+  private final TunableDouble m_kd = TunableHelper.addDouble("Shooter/kD", 0.003);
+  private final TunableDouble m_kv = TunableHelper.addDouble("Shooter/kV", 0.12);
+  private final TunableDouble m_ks = TunableHelper.addDouble("Shooter/kS", 0.0);
+  private final TunableDouble m_ka = TunableHelper.addDouble("Shooter/kA", 0.4);
 
   // Separate tunable RPM for top and bottom groups
-  private final TunableNumber m_topTargetRPMTN =
-      new TunableNumber("Shooter/TopTargetRPM", ShooterConstants.topTESTrpm);
-  private final TunableNumber m_bottomTargetRPMTN =
-      new TunableNumber("Shooter/BottomTargetRPM", ShooterConstants.bottomTESTrpm);
+  private final TunableDouble m_topTargetRPMTN =
+      TunableHelper.addDouble("Shooter/TopTargetRPM", ShooterConstants.topTESTrpm);
+  private final TunableDouble m_bottomTargetRPMTN =
+      TunableHelper.addDouble("Shooter/BottomTargetRPM", ShooterConstants.bottomTESTrpm);
   // Tunable for the first-shot boost multiplier (do not reuse BottomTargetRPM key)
-  private final TunableNumber m_firstShotBoostTN =
-      new TunableNumber("Shooter/FirstShotBoost", ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER);
+  private final TunableDouble m_firstShotBoostTN =
+      TunableHelper.addDouble("Shooter/FirstShotBoost", ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER);
 
   // Tolerance for determining if shooter is at speed (in RPS)
   private static final double VELOCITY_TOLERANCE_RPS = 1.5;
@@ -519,16 +520,11 @@ public class ShooterSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update PID if tunable numbers changed
-    if (m_kp.hasChanged()
-        || m_ki.hasChanged()
-        || m_kd.hasChanged()
-        || m_kv.hasChanged()
-        || m_ks.hasChanged()
-        || m_ka.hasChanged()) {
+    if (TunableHelper.consumeChanged(m_kp, m_ki, m_kd, m_kv, m_ks, m_ka)) {
       updatePIDValues();
     }
     // Update first-shot boost multiplier if it changed via tunable
-    if (m_firstShotBoostTN.hasChanged()) {
+    if (TunableHelper.consumeChanged(m_firstShotBoostTN)) {
       ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER = m_firstShotBoostTN.get();
     }
     m_shooterTelemetry.log("Shooter/ForwardDistance", getDist());

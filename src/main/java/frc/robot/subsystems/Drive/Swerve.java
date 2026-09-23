@@ -36,6 +36,7 @@ import org.wpilib.driverstation.XboxController;
 import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.command2.SubsystemBase;
 import frc.lib.util.RumbleManager;
+import frc.lib.util.TunableHelper;
 import frc.robot.AutoConstants;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
@@ -497,7 +498,11 @@ public class Swerve extends SubsystemBase {
   public void periodic() {
     updateTelemetry();
     gyro.updateInputs(gyroInputs);
+    boolean driveFFChanged =
+        TunableHelper.consumeChanged(
+            SwerveModule.driveKSTN, SwerveModule.driveKVTN, SwerveModule.driveKATN);
     for (SwerveModule mod : mSwerveMods) {
+      if (driveFFChanged) mod.updateDriveFeedForward();
       mod.periodic();
     }
     Double timestamp = Timer.getTimestamp();
@@ -540,9 +545,8 @@ public class Swerve extends SubsystemBase {
     }
     // vision stuff ends
 
-    if (AutoConstants.angularKPTN.hasChanged()
-        || AutoConstants.angularKITN.hasChanged()
-        || AutoConstants.angularKDTN.hasChanged()) {
+    if (TunableHelper.consumeChanged(
+        AutoConstants.angularKPTN, AutoConstants.angularKITN, AutoConstants.angularKDTN)) {
       turnPidController.setPID(
           AutoConstants.angularKPTN.get(),
           AutoConstants.angularKITN.get(),
@@ -550,8 +554,8 @@ public class Swerve extends SubsystemBase {
       turnPidController.reset(getHeadingRads());
     }
 
-    if (AutoConstants.angularMaxAccelDegTN.hasChanged()
-        || AutoConstants.angularMaxVelDegTN.hasChanged()) {
+    if (TunableHelper.consumeChanged(
+        AutoConstants.angularMaxAccelDegTN, AutoConstants.angularMaxVelDegTN)) {
       turnPidController.setConstraints(
           new TrapezoidProfile.Constraints(
               AutoConstants.angularMaxVelRadPerSec(), AutoConstants.angularMaxAccelRadPerSecSq()));

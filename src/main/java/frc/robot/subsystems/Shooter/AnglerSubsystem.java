@@ -19,7 +19,8 @@ import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.hardware.bus.CANPort;
 
-import frc.lib.util.TunableNumber;
+import frc.lib.util.TunableHelper;
+import org.wpilib.tunable.TunableDouble;
 
 public class AnglerSubsystem extends SubsystemBase {
 
@@ -45,10 +46,10 @@ public class AnglerSubsystem extends SubsystemBase {
   private final SparkClosedLoopController m_closedLoopController;
 
   // Tunable PID for angler position control
-  private final TunableNumber m_anglerKp = new TunableNumber("Angler/kP", 0.4);
-  private final TunableNumber m_anglerKi = new TunableNumber("Angler/kI", 0.0);
-  private final TunableNumber m_anglerKd = new TunableNumber("Angler/kD", 0.0);
-  private final TunableNumber m_targetAngle = new TunableNumber("Angler/TargetAngleDeg", 20.0);
+  private final TunableDouble m_anglerKp = TunableHelper.addDouble("Angler/kP", 0.4);
+  private final TunableDouble m_anglerKi = TunableHelper.addDouble("Angler/kI", 0.0);
+  private final TunableDouble m_anglerKd = TunableHelper.addDouble("Angler/kD", 0.0);
+  private final TunableDouble m_targetAngle = TunableHelper.addDouble("Angler/TargetAngleDeg", 20.0);
 
   // Tolerance for determining if angler is at position (degrees)
   private static final double ANGLE_TOLERANCE_DEG = 2.0;
@@ -177,7 +178,7 @@ public class AnglerSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update PID if tunable numbers changed
-    if (m_anglerKp.hasChanged() || m_anglerKi.hasChanged() || m_anglerKd.hasChanged()) {
+    if (TunableHelper.consumeChanged(m_anglerKp, m_anglerKi, m_anglerKd)) {
       configureMotor();
     }
 
