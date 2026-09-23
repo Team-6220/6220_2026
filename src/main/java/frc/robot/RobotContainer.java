@@ -4,10 +4,11 @@
 
 package frc.robot;
 
+import org.wpilib.driverstation.DriverStation;
+
 // TODO: AUTO - PathPlanner doesn't support WPILib 2027 alpha 7 yet.
 // import com.pathplanner.lib.auto.AutoBuilder;
 
-import org.wpilib.driverstation.Gamepad;
 import org.wpilib.driverstation.GenericHID;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.telemetry.Telemetry;
@@ -63,7 +64,7 @@ public class RobotContainer {
 
   private final Joystick m_joystick = new Joystick(1);
 
-  private final GenericHID m_buttonBoard = new GenericHID(2);
+  private final GenericHID m_buttonBoard = DriverStation.getGenericHID(2);
 
   private final TelemetryTable m_shooterTelemetry = Telemetry.getTable("Shooter");
 
