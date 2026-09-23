@@ -4,8 +4,8 @@
 
 package frc.robot.commands;
 
-import org.wpilib.command2.Command;
 import frc.robot.subsystems.Intake.BeltSubsystem;
+import org.wpilib.command2.Command;
 
 /**
  * Runs the belt motor at a fixed speed for testing. Pass a positive speed to run forward, negative

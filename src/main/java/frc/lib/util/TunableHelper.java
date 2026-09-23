@@ -25,8 +25,8 @@ public final class TunableHelper {
   }
 
   /**
-   * Checks whether any of the given tunables have changed, and clears their changed flags.
-   * Tunable change flags are sticky until {@link TunableBase#resetChanged()} is called.
+   * Checks whether any of the given tunables have changed, and clears their changed flags. Tunable
+   * change flags are sticky until {@link TunableBase#resetChanged()} is called.
    *
    * @param tunables Tunables to check
    * @return True if any tunable changed since the last check, false otherwise

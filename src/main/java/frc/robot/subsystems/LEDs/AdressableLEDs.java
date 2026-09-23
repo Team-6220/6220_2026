@@ -6,20 +6,19 @@ package frc.robot.subsystems.LEDs;
 
 import static org.wpilib.units.Units.*;
 
-import org.wpilib.units.measure.Distance;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.SubsystemBase;
 import org.wpilib.hardware.led.AddressableLED;
 import org.wpilib.hardware.led.AddressableLED.ColorOrder;
 import org.wpilib.hardware.led.AddressableLEDBuffer;
 import org.wpilib.hardware.led.LEDPattern;
 import org.wpilib.system.RobotController;
+import org.wpilib.units.measure.Distance;
 import org.wpilib.util.Color;
-import org.wpilib.command2.Command;
-import org.wpilib.command2.SubsystemBase;
 
 public class AdressableLEDs extends SubsystemBase {
 
-  // Change kPort to what is necessary and make kLength the number of LEDs on the strip
-  private static final int kPort = 9;
+  private static final int kPort = 0;
   private static final int kLength = 120;
 
   // Byte order the LED strip expects. WS2812B strips are usually GRB. WPILib 2027 converts our
@@ -97,8 +96,7 @@ public class AdressableLEDs extends SubsystemBase {
     Color orange = new Color(255.0 / 255.0, 50.0 / 255.0, 0.0);
 
     LEDPattern gradient =
-        LEDPattern.gradient(
-            LEDPattern.GradientType.CONTINUOUS, yellow, teamGold, orange, teamGold);
+        LEDPattern.gradient(LEDPattern.GradientType.CONTINUOUS, yellow, teamGold, orange, teamGold);
 
     // Scroll from start to end at a nice visible speed
     return gradient.scrollAtAbsoluteVelocity(MetersPerSecond.of(-0.5), kLEDSpacing);

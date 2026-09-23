@@ -9,30 +9,30 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import frc.lib.util.TunableHelper;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.math.controller.ArmFeedforward;
 import org.wpilib.math.controller.ProfiledPIDController;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.system.Timer;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.telemetry.TelemetryTable;
-import org.wpilib.command2.SubsystemBase;
-import org.wpilib.hardware.bus.CANPort;
-
-import frc.lib.util.TunableHelper;
 import org.wpilib.tunable.TunableDouble;
 
 public class ArmSubsystem extends SubsystemBase {
 
   private static ArmSubsystem INSTANCE = null;
 
-  private final TelemetryTable m_armtelemetry =
-    Telemetry.getTable("Arm");
+  private final TelemetryTable m_armtelemetry = Telemetry.getTable("Arm");
 
   // Non-gain tunables (kept as TunableDouble)
-  private final TunableDouble ArmIZone = TunableHelper.addDouble("arm izone", ArmConstants.armIZone);
+  private final TunableDouble ArmIZone =
+      TunableHelper.addDouble("arm izone", ArmConstants.armIZone);
   private final TunableDouble ArmTolerance =
       TunableHelper.addDouble("arm tolerance", ArmConstants.armTolerance);
-  private final TunableDouble ArmMaxVel = TunableHelper.addDouble("arm max vel", ArmConstants.armMaxVel);
+  private final TunableDouble ArmMaxVel =
+      TunableHelper.addDouble("arm max vel", ArmConstants.armMaxVel);
   private final TunableDouble ArmMaxAccel =
       TunableHelper.addDouble("arm max accel", ArmConstants.armMaxAccel);
   private final TunableDouble ArmIdleVoltage =
@@ -126,8 +126,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     // If Ks, Kg, or Kv changed, rebuild feedforward
     if (TunableHelper.consumeChanged(ArmKs, ArmKg, ArmKv)) {
-      m_Feedforward =
-          new ArmFeedforward(ArmKs.get(), ArmKg.get(), ArmKv.get(), ArmConstants.armKa);
+      m_Feedforward = new ArmFeedforward(ArmKs.get(), ArmKg.get(), ArmKv.get(), ArmConstants.armKa);
       System.out.println(
           "[Arm] FF updated -> Ks:" + ArmKs.get() + " Kg:" + ArmKg.get() + " Kv:" + ArmKv.get());
     }

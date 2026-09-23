@@ -4,18 +4,18 @@
 
 package frc.robot.commands.Autos;
 
-import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.command2.InstantCommand;
-import org.wpilib.command2.PrintCommand;
-import org.wpilib.command2.RunCommand;
-import org.wpilib.command2.SequentialCommandGroup;
-import org.wpilib.command2.button.CommandXboxController;
 import frc.robot.commands.AlignAndMove;
 import frc.robot.commands.HashShootAuto;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Intake.BeltSubsystem;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
+import org.wpilib.command2.InstantCommand;
+import org.wpilib.command2.PrintCommand;
+import org.wpilib.command2.RunCommand;
+import org.wpilib.command2.SequentialCommandGroup;
+import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.math.geometry.Translation2d;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:

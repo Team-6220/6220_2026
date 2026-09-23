@@ -2,13 +2,13 @@ package frc.robot.commands;
 
 import static org.wpilib.units.Units.Degree;
 
-import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.command2.Command;
-import org.wpilib.command2.button.CommandXboxController;
 import frc.robot.IOConstants;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Vision.Cameras;
 import java.util.function.BooleanSupplier;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.math.geometry.Translation2d;
 
 /** Swerve drive command used for teleop period. */
 public class AlignAndMove extends Command {

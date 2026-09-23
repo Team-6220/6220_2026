@@ -4,18 +4,18 @@
 
 package frc.robot.subsystems.Drive;
 
+import frc.robot.Constants;
 import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.hardware.imu.OnboardIMU.MountOrientation;
 import org.wpilib.math.geometry.Rotation2d;
 
-import frc.robot.Constants;
-
 /** Add your docs here. */
 public class GyroIOSystemCore implements GyroIO {
-    private final OnboardIMU builtinIMU = new OnboardIMU(MountOrientation.FLAT);
-    @Override
-    public void updateInputs(GyroIOInputs inputs) {
-        Rotation2d raw = builtinIMU.getRotation2d();
+  private final OnboardIMU builtinIMU = new OnboardIMU(MountOrientation.FLAT);
+
+  @Override
+  public void updateInputs(GyroIOInputs inputs) {
+    Rotation2d raw = builtinIMU.getRotation2d();
 
     if (Constants.GYRO_UPSIDEDOWN) {
       // If the NavX is mounted upside-down on the robot, its reported yaw will be
@@ -29,5 +29,5 @@ public class GyroIOSystemCore implements GyroIO {
     } else {
       inputs.yawPosition = raw;
     }
-    }
+  }
 }

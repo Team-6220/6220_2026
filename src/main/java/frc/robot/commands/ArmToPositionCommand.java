@@ -4,8 +4,8 @@
 
 package frc.robot.commands;
 
-import org.wpilib.command2.Command;
 import frc.robot.subsystems.Intake.ArmSubsystem;
+import org.wpilib.command2.Command;
 
 /**
  * Moves the arm to a given encoder position and holds it there.

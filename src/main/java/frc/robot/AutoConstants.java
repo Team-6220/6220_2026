@@ -5,8 +5,6 @@ import static org.wpilib.units.Units.DegreesPerSecond;
 import static org.wpilib.units.Units.DegreesPerSecondPerSecond;
 import static org.wpilib.units.Units.MetersPerSecond;
 import static org.wpilib.units.Units.MetersPerSecondPerSecond;
-import static org.wpilib.units.Units.RadiansPerSecond;
-import static org.wpilib.units.Units.RadiansPerSecondPerSecond;
 
 // TODO: AUTO - PathPlanner doesn't support WPILib 2027 alpha 7 yet.
 // import com.pathplanner.lib.path.PathConstraints;

@@ -4,12 +4,12 @@
 
 package frc.robot.commands;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.button.CommandXboxController;
 import frc.robot.subsystems.Intake.BeltSubsystem;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.button.CommandXboxController;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class HashShoot extends Command {

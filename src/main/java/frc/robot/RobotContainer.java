@@ -88,7 +88,7 @@ public class RobotContainer {
 
     // TODO: Register named commands as needed for auto
     // NamedCommands.registerCommand("AutoClimber", new AutoClimberCommand(climberSubsystem));
-    
+
     autoChooser.addDefault("Do nothing", new InstantCommand());
     // NamedCommands.registerCommand(null, null);
     autoChooser.add(

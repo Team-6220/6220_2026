@@ -1,16 +1,12 @@
 package frc.robot.commands;
 
-import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.driverstation.MatchState;
-import org.wpilib.driverstation.RobotState;
-import org.wpilib.driverstation.Alliance;
-import org.wpilib.driverstation.MatchType;
-import org.wpilib.driverstation.DriverStationErrors;
-import org.wpilib.command2.Command;
-import org.wpilib.command2.button.CommandXboxController;
 import frc.robot.IOConstants;
 import frc.robot.subsystems.Drive.Swerve;
 import java.util.function.BooleanSupplier;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.math.geometry.Translation2d;
 
 /** Swerve drive command used for teleop period. */
 public class SwerveCom extends Command {

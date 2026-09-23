@@ -4,8 +4,8 @@
 
 package frc.robot.commands;
 
-import org.wpilib.command2.Command;
 import frc.robot.subsystems.Intake.RollerSubsystem;
+import org.wpilib.command2.Command;
 
 /**
  * Spins the roller motor in intake or outtake direction for testing.

@@ -2,14 +2,14 @@ package frc.robot.commands;
 
 import static org.wpilib.units.Units.Radians;
 
+import frc.robot.AutoConstants;
+import frc.robot.subsystems.Drive.Swerve;
+import org.wpilib.command2.Command;
 import org.wpilib.math.controller.ProfiledPIDController;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.trajectory.TrapezoidProfile;
-import org.wpilib.command2.Command;
-import frc.robot.AutoConstants;
-import frc.robot.subsystems.Drive.Swerve;
 
 /**
  * Drives the robot to a field pose in a straight line using PID on X, Y, and heading.
@@ -17,7 +17,8 @@ import frc.robot.subsystems.Drive.Swerve;
  * <p>Simple stand-in for PathPlanner's pathfindToPose while PathPlanner doesn't support WPILib 2027
  * alpha 7. X and Y each use a ProfiledPIDController so the robot accelerates and decelerates within
  * AutoConstants' translation limits. Heading uses Swerve's existing turn controller. Gains are read
- * from the AutoConstants tunables when the command starts, so dashboard edits apply on the next run.
+ * from the AutoConstants tunables when the command starts, so dashboard edits apply on the next
+ * run.
  */
 public class DriveToPose extends Command {
   /** How close (meters) X and Y must each be to the target to finish. */

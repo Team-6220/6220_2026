@@ -6,20 +6,20 @@ package frc.robot;
 
 // TODO: AUTO - PathPlanner doesn't support WPILib 2027 alpha 7 yet.
 // import com.pathplanner.lib.commands.PathfindingCommand;
-import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.system.DataLogManager;
-import org.wpilib.driverstation.MatchState;
-import org.wpilib.driverstation.RobotState;
+import java.util.ArrayList;
+import java.util.Optional;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.framework.TimedRobot;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.system.DataLogManager;
 import org.wpilib.system.Timer;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.telemetry.TelemetryTable;
-import org.wpilib.command2.Command;
-import org.wpilib.command2.CommandScheduler;
-import java.util.ArrayList;
-import java.util.Optional;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -35,8 +35,7 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
 
-  private final TelemetryTable m_matchTelemetry =
-    Telemetry.getTable("Match");
+  private final TelemetryTable m_matchTelemetry = Telemetry.getTable("Match");
 
   // Shift tracking for 2026 FRC game
   private double teleOpStartTime = 0.0;

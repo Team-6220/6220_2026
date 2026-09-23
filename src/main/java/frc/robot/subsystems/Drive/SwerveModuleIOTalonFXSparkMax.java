@@ -14,8 +14,6 @@ import static org.wpilib.units.Units.Rotations;
 import static org.wpilib.units.Units.RotationsPerSecond;
 import static org.wpilib.units.Units.Volts;
 
-import org.wpilib.hardware.bus.CANPort;
-
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -28,12 +26,13 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.units.measure.Voltage;
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.RevConfigs;
 import frc.robot.Robot;
+import org.wpilib.hardware.bus.CANPort;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.units.measure.Voltage;
 
 /** TalonFX Drive Motor, SparkMax Turn Motor */
 public class SwerveModuleIOTalonFXSparkMax implements SwerveModuleIO {
@@ -62,9 +61,9 @@ public class SwerveModuleIOTalonFXSparkMax implements SwerveModuleIO {
         .closedLoop
         .pid(SwerveConstants.ANGLE_KP, SwerveConstants.ANGLE_KI, SwerveConstants.ANGLE_KD)
         .positionWrappingEnabled(true);
-        //NOTE: use firmware instead?
-        // .positionWrappingMinInput(RevConfigs.CANCoderAngleToNeoEncoder(-0.5))
-        // .positionWrappingMaxInput(RevConfigs.CANCoderAngleToNeoEncoder(0.5))
+    // NOTE: use firmware instead?
+    // .positionWrappingMinInput(RevConfigs.CANCoderAngleToNeoEncoder(-0.5))
+    // .positionWrappingMaxInput(RevConfigs.CANCoderAngleToNeoEncoder(0.5))
     angleMotor.configure(
         angleMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -138,6 +137,7 @@ public class SwerveModuleIOTalonFXSparkMax implements SwerveModuleIO {
 
   @Override
   public void setAnglePosition(double setpoint) {
-    angleController.setSetpoint(setpoint, com.revrobotics.spark.SparkLowLevel.ControlType.kPosition);
+    angleController.setSetpoint(
+        setpoint, com.revrobotics.spark.SparkLowLevel.ControlType.kPosition);
   }
 }

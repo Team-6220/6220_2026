@@ -6,41 +6,35 @@ import static org.wpilib.units.Units.Radians;
 import com.limelightvision.Limelight;
 import com.limelightvision.PoseEstimate;
 import com.limelightvision.PoseEstimateType;
-import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.linalg.Vector;
+import frc.lib.util.RumbleManager;
+import frc.lib.util.TunableHelper;
+import frc.robot.AutoConstants;
+import frc.robot.Constants;
+import frc.robot.subsystems.Drive.GyroIO.GyroIOInputs;
+import frc.robot.subsystems.Vision.Cameras;
+import java.util.HashMap;
+import java.util.LinkedList;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.driverstation.XboxController;
+import org.wpilib.framework.RobotBase;
 import org.wpilib.math.controller.ProfiledPIDController;
 import org.wpilib.math.estimator.SwerveDrivePoseEstimator;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import org.wpilib.math.kinematics.SwerveModulePosition;
 import org.wpilib.math.kinematics.SwerveModuleVelocity;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.trajectory.TrapezoidProfile;
-import org.wpilib.units.measure.Angle;
-import org.wpilib.driverstation.MatchState;
-import org.wpilib.driverstation.RobotState;
-import org.wpilib.driverstation.Alliance;
-import org.wpilib.driverstation.MatchType;
-import org.wpilib.driverstation.DriverStationErrors;
-import org.wpilib.framework.RobotBase;
+import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.system.Timer;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.telemetry.TelemetryTable;
-import org.wpilib.driverstation.XboxController;
-import org.wpilib.smartdashboard.Field2d;
-import org.wpilib.command2.SubsystemBase;
-import frc.lib.util.RumbleManager;
-import frc.lib.util.TunableHelper;
-import frc.robot.AutoConstants;
-import frc.robot.Constants;
-import frc.robot.subsystems.Vision.Cameras;
-import frc.robot.subsystems.Drive.GyroIO.GyroIOInputs;
-import java.util.HashMap;
-import java.util.LinkedList;
+import org.wpilib.units.measure.Angle;
 
 public class Swerve extends SubsystemBase {
 
@@ -76,8 +70,7 @@ public class Swerve extends SubsystemBase {
   private HashMap<Double, Rotation2d> gyro_headings = new HashMap<Double, Rotation2d>();
   private LinkedList<Double> gyro_timestamps = new LinkedList<Double>();
 
-  private final TelemetryTable m_driveTelemetry =
-    Telemetry.getTable("Drive");
+  private final TelemetryTable m_driveTelemetry = Telemetry.getTable("Drive");
 
   public Field2d field2d = new Field2d();
   private final Field2d megatag2Pose = new Field2d();
@@ -203,10 +196,11 @@ public class Swerve extends SubsystemBase {
    */
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-    //Calculating how to drive the robot field relative in the robot's POV
-    ChassisVelocities velocities = new ChassisVelocities(translation.getX(), translation.getY(), rotation);
+    // Calculating how to drive the robot field relative in the robot's POV
+    ChassisVelocities velocities =
+        new ChassisVelocities(translation.getX(), translation.getY(), rotation);
     velocities = velocities.toRobotRelative(getHeading());
-    
+
     SwerveModuleVelocity[] SwerveModuleVelocities =
         SwerveConstants.kinematics()
             .toSwerveModuleVelocities(
@@ -216,7 +210,6 @@ public class Swerve extends SubsystemBase {
     SwerveModuleVelocities =
         SwerveDriveKinematics.desaturateWheelVelocities(
             SwerveModuleVelocities, SwerveConstants.maxSpeed());
-    
 
     // set all the modules
     for (SwerveModule mod : mSwerveMods) {
@@ -307,7 +300,8 @@ public class Swerve extends SubsystemBase {
 
   /** Get's the chassis speed of the robot in ROBOT RELATIVE SPEED */
   public ChassisVelocities getRobotRelativeSpeeds() {
-    ChassisVelocities chassisSpeeds = SwerveConstants.kinematics().toChassisVelocities(getModuleStates());
+    ChassisVelocities chassisSpeeds =
+        SwerveConstants.kinematics().toChassisVelocities(getModuleStates());
     return chassisSpeeds;
   }
 
@@ -572,21 +566,19 @@ public class Swerve extends SubsystemBase {
     m_driveTelemetry.log("where the bot think it is swerve x", getPose().getX());
     m_driveTelemetry.log("where the bot think it is swerve y", getPose().getY());
     m_driveTelemetry.log(
-            "where the bot think it is swerve degree", getPose().getRotation().getDegrees());
+        "where the bot think it is swerve degree", getPose().getRotation().getDegrees());
 
     for (SwerveModule mod : mSwerveMods) {
       m_driveTelemetry.log(
-              "Mod " + mod.getModuleNumber() + " CANcoder", mod.getCANcoder().getDegrees());
+          "Mod " + mod.getModuleNumber() + " CANcoder", mod.getCANcoder().getDegrees());
       m_driveTelemetry.log(
-              "Mod " + mod.getModuleNumber() + " Angle",
-              mod.getPosition().angle.getDegrees());
+          "Mod " + mod.getModuleNumber() + " Angle", mod.getPosition().angle.getDegrees());
       m_driveTelemetry.log(
-              "Mod " + mod.getModuleNumber() + " Velocity",
-              mod.getVelocities().velocity);
+          "Mod " + mod.getModuleNumber() + " Velocity", mod.getVelocities().velocity);
     }
     m_driveTelemetry.log("Real Heading", getHeading().getDegrees());
     m_driveTelemetry.log("Auto Turn Heading", autoTurnHeading);
     m_driveTelemetry.log("Turn Controller Setpoint", turnPidController.getSetpoint().position);
     m_driveTelemetry.log("is Red", Constants.isRed.equals("red"));
-      }
+  }
 }

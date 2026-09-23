@@ -9,12 +9,12 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 // TODO: AUTO - PathPlanner doesn't support WPILib 2027 alpha 7 yet.
 // import com.pathplanner.lib.config.ModuleConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import frc.lib.util.SwerveModuleConstants;
+import frc.robot.Constants;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import org.wpilib.math.system.DCMotor;
 import org.wpilib.units.measure.Distance;
-import frc.lib.util.SwerveModuleConstants;
-import frc.robot.Constants;
 
 /**
  * SwerveConstants contains robot-independnet swerve constants and also per-robot swerve
@@ -92,14 +92,11 @@ public final class SwerveConstants {
   // keeping the public names unchanged. This moves the original angle values
   // between the GEORGE_* variables (old FRONT_LEFT -> BACK_RIGHT, etc.).
   private static final SwerveModuleConstants GEORGE_BACK_RIGHT_MODULE =
-      new SwerveModuleConstants(
-          1, 2, 3, org.wpilib.math.geometry.Rotation2d.fromDegrees(-41.22));
+      new SwerveModuleConstants(1, 2, 3, org.wpilib.math.geometry.Rotation2d.fromDegrees(-41.22));
   private static final SwerveModuleConstants GEORGE_BACK_LEFT_MODULE =
-      new SwerveModuleConstants(
-          4, 5, 6, org.wpilib.math.geometry.Rotation2d.fromDegrees(12.563));
+      new SwerveModuleConstants(4, 5, 6, org.wpilib.math.geometry.Rotation2d.fromDegrees(12.563));
   private static final SwerveModuleConstants GEORGE_FRONT_RIGHT_MODULE =
-      new SwerveModuleConstants(
-          7, 8, 9, org.wpilib.math.geometry.Rotation2d.fromDegrees(-85.869));
+      new SwerveModuleConstants(7, 8, 9, org.wpilib.math.geometry.Rotation2d.fromDegrees(-85.869));
   private static final SwerveModuleConstants GEORGE_FRONT_LEFT_MODULE =
       new SwerveModuleConstants(
           10, 11, 12, org.wpilib.math.geometry.Rotation2d.fromDegrees(-59.386 - 90));

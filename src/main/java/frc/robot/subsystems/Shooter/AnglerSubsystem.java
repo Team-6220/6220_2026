@@ -13,19 +13,16 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import org.wpilib.math.util.MathUtil;
-import org.wpilib.telemetry.Telemetry;
-import org.wpilib.telemetry.TelemetryTable;
+import frc.lib.util.TunableHelper;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.hardware.bus.CANPort;
-
-import frc.lib.util.TunableHelper;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.tunable.TunableDouble;
 
 public class AnglerSubsystem extends SubsystemBase {
 
-  private final TelemetryTable m_anglerTelemetry =
-    Telemetry.getTable("Angler");
+  private final TelemetryTable m_anglerTelemetry = Telemetry.getTable("Angler");
 
   private static final int ANGLER_MOTOR_ID = 19;
   private static final int CURRENT_LIMIT = 30;
@@ -49,14 +46,15 @@ public class AnglerSubsystem extends SubsystemBase {
   private final TunableDouble m_anglerKp = TunableHelper.addDouble("Angler/kP", 0.4);
   private final TunableDouble m_anglerKi = TunableHelper.addDouble("Angler/kI", 0.0);
   private final TunableDouble m_anglerKd = TunableHelper.addDouble("Angler/kD", 0.0);
-  private final TunableDouble m_targetAngle = TunableHelper.addDouble("Angler/TargetAngleDeg", 20.0);
+  private final TunableDouble m_targetAngle =
+      TunableHelper.addDouble("Angler/TargetAngleDeg", 20.0);
 
   // Tolerance for determining if angler is at position (degrees)
   private static final double ANGLE_TOLERANCE_DEG = 2.0;
 
   public AnglerSubsystem() {
     CANPort shooterCANPort = CANPort.CAN_S2;
-    m_anglerMotor = new SparkMax(shooterCANPort,ANGLER_MOTOR_ID, MotorType.kBrushless);
+    m_anglerMotor = new SparkMax(shooterCANPort, ANGLER_MOTOR_ID, MotorType.kBrushless);
     configureMotor();
     m_encoder = m_anglerMotor.getEncoder();
     m_closedLoopController = m_anglerMotor.getClosedLoopController();
@@ -68,7 +66,7 @@ public class AnglerSubsystem extends SubsystemBase {
     config.inverted(true);
     // Configure encoder with gear ratio so position reads in degrees
     // config.encoder.positionConversionFactor(GEAR_RATIO).velocityConversionFactor(GEAR_RATIO);
-    
+
     // Use the primary (relative) encoder for closed loop
     config
         .closedLoop

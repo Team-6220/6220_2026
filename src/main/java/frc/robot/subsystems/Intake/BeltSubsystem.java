@@ -8,17 +8,16 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import org.wpilib.telemetry.Telemetry;
-import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.hardware.bus.CANPort;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
 
 public class BeltSubsystem extends SubsystemBase {
 
   private static BeltSubsystem INSTANCE = null;
 
-  private final TelemetryTable m_beltTelemetry =
-    Telemetry.getTable("Belt");
+  private final TelemetryTable m_beltTelemetry = Telemetry.getTable("Belt");
   private final String tableKey = "belt_";
 
   private final SparkMax beltMotor;

@@ -17,23 +17,21 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import org.wpilib.telemetry.Telemetry;
-import org.wpilib.telemetry.TelemetryTable;
+import com.limelightvision.LimelightResults;
+import frc.lib.util.TunableHelper;
+import frc.robot.subsystems.Vision.Cameras;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.sysid.SysIdRoutine;
 import org.wpilib.hardware.bus.CANPort;
-
-import frc.lib.util.TunableHelper;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.tunable.TunableDouble;
-import com.limelightvision.LimelightResults;
-import frc.robot.subsystems.Vision.Cameras;
 
 public class ShooterSubsystem extends SubsystemBase {
 
-  private final TelemetryTable m_shooterTelemetry =
-    Telemetry.getTable("Shooter");
+  private final TelemetryTable m_shooterTelemetry = Telemetry.getTable("Shooter");
   // Motor CAN IDs
   private static final int MOTOR_41_ID = 41;
   private static final int MOTOR_34_ID = 34;
@@ -79,7 +77,8 @@ public class ShooterSubsystem extends SubsystemBase {
       TunableHelper.addDouble("Shooter/BottomTargetRPM", ShooterConstants.bottomTESTrpm);
   // Tunable for the first-shot boost multiplier (do not reuse BottomTargetRPM key)
   private final TunableDouble m_firstShotBoostTN =
-      TunableHelper.addDouble("Shooter/FirstShotBoost", ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER);
+      TunableHelper.addDouble(
+          "Shooter/FirstShotBoost", ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER);
 
   // Tolerance for determining if shooter is at speed (in RPS)
   private static final double VELOCITY_TOLERANCE_RPS = 1.5;
@@ -537,30 +536,25 @@ public class ShooterSubsystem extends SubsystemBase {
 
     m_shooterTelemetry.log("Shooter/TopTargetRPM", m_topTargetRPMTN.get());
     m_shooterTelemetry.log("Shooter/BottomTargetRPM", m_bottomTargetRPMTN.get());
-    m_shooterTelemetry.log(
-        "Shooter/FirstShotBoost", ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER);
+    m_shooterTelemetry.log("Shooter/FirstShotBoost", ShooterConstants.FIRST_SHOT_BOOST_MULTIPLIER);
 
     m_shooterTelemetry.log("Shooter/isFirstShot", isFirstShot);
 
     // Voltage Telemetry
     m_shooterTelemetry.log(
         "Shooter/Motor41Voltage", m_motor41.getMotorVoltage().getValueAsDouble());
-    m_shooterTelemetry.log(
-        "Shooter/Motor1Voltage", m_motor34.getMotorVoltage().getValueAsDouble());
-    m_shooterTelemetry.log(
-        "Shooter/Motor9Voltage", m_motor9.getMotorVoltage().getValueAsDouble());
+    m_shooterTelemetry.log("Shooter/Motor1Voltage", m_motor34.getMotorVoltage().getValueAsDouble());
+    m_shooterTelemetry.log("Shooter/Motor9Voltage", m_motor9.getMotorVoltage().getValueAsDouble());
     m_shooterTelemetry.log(
         "Shooter/Motor31Voltage", m_motor31.getMotorVoltage().getValueAsDouble());
-    m_shooterTelemetry.log(
-        "Shooter/Motor2Voltage", m_motor35.getMotorVoltage().getValueAsDouble());
+    m_shooterTelemetry.log("Shooter/Motor2Voltage", m_motor35.getMotorVoltage().getValueAsDouble());
 
     // Current Telemetry
     m_shooterTelemetry.log(
         "Shooter/Motor41Current", m_motor41.getSupplyCurrent().getValueAsDouble());
     m_shooterTelemetry.log(
         "Shooter/Motor1Current", m_motor34.getSupplyCurrent().getValueAsDouble());
-    m_shooterTelemetry.log(
-        "Shooter/Motor9Current", m_motor9.getSupplyCurrent().getValueAsDouble());
+    m_shooterTelemetry.log("Shooter/Motor9Current", m_motor9.getSupplyCurrent().getValueAsDouble());
     m_shooterTelemetry.log(
         "Shooter/Motor31Current", m_motor31.getSupplyCurrent().getValueAsDouble());
     m_shooterTelemetry.log(

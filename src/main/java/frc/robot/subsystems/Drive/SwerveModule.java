@@ -4,18 +4,17 @@ import static org.wpilib.units.Units.Volts;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import frc.lib.math.Conversions;
+import frc.lib.util.SwerveModuleConstants;
+import frc.lib.util.TunableHelper;
+import frc.robot.RevConfigs;
+import frc.robot.subsystems.Drive.SwerveModuleIO.SwerveModuleIOInputs;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.geometry.Rotation2d;
 // import org.wpilib.math.kinematics.Kinematics;
 import org.wpilib.math.kinematics.SwerveModulePosition;
 import org.wpilib.math.kinematics.SwerveModuleVelocity;
-
-import frc.lib.math.Conversions;
-import frc.lib.util.SwerveModuleConstants;
-import frc.lib.util.TunableHelper;
 import org.wpilib.tunable.TunableDouble;
-import frc.robot.RevConfigs;
-import frc.robot.subsystems.Drive.SwerveModuleIO.SwerveModuleIOInputs;
 
 public class SwerveModule {
   private final int moduleNumber;

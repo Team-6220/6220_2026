@@ -4,12 +4,12 @@
 
 package frc.robot.commands;
 
-import org.wpilib.command2.ParallelCommandGroup;
-import org.wpilib.command2.button.CommandXboxController;
 import frc.robot.subsystems.Drive.Swerve;
 import frc.robot.subsystems.Intake.BeltSubsystem;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
+import org.wpilib.command2.ParallelCommandGroup;
+import org.wpilib.command2.button.CommandXboxController;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:

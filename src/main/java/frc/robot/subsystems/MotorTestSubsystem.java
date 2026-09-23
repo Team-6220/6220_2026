@@ -13,7 +13,8 @@
 
 // /**
 //  * A subsystem for testing motors one at a time. Each press of the Start button stops the current
-//  * motor and starts the next one in the list. One more press after the last motor stops everything.
+//  * motor and starts the next one in the list. One more press after the last motor stops
+// everything.
 //  *
 //  * <p>This is a temporary diagnostic tool — remove it before competition.
 //  */
@@ -66,7 +67,8 @@
 //   public MotorTestSubsystem() {}
 
 //   /**
-//    * Called once every ~20 ms. Pushes the active motor index to the dashboard so you can see which
+//    * Called once every ~20 ms. Pushes the active motor index to the dashboard so you can see
+// which
 //    * motor is running without staring at the robot.
 //    */
 //   @Override

@@ -4,9 +4,9 @@
 
 package frc.robot.commands;
 
-import org.wpilib.command2.Command;
 import frc.robot.subsystems.Intake.BeltSubsystem;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
+import org.wpilib.command2.Command;
 
 /**
  * Runs all shooter motors at the tunable target velocity while the command is active. Stops when

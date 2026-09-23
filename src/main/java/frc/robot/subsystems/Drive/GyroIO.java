@@ -4,8 +4,8 @@
 
 package frc.robot.subsystems.Drive;
 
-import org.wpilib.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
+import org.wpilib.math.geometry.Rotation2d;
 
 public interface GyroIO {
 
