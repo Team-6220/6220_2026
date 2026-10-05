@@ -5,16 +5,17 @@ import static org.wpilib.units.Units.DegreesPerSecond;
 import static org.wpilib.units.Units.DegreesPerSecondPerSecond;
 import static org.wpilib.units.Units.MetersPerSecond;
 import static org.wpilib.units.Units.MetersPerSecondPerSecond;
+import static org.wpilib.units.Units.RadiansPerSecond;
+import static org.wpilib.units.Units.RadiansPerSecondPerSecond;
 
-// TODO: AUTO - PathPlanner doesn't support WPILib 2027 alpha 7 yet.
-// import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathConstraints;
+import frc.lib.util.TunableHelper;
+import org.wpilib.tunable.TunableDouble;
 import org.wpilib.units.measure.Angle;
 import org.wpilib.units.measure.AngularAcceleration;
 import org.wpilib.units.measure.AngularVelocity;
 import org.wpilib.units.measure.LinearAcceleration;
 import org.wpilib.units.measure.LinearVelocity;
-import frc.lib.util.TunableHelper;
-import org.wpilib.tunable.TunableDouble;
 
 public final class AutoConstants {
   // FIXME: The below constants are used in the example auto, and must be
@@ -39,15 +40,14 @@ public final class AutoConstants {
 
   public static final Angle angularTolerance = Degrees.of(5);
 
-  // TODO: AUTO - PathPlanner path constraints, disabled until PathPlanner supports WPILib 2027
-  // alpha 7. The tunable limits below are still available to any other path follower.
-  // public static PathConstraints getPathConstraints() {
-  //   return new PathConstraints(
-  //       MetersPerSecond.of(translationMaxVelMpsTN.get()),
-  //       MetersPerSecondPerSecond.of(translationMaxAccelMpsSqTN.get()),
-  //       RadiansPerSecond.of(angularMaxVelRadPerSec()),
-  //       RadiansPerSecondPerSecond.of(angularMaxAccelRadPerSecSq()));
-  // }
+  /** PathPlanner path constraints built from the current tunable limits */
+  public static PathConstraints getPathConstraints() {
+    return new PathConstraints(
+        MetersPerSecond.of(translationMaxVelMpsTN.get()),
+        MetersPerSecondPerSecond.of(translationMaxAccelMpsSqTN.get()),
+        RadiansPerSecond.of(angularMaxVelRadPerSec()),
+        RadiansPerSecondPerSecond.of(angularMaxAccelRadPerSecSq()));
+  }
 
   // -----------------------------
   // TRANSLATION PID (raw doubles)
@@ -68,17 +68,20 @@ public final class AutoConstants {
   // ANGULAR PID (raw doubles)
   // -----------------------------
   /** angularKP Tunable Number */
-  public static final TunableDouble angularKPTN = TunableHelper.addDouble("auto/angular_kP", angular_kP);
+  public static final TunableDouble angularKPTN =
+      TunableHelper.addDouble("auto/angular_kP", angular_kP);
 
   /** angularKI Tunable Number */
-  public static final TunableDouble angularKITN = TunableHelper.addDouble("auto/angular_kI", angular_kI);
+  public static final TunableDouble angularKITN =
+      TunableHelper.addDouble("auto/angular_kI", angular_kI);
 
   /** angularKIzone Tunable Number */
   public static final TunableDouble angularKIzoneTN =
       TunableHelper.addDouble("auto/angular_kIzone", angular_kIzone);
 
   /** angularKD Tunable Number */
-  public static final TunableDouble angularKDTN = TunableHelper.addDouble("auto/angular_kD", angular_kD);
+  public static final TunableDouble angularKDTN =
+      TunableHelper.addDouble("auto/angular_kD", angular_kD);
 
   // -----------------------------
   // TRANSLATION CONSTRAINTS

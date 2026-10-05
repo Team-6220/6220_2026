@@ -4,8 +4,7 @@
 
 package frc.robot;
 
-// TODO: AUTO - PathPlanner doesn't support WPILib 2027 alpha 7 yet.
-// import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.wpilib.command2.Command;
@@ -66,8 +65,7 @@ public class Robot extends TimedRobot {
               "mjpg:http://10.62.20.11:5800/stream.mjpg",
               "mjpg:http://10.62.20.11:5800"
             });
-    // TODO: AUTO - re-enable PathPlanner pathfinding warmup once it supports WPILib 2027 alpha 7.
-    // PathfindingCommand.warmupCommand();
+    CommandScheduler.getInstance().schedule(PathfindingCommand.warmupCommand());
   }
 
   /**

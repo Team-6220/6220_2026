@@ -6,6 +6,11 @@ import static org.wpilib.units.Units.Radians;
 import com.limelightvision.Limelight;
 import com.limelightvision.PoseEstimate;
 import com.limelightvision.PoseEstimateType;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import frc.lib.util.RumbleManager;
 import frc.lib.util.TunableHelper;
 import frc.robot.AutoConstants;
@@ -15,6 +20,8 @@ import frc.robot.subsystems.Vision.Cameras;
 import java.util.HashMap;
 import java.util.LinkedList;
 import org.wpilib.command2.SubsystemBase;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchState;
 import org.wpilib.driverstation.XboxController;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.math.controller.ProfiledPIDController;
@@ -101,8 +108,7 @@ public class Swerve extends SubsystemBase {
 
   private final SwerveDrivePoseEstimator poseEstimator;
 
-  // TODO: AUTO - PathPlanner robot config, disabled until PathPlanner supports WPILib 2027 alpha 7.
-  // RobotConfig config;
+  private final RobotConfig config;
 
   /** initializes the swerve drive and sets up the variables and constants */
   public Swerve() {
@@ -163,26 +169,19 @@ public class Swerve extends SubsystemBase {
 
     turnPidController.enableContinuousInput(-(Math.PI), (Math.PI));
 
-    // TODO: AUTO - PathPlanner path logging + robot config, disabled until PathPlanner supports
-    // WPILib 2027 alpha 7.
-    // // Set up custom logging to add the current path to a field 2d widget
-    // PathPlannerLogging.setLogActivePathCallback(
-    //     (poses) -> field2d.getObject("path").setPoses(poses));
-    //
-    // // try{
-    // // config = RobotConfig.fromGUISettings();
-    // // } catch (Exception e) {
-    // config =
-    //     new RobotConfig(
-    //         Constants.robotMass,
-    //         Constants.robotMOI,
-    //         SwerveConstants.swerveModuleConfig(),
-    //         SwerveConstants.kinematics().getModules()); // see
-    // // https://pathplanner.dev/robot-config.html#bumper-config-options
-    // // for more details on what you need to set robotconfig up manuelly
-    // // Also https://pathplanner.dev/api/java/com/pathplanner/lib/config/RobotConfig.html for API
-    // // e.printStackTrace();
-    // // }
+    // Set up custom logging to add the current path to a field 2d widget
+    PathPlannerLogging.setLogActivePathCallback(
+        (poses) -> field2d.getObject("path").setPoses(poses));
+
+    // See https://pathplanner.dev/robot-config.html#bumper-config-options for setting RobotConfig
+    // up manually, and https://pathplanner.dev/api/java/com/pathplanner/lib/config/RobotConfig.html
+    // for the API. Module offsets must be in PathPlanner's FL, FR, BL, BR order.
+    config =
+        new RobotConfig(
+            Constants.robotMass,
+            Constants.robotMOI,
+            SwerveConstants.swerveModuleConfig(),
+            SwerveConstants.ppModuleOffsets());
     updateTelemetry();
   }
 
@@ -247,35 +246,32 @@ public class Swerve extends SubsystemBase {
     }
   }
 
-  // TODO: AUTO - PathPlanner AutoBuilder setup, disabled until PathPlanner supports WPILib 2027
-  // alpha 7. getPose/resetOdometry/getRobotRelativeSpeeds/driveRobotRelative are still here and
-  // can be reused by any other path follower.
-  // /** swerve auto init */
-  // public void configureAutoBuilder() {
-  //   AutoBuilder.configure(
-  //       this::getPose,
-  //       this::resetOdometry,
-  //       this::getRobotRelativeSpeeds,
-  //       (speeds, feedforwards) -> driveRobotRelative(speeds),
-  //       new PPHolonomicDriveController(
-  //           new PIDConstants(
-  //               AutoConstants.translationKPTN.get(),
-  //               AutoConstants.translationKITN.get(),
-  //               AutoConstants.translationKDTN.get()),
-  //           new PIDConstants(
-  //               AutoConstants.angularKPTN.get(),
-  //               AutoConstants.angularKITN.get(),
-  //               AutoConstants.angularKDTN.get())),
-  //       config,
-  //       () -> {
-  //         var alliance = MatchState.getAlliance();
-  //         if (alliance.isPresent()) {
-  //           return alliance.get() == Alliance.RED;
-  //         }
-  //         return false;
-  //       },
-  //       this);
-  // }
+  /** swerve auto init */
+  public void configureAutoBuilder() {
+    AutoBuilder.configure(
+        this::getPose,
+        this::resetOdometry,
+        this::getRobotRelativeSpeeds,
+        (speeds, feedforwards) -> driveRobotRelative(speeds),
+        new PPHolonomicDriveController(
+            new PIDConstants(
+                AutoConstants.translationKPTN.get(),
+                AutoConstants.translationKITN.get(),
+                AutoConstants.translationKDTN.get()),
+            new PIDConstants(
+                AutoConstants.angularKPTN.get(),
+                AutoConstants.angularKITN.get(),
+                AutoConstants.angularKDTN.get())),
+        config,
+        () -> {
+          var alliance = MatchState.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == Alliance.RED;
+          }
+          return false;
+        },
+        this);
+  }
 
   /**
    * @param robotRelativeSpeeds the speed in m/s

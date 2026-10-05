@@ -4,22 +4,6 @@
 
 package frc.robot;
 
-import org.wpilib.driverstation.DriverStation;
-
-// TODO: AUTO - PathPlanner doesn't support WPILib 2027 alpha 7 yet.
-// import com.pathplanner.lib.auto.AutoBuilder;
-
-import org.wpilib.driverstation.GenericHID;
-import org.wpilib.driverstation.Joystick;
-import org.wpilib.telemetry.Telemetry;
-import org.wpilib.telemetry.TelemetryTable;
-import org.wpilib.tunable.Selectable;
-import org.wpilib.tunable.Tunables;
-import org.wpilib.command2.Command;
-import org.wpilib.command2.Commands;
-import org.wpilib.command2.InstantCommand;
-import org.wpilib.command2.button.CommandXboxController;
-import org.wpilib.command2.button.Trigger;
 import frc.robot.commands.AlignAndFlywheels;
 import frc.robot.commands.ArmToPositionCommand;
 import frc.robot.commands.ArmUpAndDown;
@@ -39,6 +23,18 @@ import frc.robot.subsystems.LEDs.AdressableLEDs;
 import frc.robot.subsystems.Shooter.AnglerSubsystem;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
 import frc.robot.subsystems.Vision.Cameras;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
+import org.wpilib.command2.InstantCommand;
+import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.command2.button.Trigger;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.tunable.Tunables;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -75,8 +71,7 @@ public class RobotContainer {
     // Initialize climber subsystem based on robot mode
 
     // Configure the trigger bindings
-    // TODO: AUTO - re-enable once PathPlanner supports WPILib 2027 alpha 7.
-    // s_Swerve.configureAutoBuilder();
+    s_Swerve.configureAutoBuilder();
     s_Swerve.zeroHeading(m_driverController.getController());
 
     s_Swerve.setDefaultCommand(
@@ -105,11 +100,10 @@ public class RobotContainer {
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * org.wpilib.command2.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link org.wpilib.command2.button.CommandPS4Controller
-   * PS4} controllers or {@link org.wpilib.command2.button.CommandJoystick Flight
-   * joysticks}.
+   * predicate, or via the named factories in {@link org.wpilib.command2.button.CommandGenericHID}'s
+   * subclasses for {@link CommandXboxController Xbox}/{@link
+   * org.wpilib.command2.button.CommandPS4Controller PS4} controllers or {@link
+   * org.wpilib.command2.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
@@ -223,7 +217,9 @@ public class RobotContainer {
             .andThen(
                 Commands.runOnce(
                     () -> {
-                      m_driverController.getHID().setRumble(GenericHID.RumbleType.RIGHT_RUMBLE, 0.0);
+                      m_driverController
+                          .getHID()
+                          .setRumble(GenericHID.RumbleType.RIGHT_RUMBLE, 0.0);
                       m_driverController.getHID().setRumble(GenericHID.RumbleType.LEFT_RUMBLE, 0.0);
                     })));
   }
@@ -231,8 +227,7 @@ public class RobotContainer {
   /** Publish shooter booleans needed by Elastic dashboard widgets. */
   public void publishDriverDashboardBooleans() {
     boolean aligned =
-        Cameras.FRONT.hasTarget()
-            && Math.abs(Cameras.FRONT.getTXDegrees()) < ALIGN_TOLERANCE_DEG;
+        Cameras.FRONT.hasTarget() && Math.abs(Cameras.FRONT.getTXDegrees()) < ALIGN_TOLERANCE_DEG;
     double dist = m_shooter.getDist();
     boolean shortRange = dist > 0 && dist <= MAX_SHOOT_DISTANCE_M;
 

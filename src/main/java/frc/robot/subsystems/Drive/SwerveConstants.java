@@ -6,8 +6,7 @@ import static org.wpilib.units.Units.Meters;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-// TODO: AUTO - PathPlanner doesn't support WPILib 2027 alpha 7 yet.
-// import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.ModuleConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.Constants;
@@ -270,10 +269,18 @@ public final class SwerveConstants {
     return maxSpeed() / Math.hypot(tw / 2.0, wb / 2.0);
   }
 
-  // TODO: AUTO - PathPlanner module config (used by Swerve's RobotConfig), disabled until
-  // PathPlanner supports WPILib 2027 alpha 7.
-  // public static ModuleConfig swerveModuleConfig() {
-  //   return new ModuleConfig(
-  //       wheelRadius(), maxSpeed(), 1.0, DC_MOTOR, DRIVE_GEAR_RATIO, driveStatorCurrentLimit, 1);
-  // }
+  /** PathPlanner module config (used by Swerve's RobotConfig) */
+  public static ModuleConfig swerveModuleConfig() {
+    return new ModuleConfig(
+        wheelRadius(), maxSpeed(), 1.0, DC_MOTOR, DRIVE_GEAR_RATIO, driveStatorCurrentLimit, 1);
+  }
+
+  /**
+   * Module offsets in PathPlanner's required FL, FR, BL, BR order. KINEMATICS uses BR, BL, FR, FL
+   * (see above), so this reverses it. Don't pass KINEMATICS.getModules() to PathPlanner directly.
+   */
+  public static Translation2d[] ppModuleOffsets() {
+    Translation2d[] modules = KINEMATICS.getModules();
+    return new Translation2d[] {modules[3], modules[2], modules[1], modules[0]};
+  }
 }
