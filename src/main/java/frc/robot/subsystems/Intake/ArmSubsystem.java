@@ -90,7 +90,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public ArmSubsystem() {
-    CANPort armCANPort = CANPort.CAN_S1;
+    CANPort armCANPort = CANPort.CAN_S2;
     armMotor = new SparkMax(armCANPort, ArmConstants.armMotorID, MotorType.kBrushless);
     armMotorConfig.inverted(ArmConstants.armInvert);
     armMotorConfig.smartCurrentLimit(ArmConstants.stallLimit, ArmConstants.freeLimit);

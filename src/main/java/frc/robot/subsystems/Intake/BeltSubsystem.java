@@ -34,7 +34,7 @@ public class BeltSubsystem extends SubsystemBase {
   }
 
   public BeltSubsystem() {
-    CANPort beltCANPort = CANPort.CAN_S2;
+    CANPort beltCANPort = CANPort.CAN_S3;
     beltMotor = new SparkMax(beltCANPort, BeltConstants.beltID, MotorType.kBrushless);
     beltMotorConfig.inverted(BeltConstants.beltInvert);
     beltMotorConfig.smartCurrentLimit(BeltConstants.stallLimit, BeltConstants.freeLimit);

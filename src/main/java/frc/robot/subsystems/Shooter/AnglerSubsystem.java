@@ -53,7 +53,7 @@ public class AnglerSubsystem extends SubsystemBase {
   private static final double ANGLE_TOLERANCE_DEG = 2.0;
 
   public AnglerSubsystem() {
-    CANPort shooterCANPort = CANPort.CAN_S2;
+    CANPort shooterCANPort = CANPort.CAN_S1;
     m_anglerMotor = new SparkMax(shooterCANPort, ANGLER_MOTOR_ID, MotorType.kBrushless);
     configureMotor();
     m_encoder = m_anglerMotor.getEncoder();

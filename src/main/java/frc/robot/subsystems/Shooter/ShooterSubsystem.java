@@ -103,10 +103,10 @@ public class ShooterSubsystem extends SubsystemBase {
   private double peakRPM = 0.0;
 
   public ShooterSubsystem() {
-    CANPort shooterCANPort = CANPort.CAN_S2;
+    CANPort shooterCANPort = CANPort.CAN_S1;
     CANBus shooterCANBus = new CANBus(shooterCANPort);
-    m_motor41 = new TalonFX(MOTOR_41_ID, shooterCANBus);
-    m_motor34 = new TalonFX(MOTOR_34_ID, shooterCANBus);
+    m_motor41 = new TalonFX(MOTOR_41_ID, new CANBus(CANPort.CAN_S3));
+    m_motor34 = new TalonFX(MOTOR_34_ID, new CANBus(CANPort.CAN_S3));
     m_motor9 = new TalonFX(MOTOR_9_ID, shooterCANBus);
     m_motor31 = new TalonFX(MOTOR_31_ID, shooterCANBus);
     m_motor35 = new TalonFX(MOTOR_35_ID, shooterCANBus);
