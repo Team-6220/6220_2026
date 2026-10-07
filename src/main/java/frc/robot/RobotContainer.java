@@ -107,18 +107,18 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    Trigger angleUp = new Trigger(() -> m_buttonBoard.getRawButton(15));
-    Trigger angleDown = new Trigger(() -> m_buttonBoard.getRawButton(16));
-    Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(2));
-    Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(1));
+    Trigger angleUp = new Trigger(() -> m_buttonBoard.getRawButton(14));
+    Trigger angleDown = new Trigger(() -> m_buttonBoard.getRawButton(15));
+    Trigger intakeOut = new Trigger(() -> m_buttonBoard.getRawButton(1));
+    Trigger intakeIn = new Trigger(() -> m_buttonBoard.getRawButton(0));
     Trigger passMid = m_driverController.rightBumper();
     Trigger passFar = m_driverController.b();
-    Trigger resetEncoder = new Trigger(() -> m_buttonBoard.getRawButton(13));
-    Trigger manualArm = new Trigger(() -> m_joystick.getRawButton(1));
-    Trigger armUpAndDown = new Trigger(() -> m_buttonBoard.getRawButton(3));
-    Trigger arm0 = new Trigger(() -> m_buttonBoard.getRawButton(5));
-    Trigger arm90 = new Trigger(() -> m_buttonBoard.getRawButton(6));
-    Trigger armReset = new Trigger(() -> m_buttonBoard.getRawButton(14));
+    Trigger resetEncoder = new Trigger(() -> m_buttonBoard.getRawButton(12));
+    Trigger manualArm = new Trigger(() -> m_joystick.getRawButton(0));
+    Trigger armUpAndDown = new Trigger(() -> m_buttonBoard.getRawButton(2));
+    Trigger arm0 = new Trigger(() -> m_buttonBoard.getRawButton(4));
+    Trigger arm90 = new Trigger(() -> m_buttonBoard.getRawButton(5));
+    Trigger armReset = new Trigger(() -> m_buttonBoard.getRawButton(13));
 
     resetEncoder.onTrue(Commands.runOnce(() -> m_angler.resetEncoder()));
     armReset.onTrue(Commands.runOnce(() -> arm.resetEncoder()));
