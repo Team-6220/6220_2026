@@ -1,0 +1,584 @@
+package frc.robot.subsystems.Drive;
+
+import static org.wpilib.units.Units.Degrees;
+import static org.wpilib.units.Units.Radians;
+
+import com.limelightvision.Limelight;
+import com.limelightvision.PoseEstimate;
+import com.limelightvision.PoseEstimateType;
+import frc.lib.util.RumbleManager;
+import frc.lib.util.TunableHelper;
+import frc.robot.AutoConstants;
+import frc.robot.Constants;
+import frc.robot.subsystems.Drive.GyroIO.GyroIOInputs;
+import frc.robot.subsystems.Vision.Cameras;
+import java.util.HashMap;
+import java.util.LinkedList;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.driverstation.XboxController;
+import org.wpilib.framework.RobotBase;
+import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.estimator.SwerveDrivePoseEstimator;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.linalg.Vector;
+import org.wpilib.math.numbers.N3;
+import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.smartdashboard.Field2d;
+import org.wpilib.system.Timer;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.units.measure.Angle;
+
+public class Swerve extends SubsystemBase {
+
+  // Kalman Filter Configuration. These can be "tuned-to-taste" based on how much
+  // you trust your various sensors. Smaller numbers will cause the filter to
+  // "trust" the estimate from that particular component more than the others.
+  // This in turn means the particualr component will have a stronger influence
+  // on the final pose estimate.
+
+  /**
+   * Standard deviations of model states. Increase these numbers to trust your model's state
+   * estimates less. This matrix is in the form [x, y, theta]ᵀ, with units in meters and radians,
+   * then meters.
+   */
+  private static final Vector<N3> stateStdDevs = VecBuilder.fill(0.05, 0.05, 0.05);
+
+  /**
+   * Standard deviations of the vision measurements. Increase these numbers to trust global
+   * measurements from vision less. This matrix is in the form [x, y, theta]ᵀ, with units in meters
+   * and radians.
+   */
+  private static final Vector<N3> visionMeasurementStdDevs =
+      VecBuilder.fill(0.7, 0.7, Double.MAX_VALUE);
+
+  public SwerveModule[] mSwerveMods = new SwerveModule[4]; // BR, BL, FR, FL
+  private final GyroIO gyro;
+  private final GyroIOInputs gyroInputs = new GyroIOInputs();
+  private boolean isAutoTurning;
+
+  /** PID controller using rad */
+  private ProfiledPIDController turnPidController;
+
+  private HashMap<Double, Rotation2d> gyro_headings = new HashMap<Double, Rotation2d>();
+  private LinkedList<Double> gyro_timestamps = new LinkedList<Double>();
+
+  private final TelemetryTable m_driveTelemetry = Telemetry.getTable("Drive");
+
+  public Field2d field2d = new Field2d();
+  private final Field2d megatag2Pose = new Field2d();
+
+  private double lastTurnUpdate;
+  private double autoTurnHeading;
+
+  // Tracked to derive yaw rate for MegaTag2's SetRobotOrientation call, since the navX's raw
+  // getRate() sign convention isn't guaranteed to match the already-verified getGyroYaw().
+  private Rotation2d lastYawForRate = new Rotation2d();
+  private double lastYawRateTimestamp = Timer.getTimestamp();
+
+  private final int swerveAlignUpdateSecond = 20;
+
+  private boolean autoIsOverShoot = false, isAuto = false;
+
+  // private double targetX;
+  // private double targetY;
+  // private double targetYaw;
+  // private double targetPitch;
+
+  private SwerveModulePosition[] positions = {
+    new SwerveModulePosition(),
+    new SwerveModulePosition(),
+    new SwerveModulePosition(),
+    new SwerveModulePosition()
+  };
+
+  private final SwerveDrivePoseEstimator poseEstimator;
+
+  // TODO: AUTO - PathPlanner robot config, disabled until PathPlanner supports WPILib 2027 alpha 7.
+  // RobotConfig config;
+
+  /** initializes the swerve drive and sets up the variables and constants */
+  public Swerve() {
+    gyro = RobotBase.isSimulation() ? new GyroIOSim() : new GyroIOSystemCore();
+
+    mSwerveMods =
+        new SwerveModule[] {
+          new SwerveModule(
+              0,
+              SwerveConstants.BACK_RIGHT_MODULE,
+              // RobotBase.isSimulation()
+              // ? new SwerveModuleIOSim()
+              // :
+              new SwerveModuleIOTalonFXSparkMax(SwerveConstants.BACK_RIGHT_MODULE)),
+          new SwerveModule(
+              1,
+              SwerveConstants.BACK_LEFT_MODULE,
+              // RobotBase.isSimulation()
+              // ? new SwerveModuleIOSim()
+              // :
+              new SwerveModuleIOTalonFXSparkMax(SwerveConstants.BACK_LEFT_MODULE)),
+          new SwerveModule(
+              2,
+              SwerveConstants.FRONT_RIGHT_MODULE,
+              // RobotBase.isSimulation()
+              // ? new SwerveModuleIOSim()
+              // :
+              new SwerveModuleIOTalonFXSparkMax(SwerveConstants.FRONT_RIGHT_MODULE)),
+          new SwerveModule(
+              3,
+              SwerveConstants.FRONT_LEFT_MODULE,
+              // RobotBase.isSimulation()
+              // ? new SwerveModuleIOSim()
+              // :
+              new SwerveModuleIOTalonFXSparkMax(SwerveConstants.FRONT_LEFT_MODULE))
+        };
+
+    poseEstimator =
+        new SwerveDrivePoseEstimator(
+            SwerveConstants.kinematics(),
+            new Rotation2d(),
+            positions,
+            new Pose2d(),
+            stateStdDevs,
+            visionMeasurementStdDevs);
+
+    turnPidController =
+        new ProfiledPIDController(
+            AutoConstants.angularKPTN.get(),
+            AutoConstants.angularKITN.get(),
+            AutoConstants.angularKDTN.get(),
+            new TrapezoidProfile.Constraints(
+                AutoConstants.angularMaxVelRadPerSec(),
+                AutoConstants.angularMaxAccelRadPerSecSq()));
+
+    turnPidController.setIZone(AutoConstants.angularKIzoneTN.get());
+    turnPidController.setTolerance(AutoConstants.angularToleranceRad());
+
+    turnPidController.enableContinuousInput(-(Math.PI), (Math.PI));
+
+    // TODO: AUTO - PathPlanner path logging + robot config, disabled until PathPlanner supports
+    // WPILib 2027 alpha 7.
+    // // Set up custom logging to add the current path to a field 2d widget
+    // PathPlannerLogging.setLogActivePathCallback(
+    //     (poses) -> field2d.getObject("path").setPoses(poses));
+    //
+    // // try{
+    // // config = RobotConfig.fromGUISettings();
+    // // } catch (Exception e) {
+    // config =
+    //     new RobotConfig(
+    //         Constants.robotMass,
+    //         Constants.robotMOI,
+    //         SwerveConstants.swerveModuleConfig(),
+    //         SwerveConstants.kinematics().getModules()); // see
+    // // https://pathplanner.dev/robot-config.html#bumper-config-options
+    // // for more details on what you need to set robotconfig up manuelly
+    // // Also https://pathplanner.dev/api/java/com/pathplanner/lib/config/RobotConfig.html for API
+    // // e.printStackTrace();
+    // // }
+    updateTelemetry();
+  }
+
+  /**
+   * @param translation the 2d position on where the robot is
+   * @param rotation the rotation of the robot
+   * @param fieldRelative is the robot driving using the field's directions or the robot's
+   *     directions?
+   * @param isOpenLoop open loop: takes input directly from controller without feedback from the
+   *     output, close loop vice versa
+   */
+  public void drive(
+      Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+    // Calculating how to drive the robot field relative in the robot's POV
+    ChassisVelocities velocities =
+        new ChassisVelocities(translation.getX(), translation.getY(), rotation);
+    velocities = velocities.toRobotRelative(getHeading());
+
+    SwerveModuleVelocity[] SwerveModuleVelocities =
+        SwerveConstants.kinematics()
+            .toSwerveModuleVelocities(
+                fieldRelative
+                    ? velocities
+                    : new ChassisVelocities(translation.getX(), translation.getY(), rotation));
+    SwerveModuleVelocities =
+        SwerveDriveKinematics.desaturateWheelVelocities(
+            SwerveModuleVelocities, SwerveConstants.maxSpeed());
+
+    // set all the modules
+    for (SwerveModule mod : mSwerveMods) {
+      m_driveTelemetry.log(
+          "Mod " + mod.getModuleNumber() + " Swerve Module State",
+          SwerveModuleVelocities[mod.getModuleNumber()].toString());
+      m_driveTelemetry.log(
+          "Mod " + mod.getModuleNumber() + " Swerve Module State",
+          SwerveModuleVelocities[mod.getModuleNumber()].toString());
+      mod.setDesiredVelocities(SwerveModuleVelocities[mod.getModuleNumber()], isOpenLoop);
+    }
+  }
+
+  /** passes stop driving to all modules */
+  public void stopDriving() {
+    for (SwerveModule mod : mSwerveMods) {
+      mod.stopDriving();
+    }
+  }
+
+  /**
+   * Locks the swerve wheels in an "X" position to resist being pushed. Each module is angled
+   * diagonally (45°/-45° alternating) with zero drive speed, preventing lateral movement.
+   */
+  public void lockWheels() {
+    // Module order: 0=BR, 1=BL, 2=FR, 3=FL
+    SwerveModuleVelocity[] xStates = {
+      new SwerveModuleVelocity(0, Rotation2d.fromDegrees(45)), // BR
+      new SwerveModuleVelocity(0, Rotation2d.fromDegrees(-45)), // BL
+      new SwerveModuleVelocity(0, Rotation2d.fromDegrees(-45)), // FR
+      new SwerveModuleVelocity(0, Rotation2d.fromDegrees(45)), // FL
+    };
+    for (SwerveModule mod : mSwerveMods) {
+      mod.setDesiredVelocities(xStates[mod.getModuleNumber()], true);
+    }
+  }
+
+  // TODO: AUTO - PathPlanner AutoBuilder setup, disabled until PathPlanner supports WPILib 2027
+  // alpha 7. getPose/resetOdometry/getRobotRelativeSpeeds/driveRobotRelative are still here and
+  // can be reused by any other path follower.
+  // /** swerve auto init */
+  // public void configureAutoBuilder() {
+  //   AutoBuilder.configure(
+  //       this::getPose,
+  //       this::resetOdometry,
+  //       this::getRobotRelativeSpeeds,
+  //       (speeds, feedforwards) -> driveRobotRelative(speeds),
+  //       new PPHolonomicDriveController(
+  //           new PIDConstants(
+  //               AutoConstants.translationKPTN.get(),
+  //               AutoConstants.translationKITN.get(),
+  //               AutoConstants.translationKDTN.get()),
+  //           new PIDConstants(
+  //               AutoConstants.angularKPTN.get(),
+  //               AutoConstants.angularKITN.get(),
+  //               AutoConstants.angularKDTN.get())),
+  //       config,
+  //       () -> {
+  //         var alliance = MatchState.getAlliance();
+  //         if (alliance.isPresent()) {
+  //           return alliance.get() == Alliance.RED;
+  //         }
+  //         return false;
+  //       },
+  //       this);
+  // }
+
+  /**
+   * @param robotRelativeSpeeds the speed in m/s
+   */
+  public void driveRobotRelative(ChassisVelocities robotRelativeSpeeds) {
+    System.out.println("relative");
+    ChassisVelocities targetSpeeds = robotRelativeSpeeds.discretize(0.02);
+    SwerveModuleVelocity[] targetStates =
+        SwerveConstants.kinematics().toSwerveModuleVelocities(targetSpeeds);
+    setModuleStates(targetStates);
+  }
+
+  /** Resets the odometer value */
+  public void resetOdometry(Pose2d pose2d) {
+    System.out.println("Reset Odometry: " + pose2d.getX() + ", " + pose2d.getY());
+    this.positions[0] = new SwerveModulePosition();
+    this.positions[1] = new SwerveModulePosition();
+    this.positions[2] = new SwerveModulePosition();
+    this.positions[3] = new SwerveModulePosition();
+    poseEstimator.resetPosition(getGyroYaw(), positions, pose2d);
+  }
+
+  /** Get's the chassis speed of the robot in ROBOT RELATIVE SPEED */
+  public ChassisVelocities getRobotRelativeSpeeds() {
+    ChassisVelocities chassisSpeeds =
+        SwerveConstants.kinematics().toChassisVelocities(getModuleStates());
+    return chassisSpeeds;
+  }
+
+  /* Used by SwerveControllerCommand in Auto */
+  public void setModuleStates(SwerveModuleVelocity[] desiredStates) {
+    desiredStates =
+        SwerveDriveKinematics.desaturateWheelVelocities(desiredStates, SwerveConstants.maxSpeed());
+
+    for (SwerveModule mod : mSwerveMods) {
+      mod.setDesiredVelocities(desiredStates[mod.getModuleNumber()], false);
+    }
+  }
+
+  /**
+   * @return list of the states of the modules
+   */
+  public SwerveModuleVelocity[] getModuleStates() {
+    SwerveModuleVelocity[] states = new SwerveModuleVelocity[4];
+    for (SwerveModule mod : mSwerveMods) {
+      states[mod.getModuleNumber()] = mod.getVelocities();
+    }
+    return states;
+  }
+
+  /**
+   * @return positions of the modules
+   */
+  public SwerveModulePosition[] getModulePositions() {
+    SwerveModulePosition[] positions = new SwerveModulePosition[4];
+    for (SwerveModule mod : mSwerveMods) {
+      positions[mod.getModuleNumber()] = mod.getPosition();
+    }
+    return positions;
+  }
+
+  public Pose2d getPose() {
+
+    return poseEstimator.getEstimatedPosition();
+  }
+
+  public void addVisionMeasurement(Pose2d visionPose, double timestamp) {
+    poseEstimator.addVisionMeasurement(visionPose, timestamp);
+  }
+
+  public void setPose(Pose2d pose) {
+    poseEstimator.resetPosition(getGyroYaw(), getModulePositions(), pose);
+  }
+
+  public Rotation2d getHeading() {
+    return getPose().getRotation();
+  }
+
+  public double getHeadingDegrees() {
+    return getPose().getRotation().getDegrees();
+  }
+
+  public double getHeadingRads() {
+    return getPose().getRotation().getRadians();
+  }
+
+  public void setHeading(Rotation2d heading) {
+    poseEstimator.resetPosition(
+        getGyroYaw(), getModulePositions(), new Pose2d(getPose().getTranslation(), heading));
+  }
+
+  public void zeroHeading() {
+    double offset = Constants.isRed.equals("red") ? 0 : Math.PI;
+    poseEstimator.resetPosition(
+        getGyroYaw(),
+        getModulePositions(),
+        new Pose2d(getPose().getTranslation(), new Rotation2d(offset)));
+  }
+
+  public void zeroHeading(XboxController driverController) {
+    zeroHeading();
+    RumbleManager.rumble(driverController, .2);
+  }
+
+  public Rotation2d getGyroYaw() {
+    return gyroInputs.yawPosition;
+  }
+
+  public boolean isAutoTurning() {
+    return isAutoTurning;
+  }
+
+  /**
+   * @return is it facing toward the target
+   */
+  public boolean isFacingTurnTarget() {
+    return turnPidController.atGoal();
+  }
+
+  public void setIsAutoTurning(boolean state) {
+    isAutoTurning = state;
+  }
+
+  public void setAutoTurnHeading(Angle heading) {
+    // autoTurnHeading = heading;
+    autoTurnHeading = wrapAngleForTurningPID(heading.in(Degrees));
+    resetTurnController();
+    turnPidController.setGoal(Radians.convertFrom(autoTurnHeading, Degrees));
+  }
+
+  public static double wrapAngleForTurningPID(double angle) {
+    angle = angle % 360; // Ensure angle is within 0-360 range
+    if (angle > 180) {
+      angle -= 360; // Convert angles greater than 180 to negative
+    } else if (angle < -180) {
+      angle += 360; // Convert angles less than -180 to positive
+    }
+    return angle;
+  }
+
+  public void resetModulesToAbsolute() {
+    for (SwerveModule mod : mSwerveMods) {
+      mod.resetToAbsolute();
+    }
+  }
+
+  public void resetTurnController() {
+    turnPidController.reset(getHeading().getRadians());
+  }
+
+  public void setTurnControllerGoal(Angle goal) {
+    turnPidController.setGoal(goal.in(Radians));
+  }
+
+  /**
+   * @return gets the angular velocity of turning
+   */
+  public double getTurnPidSpeed() {
+
+    double speed = turnPidController.calculate(getHeadingRads());
+
+    if (speed > SwerveConstants.maxAngularVelocity()) {
+      speed = SwerveConstants.maxAngularVelocity();
+    }
+    if (speed < -SwerveConstants.maxAngularVelocity()) {
+      speed = -SwerveConstants.maxAngularVelocity();
+    }
+    return speed;
+  }
+
+  /**
+   * @param timestamp the time
+   * @return the heading
+   */
+  public double getHeadingByTimestamp(double timestamp) {
+    double timea = 0, timeb = 0;
+    if (timestamp > gyro_timestamps.getFirst()) {
+      timea = gyro_timestamps.getFirst();
+    } else if (timestamp < gyro_timestamps.getLast()) {
+      timea = gyro_timestamps.getLast();
+    } else {
+      for (int i = 0; i < gyro_timestamps.size(); i++) {
+        if (gyro_timestamps.get(i) == timestamp) {
+
+        } else if (gyro_timestamps.get(i) < timestamp) {
+          timea = gyro_timestamps.get(i - 1);
+          timeb = gyro_timestamps.get(i);
+          break;
+        }
+      }
+    }
+    if (timeb == 0) {
+      return gyro_headings.get(timea).getDegrees();
+    }
+    return ((timestamp - timea)
+            / (timeb - timea)
+            * (gyro_headings.get(timeb).getDegrees() - gyro_headings.get(timea).getDegrees()))
+        + gyro_headings.get(timea).getDegrees();
+  }
+
+  public void setIsAuto(boolean isAuto) {
+    this.isAuto = isAuto;
+    if (!isAuto) {
+      autoIsOverShoot = false;
+    }
+  }
+
+  public boolean getIsAuto() {
+    return isAuto;
+  }
+
+  public boolean getIsAutoOverShoot() {
+    return autoIsOverShoot;
+  }
+
+  public boolean getPidAtGoalYaw() {
+    return turnPidController.atGoal();
+  }
+
+  @Override
+  public void periodic() {
+    updateTelemetry();
+    gyro.updateInputs(gyroInputs);
+    boolean driveFFChanged =
+        TunableHelper.consumeChanged(
+            SwerveModule.driveKSTN, SwerveModule.driveKVTN, SwerveModule.driveKATN);
+    for (SwerveModule mod : mSwerveMods) {
+      if (driveFFChanged) mod.updateDriveFeedForward();
+      mod.periodic();
+    }
+    Double timestamp = Timer.getTimestamp();
+
+    if (timestamp - swerveAlignUpdateSecond >= lastTurnUpdate) {
+      lastTurnUpdate = timestamp;
+      resetModulesToAbsolute();
+      // System.out.println("update!");
+    }
+
+    poseEstimator.update(getGyroYaw(), getModulePositions());
+
+    // vision stuff begin
+    // MegaTag2 needs the field-space heading, so use the pose estimator's heading (not raw gyro)
+    double robotYaw = getHeading().getDegrees();
+
+    double yawRateDegPerSec = 0.0;
+    double rateDt = timestamp - lastYawRateTimestamp;
+    if (rateDt > 0) {
+      yawRateDegPerSec = getGyroYaw().minus(lastYawForRate).getDegrees() / rateDt;
+    }
+    lastYawForRate = getGyroYaw();
+    lastYawRateTimestamp = timestamp;
+
+    // Publish yaw before reading the queue. Shared orientation feeds every MegaTag2 camera.
+    Limelight.setSharedRobotOrientation(robotYaw, yawRateDegPerSec, 0.0, 0.0, 0.0, 0.0);
+
+    // Drain every queued estimate that passed the camera's PoseEstimateConfig filters
+    // (see Cameras.MT2_CONFIG). Each estimate carries its own distance/tag-count scaled std devs.
+    for (PoseEstimate estimate :
+        Cameras.FRONT.readAcceptedPoseEstimates(PoseEstimateType.MT2_WPIBLUE)) {
+      poseEstimator.addVisionMeasurement(
+          estimate.pose, estimate.timestampSeconds, estimate.stdDevs);
+      megatag2Pose.setRobotPose(estimate.pose);
+    }
+    // vision stuff ends
+
+    if (TunableHelper.consumeChanged(
+        AutoConstants.angularKPTN, AutoConstants.angularKITN, AutoConstants.angularKDTN)) {
+      turnPidController.setPID(
+          AutoConstants.angularKPTN.get(),
+          AutoConstants.angularKITN.get(),
+          AutoConstants.angularKDTN.get());
+      turnPidController.reset(getHeadingRads());
+    }
+
+    if (TunableHelper.consumeChanged(
+        AutoConstants.angularMaxAccelDegTN, AutoConstants.angularMaxVelDegTN)) {
+      turnPidController.setConstraints(
+          new TrapezoidProfile.Constraints(
+              AutoConstants.angularMaxVelRadPerSec(), AutoConstants.angularMaxAccelRadPerSecSq()));
+      turnPidController.reset(getHeadingRads());
+    }
+  }
+
+  private void updateTelemetry() {
+    field2d.setRobotPose(getPose());
+    m_driveTelemetry.log("Field 2d", field2d);
+    m_driveTelemetry.log("megatag2", megatag2Pose);
+    m_driveTelemetry.log("where the bot think it is swerve x", getPose().getX());
+    m_driveTelemetry.log("where the bot think it is swerve y", getPose().getY());
+    m_driveTelemetry.log(
+        "where the bot think it is swerve degree", getPose().getRotation().getDegrees());
+
+    for (SwerveModule mod : mSwerveMods) {
+      m_driveTelemetry.log(
+          "Mod " + mod.getModuleNumber() + " CANcoder", mod.getCANcoder().getDegrees());
+      m_driveTelemetry.log(
+          "Mod " + mod.getModuleNumber() + " Angle", mod.getPosition().angle.getDegrees());
+      m_driveTelemetry.log(
+          "Mod " + mod.getModuleNumber() + " Velocity", mod.getVelocities().velocity);
+    }
+    m_driveTelemetry.log("Real Heading", getHeading().getDegrees());
+    m_driveTelemetry.log("Auto Turn Heading", autoTurnHeading);
+    m_driveTelemetry.log("Turn Controller Setpoint", turnPidController.getSetpoint().position);
+    m_driveTelemetry.log("is Red", Constants.isRed.equals("red"));
+  }
+}

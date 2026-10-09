@@ -1,0 +1,380 @@
+{
+  "version": 1.0,
+  "grid_size": 128,
+  "tabs": [
+    {
+      "name": "Match",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Shooter Distance",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 768.0,
+            "height": 384.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/ForwardDistance",
+              "period": 0.06,
+              "data_type": "double"
+            }
+          },
+          {
+            "title": "Shooter Flywheel RPM",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/Motor41RPM",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Driver Camera",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 640.0,
+            "height": 512.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/limelight-driver",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "Flywheel RPM Target",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/TopTargetRPM",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Hood Angle",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Angler/CurrentAngleDeg",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Shift Countdown",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 512.0,
+            "height": 256.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/SmartDashboard/Match/ShiftCountdown",
+              "period": 0.06,
+              "data_type": "double",
+              "time_display_mode": "Seconds Only",
+              "red_start_time": 5,
+              "yellow_start_time": 15
+            }
+          },
+          {
+            "title": "Current Shift",
+            "x": 512.0,
+            "y": 384.0,
+            "width": 512.0,
+            "height": 256.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Match/ShiftName",
+              "period": 0.06,
+              "data_type": "string"
+            }
+          },
+          {
+            "title": "Match Time",
+            "x": 256.0,
+            "y": 640.0,
+            "width": 512.0,
+            "height": 128.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/SmartDashboard/Match/Time",
+              "period": 0.06,
+              "data_type": "double",
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 20,
+              "yellow_start_time": 30
+            }
+          },
+          {
+            "title": "Shooter Aligned",
+            "x": 768.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/Aligned",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Flywheels at Speed",
+            "x": 0.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/FlywheelsAtTarget",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "FMSInfo",
+            "x": 1024.0,
+            "y": 640.0,
+            "width": 640.0,
+            "height": 128.0,
+            "type": "FMSInfo",
+            "properties": {
+              "topic": "/FMSInfo",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "SendableChooser[0]",
+            "x": 1024.0,
+            "y": 512.0,
+            "width": 640.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/SendableChooser[0]",
+              "period": 0.06,
+              "sort_options": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tab 2",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "kP",
+            "x": 640.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tunables/Shooter/kP",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kI",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tunables/Shooter/kI",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kD",
+            "x": 896.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tunables/Shooter/kD",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kA",
+            "x": 640.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tunables/Shooter/kA",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "kV",
+            "x": 768.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tunables/Shooter/kV",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "kS",
+            "x": 896.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tunables/Shooter/kS",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Motor31RPM",
+            "x": 1024.0,
+            "y": 256.0,
+            "width": 640.0,
+            "height": 512.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/Motor31RPM",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Motor9RPM",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/Motor9RPM",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "TopTargetRPM",
+            "x": 1024.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/TopTargetRPM",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "TopTargetRPM",
+            "x": 768.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tunables/Shooter/TopTargetRPM",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "FlywheelsReady",
+            "x": 1152.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/FlywheelsReady",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "ForwardDistance",
+            "x": 640.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/ForwardDistance",
+              "period": 0.06,
+              "data_type": "double"
+            }
+          },
+          {
+            "title": "FirstShotBoost",
+            "x": 640.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tunables/Shooter/FirstShotBoost",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

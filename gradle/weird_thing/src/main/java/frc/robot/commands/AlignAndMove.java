@@ -1,0 +1,85 @@
+package frc.robot.commands;
+
+import static org.wpilib.units.Units.Degree;
+
+import frc.robot.IOConstants;
+import frc.robot.subsystems.Drive.Swerve;
+import frc.robot.subsystems.Vision.Cameras;
+import java.util.function.BooleanSupplier;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.math.geometry.Translation2d;
+
+/** Swerve drive command used for teleop period. */
+public class AlignAndMove extends Command {
+  private Swerve s_Swerve;
+  private BooleanSupplier robotCentricSup;
+  private CommandXboxController driver;
+  private int ticks;
+
+  public AlignAndMove(
+      Swerve s_Swerve, CommandXboxController driver, BooleanSupplier robotCentricSup) {
+    this.s_Swerve = s_Swerve;
+    addRequirements(s_Swerve);
+    this.driver = driver;
+    this.robotCentricSup = robotCentricSup;
+    ticks = 0;
+  }
+
+  @Override
+  public void initialize() {
+    // Initialize so that the swerve doesn't become grumpy
+    s_Swerve.resetModulesToAbsolute();
+    Cameras.setPipelineForVisibleTag();
+    s_Swerve.resetTurnController();
+    s_Swerve.setTurnControllerGoal(
+        Degree.of(Cameras.FRONT.getTXDegrees() + s_Swerve.getHeadingDegrees()));
+  }
+
+  @Override
+  public void execute() {
+    if (!Cameras.FRONT.hasTarget() && ticks >= 50) {
+      Cameras.setPipelineForVisibleTag();
+      ticks = 0;
+    }
+    if (Cameras.FRONT.getCurrentPipelineIndex() == 0) {
+      Cameras.setPipelineForVisibleTag();
+    }
+    s_Swerve.setTurnControllerGoal(
+        Degree.of(Cameras.FRONT.getTXDegrees() + s_Swerve.getHeadingDegrees()));
+    /* Get Values, Deadband*/
+    double[] driverInputs = IOConstants.getDriverInputs(driver.getController());
+    /* Drive */
+    if (Math.abs(Cameras.FRONT.getTXDegrees()) <= 2) {
+      s_Swerve.drive(
+          new Translation2d(driverInputs[0], driverInputs[1]),
+          0.0,
+          !robotCentricSup.getAsBoolean(),
+          false);
+    } else {
+      s_Swerve.drive(
+          new Translation2d(driverInputs[0], driverInputs[1]),
+          s_Swerve.getTurnPidSpeed(),
+          !robotCentricSup.getAsBoolean(),
+          false);
+    }
+
+    if (Math.abs(Cameras.FRONT.getTXDegrees()) <= 2
+        && (Math.abs(driverInputs[0]) <= 0.1 && Math.abs(driverInputs[1]) <= 0.1)) {
+      s_Swerve.lockWheels();
+    }
+    ticks++;
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    s_Swerve.stopDriving();
+    Cameras.FRONT.setPipelineIndex(0);
+    System.out.println("DONE ALIGNINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
+  }
+
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
+}
