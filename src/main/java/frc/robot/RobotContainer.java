@@ -142,9 +142,10 @@ public class RobotContainer {
 
     // m_driverController.x().whileTrue(new ShooterTESTER(m_shooter, belt));
 
-    passMid.whileTrue(new PassToAlliance(m_angler, m_shooter, belt, m_driverController, 2200));
+    passMid.whileTrue(new PassToAlliance(m_angler, m_shooter, belt, m_driverController, 2200, 32));
 
-    passFar.whileTrue(new PassToAlliance(m_angler, m_shooter, belt, m_driverController, 3100));
+    passFar.whileTrue(new PassToAlliance(m_angler, m_shooter, belt, m_driverController, 3100, 32));
+    m_driverController.x().whileTrue(new PassToAlliance(m_angler, m_shooter, belt, m_driverController, -1500, 0));
 
     intakeOut.whileTrue(new TestRollerCommand(true));
 

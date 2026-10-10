@@ -22,19 +22,21 @@ public class PassToAlliance extends Command {
   CommandXboxController controller;
 
   double rpm;
+  int angle;
 
   public PassToAlliance(
       AnglerSubsystem m_angler,
       ShooterSubsystem m_shoot,
       BeltSubsystem m_belt,
       CommandXboxController controller,
-      double rpm) {
+      double rpm, int angle) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.m_angler = m_angler;
     this.m_shoot = m_shoot;
     this.m_belt = m_belt;
     this.controller = controller;
     this.rpm = rpm;
+    this.angle = angle;
     addRequirements(m_angler, m_shoot, m_belt);
   }
 
@@ -45,7 +47,7 @@ public class PassToAlliance extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_angler.setAngle(32);
+    m_angler.setAngle(angle);
     m_shoot.runAtTargetVelocity(rpm, controller);
     m_belt.simpleDrive(-0.5);
   }
