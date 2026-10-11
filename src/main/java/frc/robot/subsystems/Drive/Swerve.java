@@ -119,31 +119,27 @@ public class Swerve extends SubsystemBase {
           new SwerveModule(
               0,
               SwerveConstants.BACK_RIGHT_MODULE,
-              // RobotBase.isSimulation()
-              // ? new SwerveModuleIOSim()
-              // :
-              new SwerveModuleIOTalonFXSparkMax(SwerveConstants.BACK_RIGHT_MODULE)),
+              RobotBase.isSimulation()
+                ? new SwerveModuleIOSim()
+                : new SwerveModuleIOTalonFXSparkMax(SwerveConstants.BACK_RIGHT_MODULE)),
           new SwerveModule(
               1,
               SwerveConstants.BACK_LEFT_MODULE,
-              // RobotBase.isSimulation()
-              // ? new SwerveModuleIOSim()
-              // :
-              new SwerveModuleIOTalonFXSparkMax(SwerveConstants.BACK_LEFT_MODULE)),
+                RobotBase.isSimulation()
+                  ? new SwerveModuleIOSim()
+                  : new SwerveModuleIOTalonFXSparkMax(SwerveConstants.BACK_LEFT_MODULE)),
           new SwerveModule(
               2,
               SwerveConstants.FRONT_RIGHT_MODULE,
-              // RobotBase.isSimulation()
-              // ? new SwerveModuleIOSim()
-              // :
-              new SwerveModuleIOTalonFXSparkMax(SwerveConstants.FRONT_RIGHT_MODULE)),
+                RobotBase.isSimulation()
+                  ? new SwerveModuleIOSim()
+                  : new SwerveModuleIOTalonFXSparkMax(SwerveConstants.FRONT_RIGHT_MODULE)),
           new SwerveModule(
               3,
               SwerveConstants.FRONT_LEFT_MODULE,
-              // RobotBase.isSimulation()
-              // ? new SwerveModuleIOSim()
-              // :
-              new SwerveModuleIOTalonFXSparkMax(SwerveConstants.FRONT_LEFT_MODULE))
+                RobotBase.isSimulation()
+                  ? new SwerveModuleIOSim()
+                  : new SwerveModuleIOTalonFXSparkMax(SwerveConstants.FRONT_LEFT_MODULE))
         };
 
     poseEstimator =
@@ -501,6 +497,9 @@ public class Swerve extends SubsystemBase {
     for (SwerveModule mod : mSwerveMods) {
       if (driveFFChanged) mod.updateDriveFeedForward();
       mod.periodic();
+    }
+    if (gyro instanceof GyroIOSim simGyro) {
+      simGyro.updateFromChassisSpeeds(getRobotRelativeSpeeds());
     }
     Double timestamp = Timer.getTimestamp();
 

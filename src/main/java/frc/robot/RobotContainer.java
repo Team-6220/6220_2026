@@ -9,6 +9,7 @@ import frc.robot.commands.ArmToPositionCommand;
 import frc.robot.commands.ArmUpAndDown;
 import frc.robot.commands.Autos.BasicAutoBlue;
 import frc.robot.commands.Autos.BasicAutoRed;
+import frc.robot.commands.Autos.SamAuto.BrightTryMakeAuto;
 import frc.robot.commands.Autos.SamAuto.SamAutoV1;
 import frc.robot.commands.Autos.SamAuto.SamAutoV2;
 import frc.robot.commands.ManualArm;
@@ -92,6 +93,8 @@ public class RobotContainer {
         "Blue", new BasicAutoBlue(s_Swerve, m_angler, m_shooter, belt, m_driverController));
     autoChooser.add("samautov1", new SamAutoV1(s_Swerve));
     autoChooser.add("samautov2", new SamAutoV2(s_Swerve));
+    autoChooser.add("brightAuto", new BrightTryMakeAuto(s_Swerve, arm, m_driverController, m_angler, m_shooter, belt));
+
     autoChooser.onChange(command -> System.out.println("Auto selected: " + command.getName()));
     Tunables.publish("Auto Chooser", autoChooser);
     configureBindings();
