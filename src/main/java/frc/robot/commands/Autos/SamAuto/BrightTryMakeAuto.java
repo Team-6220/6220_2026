@@ -4,6 +4,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 
+import frc.robot.AutoConstants;
 import frc.robot.commands.AlignAndMove;
 import frc.robot.commands.ArmToPositionCommand;
 import frc.robot.commands.DriveToPose;
@@ -23,6 +24,7 @@ import org.wpilib.command2.WaitCommand;
 import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import static org.wpilib.units.Units.MetersPerSecond;
 
 public class BrightTryMakeAuto extends SequentialCommandGroup{
       /** Starting pose (toptostation.path first anchor, idealStartingState rotation). */
@@ -59,11 +61,14 @@ public class BrightTryMakeAuto extends SequentialCommandGroup{
     for (Pose2d waypoint : ALIGNTOOUTPOST) {
       addCommands(new DriveToPose(swerve, waypoint).withTimeout(WAYPOINT_TIMEOUT_SECONDS));
     };
+    addCommands(new InstantCommand(()-> AutoConstants.translationMaxVelMpsTN.set(MetersPerSecond.of(0.5).in(MetersPerSecond))));
     addCommands(new TestRollerCommand(true)
       .alongWith(new ArmToPositionCommand(this.arm, -2)).withDeadline(
         new DriveToPose(swerve, INTAKEWAYPOINTS[0]).withTimeout(WAYPOINT_TIMEOUT_SECONDS).andThen(new WaitCommand(0.5))
       )
       );
+          addCommands(new InstantCommand(()-> AutoConstants.translationMaxVelMpsTN.set(MetersPerSecond.of(5).in(MetersPerSecond))));
+
   for (Pose2d waypoint : SHOOTWAYPOINTS) {
       addCommands(new DriveToPose(swerve, waypoint).withTimeout(WAYPOINT_TIMEOUT_SECONDS));
     };
